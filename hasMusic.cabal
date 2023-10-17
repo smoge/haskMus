@@ -3,7 +3,7 @@ cabal-version:       2.2
 name:                hasMusic
 version:             0.1.0.0
 synopsis:            algorithm composition toolkit in haskell
-description:         algorithm composition toolkit in haskell
+description:         Algorithm composition toolkit library and DSL designed creation, manipulation, of music structures.
 homepage:            https://github.com/githubuser/hasMusic#readme
 license:             GPL-3.0-or-later
 --license-file:        license
