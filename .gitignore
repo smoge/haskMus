@@ -7,6 +7,7 @@
 node_modules/
 dist/
 
+
 # Compiled Java class files
 *.class
 
@@ -166,6 +167,19 @@ Sessionx.vim
 tags
 # Persistent undo
 [._]*.un~
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
 
 .vscode/*
 !.vscode/settings.json

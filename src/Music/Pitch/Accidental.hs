@@ -158,7 +158,7 @@ accToLily (Custom r) = T.pack $ show r
 
 
 
-nstance IsString Accidental where
+instance IsString Accidental where
   fromString "ff" = DoubleFlat
   fromString "tqf" = ThreeQuartersFlat
   fromString "f" = Flat
