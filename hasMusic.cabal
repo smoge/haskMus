@@ -5,8 +5,8 @@ version:             0.1.0.0
 -- synopsis:
 -- description:
 homepage:            https://github.com/githubuser/hasMusic#readme
--- license:             GPL-3.0-or-later
--- license-file:        license
+license:             GPL-3.0-or-later
+license-file:        license
 author:              bernardo barros
 maintainer:          example@example.com
 copyright:           2023 Bernardo Barros
