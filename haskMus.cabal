@@ -16,9 +16,8 @@ build-type:          Simple
 -- extra-source-files:  readme.md
 --                      changelog.md
 
-tested-with:
-  GHC==9.4.7
-  GHC==9.6.3
+tested-with: GHC ==9.4.7 || ==9.6.3
+
 
 library
   hs-source-dirs:      src

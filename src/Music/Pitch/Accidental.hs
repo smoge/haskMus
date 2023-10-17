@@ -187,22 +187,23 @@ instance IsString Accidental where
     | "custom " `isPrefixOf` str = Custom (read (drop 7 str) :: Rational)
     | otherwise = error $ "Invalid Accidental string: " ++ str
 
-accStr1 :: Accidental
-accStr1 = "♭" 
-accStr2 :: Accidental
-accStr2 = "♯" 
-accStr3 :: Accidental
-accStr3 = "♮" 
-accStr4 :: Accidental
-accStr4 = "𝄫" 
-accStr5 :: Accidental
-accStr5 = "𝄪" 
-accStr6 :: Accidental
-accStr6 = "𝄳" 
-accStr7 :: Accidental
-accStr7 = "𝄲" 
 
 {-
+>>> accStr1 :: Accidental
+>>> accStr1 = "♭"
+>>> accStr2 :: Accidental
+>>> accStr2 = "♯"
+>>> accStr3 :: Accidental
+>>> accStr3 = "♮"
+>>> accStr4 :: Accidental
+>>> accStr4 = "𝄫"
+>>> accStr5 :: Accidental
+>>> accStr5 = "𝄪"
+>>> accStr6 :: Accidental
+>>> accStr6 = "𝄳"
+>>> accStr7 :: Accidental
+>>> accStr7 = "𝄲"
+
 >>> accStr1 == Flat
 True
 >>> accStr2 == Sharp
