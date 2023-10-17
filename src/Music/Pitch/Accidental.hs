@@ -3,6 +3,7 @@
 
 {-# HLINT ignore "Redundant bracket" #-}
 {-# HLINT ignore "Eta reduce" #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
 module Music.Pitch.Accidental
   ( Accidental (..),
@@ -38,6 +39,8 @@ data Accidental
   | Custom Rational
   deriving (Eq, Ord, Show)
 
+
+
 -- | Converts a string to an accidental
 -- >>>  "ff" ::  Accidental
 -- >>>  "n" ::  Accidental
@@ -65,9 +68,55 @@ instance IsString Accidental where
   fromString "semisharp" = QuarterSharp
   fromString "quarterflat" = QuarterFlat
   fromString "semiflat" = QuarterFlat
+  fromString "♭" = Flat 
+  fromString "♯" = Sharp
+  fromString "♮" = Natural
+  fromString "𝄫" = DoubleFlat
+  fromString "𝄪" = DoubleSharp
+  fromString "𝄳" = QuarterFlat
+  fromString "𝄲" = QuarterSharp
   fromString str
     | "custom " `isPrefixOf` str = Custom (read (drop 7 str) :: Rational)
     | otherwise = error $ "Invalid Accidental string: " ++ str
+
+accStr1 :: Accidental
+accStr1 = "♭" 
+accStr2 :: Accidental
+accStr2 = "♯" 
+accStr3 :: Accidental
+accStr3 = "♮" 
+accStr4 :: Accidental
+accStr4 = "𝄫" 
+accStr5 :: Accidental
+accStr5 = "𝄪" 
+accStr6 :: Accidental
+accStr6 = "𝄳" 
+accStr7 :: Accidental
+accStr7 = "𝄲" 
+
+{-
+>>> accStr1 == Flat
+True
+>>> accStr2 == Sharp
+True
+>>> accStr3 == Natural
+True
+>>> accStr4 == DoubleFlat
+True
+>>> accStr5 == DoubleSharp
+True
+>>> accStr6 == QuarterFlat
+True
+>>> accStr7 == QuarterSharp
+True
+-}
+
+
+-- "𝄱" :: Accidental
+-- "𝄰" :: Accidental
+-- "𝄭" :: Accidental
+-- "𝄬" :: Accidental
+
 
 instance Num Accidental where
   (+) a b = toAccidental $ accidentalToSemitones a + accidentalToSemitones b

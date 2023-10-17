@@ -1,6 +1,7 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -11,11 +12,24 @@ module Music.Pitch.Pitch where
 import Control.Lens hiding (elements)
 import Data.Ratio ((%))
 import Music.Pitch.Accidental
+import Data.String
+import qualified Data.Text as T
 import Test.QuickCheck
 
 -- | Represents a note name (C, D, E, etc.).
 data NoteName = C | D | E | F | G | A | B
   deriving (Eq, Ord, Show, Enum, Bounded)
+
+instance IsString NoteName where
+  fromString :: String -> NoteName
+  fromString "c" = C
+  fromString "d" = D
+  fromString "e" = E
+  fromString "f" = F
+  fromString "g" = G
+  fromString "a" = A
+  fromString "b" = B
+  fromString s = error $ "Invalid NoteName string: " ++ s
 
 -- |
 -- This type represents standard basis for intervals.
@@ -34,6 +48,36 @@ data PitchClass where
   deriving (Eq, Ord)
 
 makeLenses ''PitchClass
+
+instance IsString PitchClass where
+  fromString :: String -> PitchClass
+  fromString "C" = PitchClass C Natural
+  fromString "c" = PitchClass C Natural
+  fromString "C#" = PitchClass C Sharp
+  fromString "c#" = PitchClass C Sharp
+  fromString "D" = PitchClass D Natural
+  fromString "d" = PitchClass D Natural
+  fromString "D#" = PitchClass D Sharp
+  fromString "d#" = PitchClass D Sharp
+  fromString "E" = PitchClass E Natural
+  fromString "e" = PitchClass E Natural
+  fromString "E#" = PitchClass E Sharp
+  fromString "e#" = PitchClass E Sharp
+  fromString "F" = PitchClass F Natural
+  fromString "f" = PitchClass F Natural
+  fromString "F#" = PitchClass F Sharp
+  fromString "f#" = PitchClass F Sharp
+  fromString "G" = PitchClass G Natural
+  fromString "g" = PitchClass G Natural
+  fromString "G#" = PitchClass G Sharp
+  fromString "g#" = PitchClass G Sharp
+  fromString "A" = PitchClass A Natural
+  fromString "a" = PitchClass A Natural
+  fromString "A#" = PitchClass A Sharp
+  fromString "a#" = PitchClass A Sharp
+  fromString "B" = PitchClass B Natural
+  fromString "b" = PitchClass B Natural
+  fromString s = error $ "Invalid PitchClass string: " ++ s
 
 instance Show PitchClass where
   show :: PitchClass -> String
