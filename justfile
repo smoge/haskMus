@@ -17,4 +17,5 @@ test:
 make-ci:
     haskell-ci github hasMusic.cabal
 
-    
+cabal-bounds:
+    cabal gen-bounds    
