@@ -52,72 +52,8 @@ data Accidental
 -- Natural
 -- QuarterSharp
 -- QuarterFlat
-instance IsString Accidental where
-  fromString "ff" = DoubleFlat
-  fromString "tqf" = ThreeQuartersFlat
-  fromString "f" = Flat
-  fromString "qf" = QuarterFlat
-  fromString "" = Natural
-  fromString "n" = Natural
-  fromString "qs" = QuarterSharp
-  fromString "s" = Sharp
-  fromString "tqs" = ThreeQuartersSharp
-  fromString "ss" = DoubleSharp
-  fromString "sharp" = Sharp
-  fromString "flat" = Flat
-  fromString "natural" = Natural
-  fromString "quartersharp" = QuarterSharp
-  fromString "semisharp" = QuarterSharp
-  fromString "quarterflat" = QuarterFlat
-  fromString "semiflat" = QuarterFlat
-  fromString "♭" = Flat 
-  fromString "♯" = Sharp
-  fromString "♮" = Natural
-  fromString "𝄫" = DoubleFlat
-  fromString "𝄪" = DoubleSharp
-  fromString "𝄳" = QuarterFlat
-  fromString "𝄲" = QuarterSharp
-  fromString str
-    | "custom " `isPrefixOf` str = Custom (read (drop 7 str) :: Rational)
-    | otherwise = error $ "Invalid Accidental string: " ++ str
 
-accStr1 :: Accidental
-accStr1 = "♭" 
-accStr2 :: Accidental
-accStr2 = "♯" 
-accStr3 :: Accidental
-accStr3 = "♮" 
-accStr4 :: Accidental
-accStr4 = "𝄫" 
-accStr5 :: Accidental
-accStr5 = "𝄪" 
-accStr6 :: Accidental
-accStr6 = "𝄳" 
-accStr7 :: Accidental
-accStr7 = "𝄲" 
-
-{-
->>> accStr1 == Flat
-True
->>> accStr2 == Sharp
-True
->>> accStr3 == Natural
-True
->>> accStr4 == DoubleFlat
-True
->>> accStr5 == DoubleSharp
-True
->>> accStr6 == QuarterFlat
-True
->>> accStr7 == QuarterSharp
-True
--}
-
-
--- "𝄱" :: Accidental
--- "𝄰" :: Accidental
--- "𝄭" :: Accidental
--- "𝄬" :: Accidental
+i
 
 
 instance Num Accidental where
@@ -219,6 +155,76 @@ accToLily Sharp = T.pack "s"
 accToLily ThreeQuartersSharp = T.pack "tqs"
 accToLily DoubleSharp = T.pack "ss"
 accToLily (Custom r) = T.pack $ show r
+
+
+
+nstance IsString Accidental where
+  fromString "ff" = DoubleFlat
+  fromString "tqf" = ThreeQuartersFlat
+  fromString "f" = Flat
+  fromString "qf" = QuarterFlat
+  fromString "" = Natural
+  fromString "n" = Natural
+  fromString "qs" = QuarterSharp
+  fromString "s" = Sharp
+  fromString "tqs" = ThreeQuartersSharp
+  fromString "ss" = DoubleSharp
+  fromString "sharp" = Sharp
+  fromString "flat" = Flat
+  fromString "natural" = Natural
+  fromString "quartersharp" = QuarterSharp
+  fromString "semisharp" = QuarterSharp
+  fromString "quarterflat" = QuarterFlat
+  fromString "semiflat" = QuarterFlat
+  fromString "♭" = Flat 
+  fromString "♯" = Sharp
+  fromString "♮" = Natural
+  fromString "𝄫" = DoubleFlat
+  fromString "𝄪" = DoubleSharp
+  fromString "𝄳" = QuarterFlat
+  fromString "𝄲" = QuarterSharp
+  fromString str
+    | "custom " `isPrefixOf` str = Custom (read (drop 7 str) :: Rational)
+    | otherwise = error $ "Invalid Accidental string: " ++ str
+
+accStr1 :: Accidental
+accStr1 = "♭" 
+accStr2 :: Accidental
+accStr2 = "♯" 
+accStr3 :: Accidental
+accStr3 = "♮" 
+accStr4 :: Accidental
+accStr4 = "𝄫" 
+accStr5 :: Accidental
+accStr5 = "𝄪" 
+accStr6 :: Accidental
+accStr6 = "𝄳" 
+accStr7 :: Accidental
+accStr7 = "𝄲" 
+
+{-
+>>> accStr1 == Flat
+True
+>>> accStr2 == Sharp
+True
+>>> accStr3 == Natural
+True
+>>> accStr4 == DoubleFlat
+True
+>>> accStr5 == DoubleSharp
+True
+>>> accStr6 == QuarterFlat
+True
+>>> accStr7 == QuarterSharp
+True
+-}
+
+
+-- "𝄱" :: Accidental
+-- "𝄰" :: Accidental
+-- "𝄭" :: Accidental
+-- "𝄬" :: Accidental
+
 
 -- | Modify the accidental by applying a function to its semitone value. Returns the modified accidental.
 -- >>> modifyAccidental Sharp (*2) == DoubleSharp
