@@ -1,10 +1,10 @@
 cabal-version:       2.2
---  haskMusic 
-name:                hasMusic  
+
+name:                haskMus  
 version:             0.1.0.0
 synopsis:            algorithm composition toolkit in haskell
 description:         Algorithm composition toolkit library and DSL designed creation, manipulation, of music structures.
-homepage:            https://github.com/githubuser/hasMusic#readme
+homepage:            https://github.com/githubuser/haskMus#readme
 license:             GPL-3.0-or-later
 --license-file:        license
 author:              bernardo barros
@@ -43,11 +43,11 @@ library
                        -Wpartial-fields
                        -Wredundant-constraints
 
-executable hasMusic-exe
+executable haskMus-exe
   hs-source-dirs:      app
   main-is:             Main.hs
   build-depends:       base
-                     , hasMusic
+                     , haskMus
   default-language:    Haskell2010
   ghc-options:         -Wall
                        -Wcompat
@@ -62,7 +62,7 @@ executable hasMusic-exe
                        -rtsopts
                        -with-rtsopts=-N
 
-test-suite hasMusic-test
+test-suite haskMus-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Test.hs
@@ -70,7 +70,7 @@ test-suite hasMusic-test
                      , PitchSpec
                      , PitchProperties
   build-depends:       base
-                     , hasMusic
+                     , haskMus
                      , hspec >= 2.10.0 && < 2.12
                      , lens >= 5.2.3 && < 5.3
                      , HUnit >= 1.6.2 && < 1.7
@@ -94,4 +94,4 @@ test-suite hasMusic-test
 
 source-repository head
   type:     git
-  location: https://github.com/smoge/hasMusic
+  location: https://github.com/smoge/haskMus
