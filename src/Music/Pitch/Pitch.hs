@@ -47,7 +47,6 @@ data PitchClass where
     PitchClass
   deriving (Eq, Ord)
 
-makeLenses ''PitchClass
 
 
 instance Show PitchClass where
@@ -75,6 +74,15 @@ data Pitch where
 instance Show Pitch where
   show :: Pitch -> String
   show (Pitch name acc oct) = show name ++ " " ++ show acc ++ " " ++ show oct
+
+makeLensesFor
+  [ ("PitchClass", "_noteName"),
+    ("PitchClass", "_accidental"),
+    ("Pitch", "_noteName"),
+    ("Pitch", "_accidental"),
+    ("Pitch", "_octave")
+  ]
+  ''PitchClass
 
 class HasNoteName a where
   noteName :: Lens' a NoteName
@@ -111,8 +119,8 @@ instance HasOctave Octave where
   octave = id
 
 instance HasOctave Pitch where
-  octave :: Lens' Pitch Octave
   octave = lens _octave (\(Pitch nn acc _) o -> Pitch nn acc o)
+
 
 
 instance IsString PitchClass where
