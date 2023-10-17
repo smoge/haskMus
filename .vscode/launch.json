@@ -18,7 +18,7 @@
             "mainArgs": "",
             "ghciPrompt": "H>>= ",
             "ghciInitialPrompt": "> ",
-            "ghciCmd": "stack ghci --with-ghc=ghci-dap --test --no-load --no-build --main-is TARGET",
+            "ghciCmd": "stack ghci --with-ghc=ghci-dap --test  --main-is TARGET",
             "ghciEnv": {},
             "logFile": "${workspaceFolder}/.vscode/phoityne.log",
             "logLevel": "WARNING",
