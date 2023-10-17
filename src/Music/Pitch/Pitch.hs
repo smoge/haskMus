@@ -4,13 +4,13 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Music.Pitch.Pitch where
 
 import Control.Lens hiding (elements)
+import Data.Ratio ((%))
 import Music.Pitch.Accidental
--- import Data.Ratio ((%))
-
 import Test.QuickCheck
 
 -- | Represents a note name (C, D, E, etc.).
@@ -61,103 +61,43 @@ instance Show Pitch where
   show :: Pitch -> String
   show (Pitch name acc oct) = show name ++ " " ++ show acc ++ " " ++ show oct
 
-class HasPitchClass t where
-  pitchClass :: Lens' t PitchClass
-  noteName :: Lens' t NoteName
-  accidental :: Lens' t Accidental
+class HasNoteName a where
+  noteName :: Lens' a NoteName
 
--- class HasPitchClass t where
---     noteName :: Lens' t NoteName
---     accidental :: Lens' t Accidental
+class HasAccidental a where
+  accidental :: Lens' a Accidental
+
+class HasPitchClass a where
+  pitchClass :: Lens' a PitchClass
+
+class HasOctave a where
+  octave :: Lens' a Octave
+
+instance HasNoteName Pitch where
+  noteName f (Pitch nn acc o) = (\nn' -> Pitch nn' acc o) <$> f nn
+
+instance HasAccidental Pitch where
+  accidental f (Pitch nn acc o) = (\acc' -> Pitch nn acc' o) <$> f acc
 
 instance HasPitchClass Pitch where
   pitchClass :: Lens' Pitch PitchClass
   pitchClass f (Pitch nn acc o) = (\(PitchClass nn' acc') -> Pitch nn' acc' o) <$> f (PitchClass nn acc)
 
-  noteName :: Lens' Pitch NoteName
-  noteName f (Pitch nn acc o) = (\nn' -> Pitch nn' acc o) <$> f nn
-
-  accidental :: Lens' Pitch Accidental
-  accidental f (Pitch nn acc o) = (\acc' -> Pitch nn acc' o) <$> f acc
-
-instance HasPitchClass PitchClass where
-  pitchClass :: Lens' PitchClass PitchClass
-  pitchClass = id
-  noteName :: Lens' PitchClass NoteName
+instance HasNoteName PitchClass where
   noteName f (PitchClass nn acc) = (`PitchClass` acc) <$> f nn
 
-  -- noteName = lens noteName (\(PitchClass _ acc) nn -> PitchClass nn acc)
-  accidental :: Lens' PitchClass Accidental
+instance HasAccidental PitchClass where
   accidental f (PitchClass nn acc) = PitchClass nn <$> f acc
 
--- ! FIXME
-
-instance HasPitchClass Accidental where
-  accidental :: Lens' Accidental Accidental
+instance HasAccidental Accidental where
   accidental = id
 
-  pitchClass :: Lens' Accidental PitchClass
-  pitchClass = lens getPitchClass setPitchClass
-    where
-      getPitchClass :: Accidental -> PitchClass
-      getPitchClass = PitchClass C
+instance HasOctave Octave where
+  octave = id
 
-      setPitchClass :: Accidental -> PitchClass -> Accidental
-      setPitchClass _ pc = pc ^. accidental
-
-class HasAccidental a where
-  accidentalLens :: Lens' a Accidental
-
-instance HasAccidental Pitch where
-  accidentalLens = lens getAccidental setAccidental
-    where
-      getAccidental :: Pitch -> Accidental
-      getAccidental (Pitch _ acc _) = acc
-
-      setAccidental :: Pitch -> Accidental -> Pitch
-      setAccidental (Pitch nn _ o) acc' = Pitch nn acc' o
-
-instance HasAccidental PitchClass where
-  accidentalLens = lens getAccidental setAccidental
-    where
-      getAccidental :: PitchClass -> Accidental
-      getAccidental (PitchClass _ acc) = acc
-
-      setAccidental :: PitchClass -> Accidental -> PitchClass
-      setAccidental (PitchClass nn _) = PitchClass nn
-
-octave :: Lens' Pitch Octave
-octave = lens _octave (\(Pitch nn acc _) o -> Pitch nn acc o)
-
-{-
-
-// ALTERNATIVE
-
-class HasNoteName a where
-    noteName :: Lens' a NoteName
-
-class HasAccidental a where
-    accidental :: Lens' a Accidental
-
-class HasPitchClass a where
-    pitchClass :: Lens' a PitchClass
-
-instance HasNoteName Pitch where
-    noteName f (Pitch nn acc o) = (\nn' -> Pitch nn' acc o) <$> f nn
-
-instance HasAccidental Pitch where
-    accidental f (Pitch nn acc o) = (\acc' -> Pitch nn acc' o) <$> f acc
-
-instance HasPitchClass Pitch where
-    pitchClass f (Pitch nn acc o) = (\(PitchClass nn' acc') -> Pitch nn' acc' o) <$> f (PitchClass nn acc)
-
-instance HasNoteName PitchClass where
-    noteName f (PitchClass nn acc) = (`PitchClass` acc) <$> f nn
-
-instance HasAccidental PitchClass where
-    accidental f (PitchClass nn acc) = PitchClass nn <$> f acc
-
- -}
+instance HasOctave Pitch where
+  octave :: Lens' Pitch Octave
+  octave = lens _octave (\(Pitch nn acc _) o -> Pitch nn acc o)
 
 {-
 >>> c = PitchClass C Natural
@@ -166,20 +106,25 @@ instance HasAccidental PitchClass where
 C
 Natural
 
->>> c & accidental .~ Sharp  -- Changes the accidental of 'c' to Sharp
+-- Changes the accidental of 'c' to Sharp
+>>> c & accidental .~ Sharp
 C Sharp
 
+>>> c = PitchClass C Natural
 >>> c & accidental %~ (\x -> addAccidental x (1%2))
 C QuarterSharp
 
 >>> pitchClasses = map (\x -> PitchClass x Natural) [C .. B]
->>> pitchClasses & each . accidental .~ Flat  -- Changes the accidental of every PitchClass in the list to Flat
+-- Changes the accidental of every PitchClass in the list to Flat
+>>> pitchClasses & each . accidental .~ Flat
 [C Flat,D Flat,E Flat,F Flat,G Flat,A Flat,B Flat]
 
->>> has (accidental . only Natural) c  -- Checks if 'c' has an accidental of Natural
+-- Checks if 'c' has an accidental of Natural
+>>> has (accidental . only Natural) c
 True
 
->>> c & accidental . filtered (== Natural) .~ Flat  -- If the accidental is Natural, change it to Flat.
+-- If the accidental is Natural, change it to Flat.
+>>> c & accidental . filtered (== Natural) .~ Flat
 C Flat
 
 -}
@@ -215,11 +160,11 @@ C Natural Octave 5
 
 >>> p & octave %~ (\(Octave o) -> Octave (o + 1))  -- Increment the octave by 1
 C Natural Octave 5
-
 -}
 
 ---------------------------------------------------------------------------------
--- Music.Pitch.Pitch
+-- QuickCheck
+---------------------------------------------------------------------------------
 
 instance Arbitrary NoteName where
   arbitrary = elements [C, D, E, F, G, A, B]
