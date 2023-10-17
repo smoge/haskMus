@@ -17,6 +17,7 @@ module Music.Pitch.Accidental
     allAccidentals,
     allSemitones,
     invertAccidental'',
+    AccidentalString(..)
   )
 where
 
@@ -307,3 +308,37 @@ instance Arbitrary Accidental where
       [ (10, elements allAccidentals), -- Picking from the predefined list
         (1, Custom <$> arbitrary) -- Picking a custom accidental
       ]
+
+
+-- Newtype wrapper for specific accidental strings
+newtype AccidentalString = AccidentalString String
+    deriving (Show)
+
+-- Arbitrary instance for AccidentalString (QuickCheck)
+instance Arbitrary AccidentalString where
+  arbitrary = AccidentalString <$> elements
+    [ "ff"
+    , "tqf"
+    , "f"
+    , "qf"
+    , ""
+    , "n"
+    , "qs"
+    , "s"
+    , "tqs"
+    , "ss"
+    , "sharp"
+    , "flat"
+    , "natural"
+    , "quartersharp"
+    , "semisharp"
+    , "quarterflat"
+    , "semiflat"
+    , "♭"
+    , "♯"
+    , "♮"
+    , "𝄫"
+    , "𝄪"
+    , "𝄳"
+    , "𝄲"
+    ]
