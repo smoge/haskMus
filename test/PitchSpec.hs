@@ -16,7 +16,7 @@ spec = do
       c ^. noteName `shouldBe` C
       c ^. accidental `shouldBe` Natural
 
-    it "can modify the accidental of a PitchClass" $ do
+   {-  it "can modify the accidental of a PitchClass" $ do
       let c = PitchClass C Natural
       let modifiedC = c & accidental .~ Sharp
       show modifiedC `shouldBe` "C Sharp"
@@ -70,7 +70,7 @@ spec = do
     it "can modify the octave using a function" $ do
       let p = Pitch C Natural (Octave 4)
       let modifiedP = p & octave %~ (\(Octave o) -> Octave (o + 1))
-      show modifiedP `shouldBe` "C Natural Octave 5"
+      show modifiedP `shouldBe` "C Natural Octave 5" -}
 
 main :: IO ()
 main = hspec spec

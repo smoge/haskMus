@@ -1,6 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-
 {-# HLINT ignore "Redundant bracket" #-}
 {-# HLINT ignore "Eta reduce" #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
@@ -17,16 +16,17 @@ module Music.Pitch.Accidental
     allAccidentals,
     allSemitones,
     invertAccidental'',
-    AccidentalString(..)
+    AccidentalString (..),
   )
 where
 
 import Data.List (isPrefixOf)
 import Data.Ratio
-
 import Data.String
 import qualified Data.Text as T
 import Test.QuickCheck
+
+-- // SECTION - ACCIDENTAL
 
 data Accidental
   = DoubleFlat
@@ -41,8 +41,6 @@ data Accidental
   | Custom Rational
   deriving (Eq, Ord, Show)
 
-
-
 -- | Converts a string to an accidental
 -- >>>  "ff" ::  Accidental
 -- >>>  "n" ::  Accidental
@@ -52,10 +50,6 @@ data Accidental
 -- Natural
 -- QuarterSharp
 -- QuarterFlat
-
-
-
-
 instance Num Accidental where
   (+) a b = toAccidental $ accidentalToSemitones a + accidentalToSemitones b
   (-) a b = toAccidental $ accidentalToSemitones a - accidentalToSemitones b
@@ -99,6 +93,7 @@ instance Bounded Accidental where
   minBound = DoubleFlat
   maxBound = DoubleSharp
 
+-- //ANCHOR toAccidental
 toAccidental :: Rational -> Accidental
 toAccidental r
   | r == (-2) = DoubleFlat
@@ -111,6 +106,8 @@ toAccidental r
   | r == 3 % 2 = ThreeQuartersSharp
   | r == 2 = DoubleSharp
   | otherwise = (Custom r)
+
+-- //ANCHOR accidentalToSemitones
 
 -- | Converts an accidental to its corresponding semitone offset as a rational number.
 accidentalToSemitones :: Accidental -> Rational
@@ -156,7 +153,7 @@ accToLily ThreeQuartersSharp = T.pack "tqs"
 accToLily DoubleSharp = T.pack "ss"
 accToLily (Custom r) = T.pack $ show r
 
-
+-- //ANCHOR OverloadedStrings
 
 instance IsString Accidental where
   fromString "ff" = DoubleFlat
@@ -176,7 +173,7 @@ instance IsString Accidental where
   fromString "semisharp" = QuarterSharp
   fromString "quarterflat" = QuarterFlat
   fromString "semiflat" = QuarterFlat
-  fromString "♭" = Flat 
+  fromString "♭" = Flat
   fromString "♯" = Sharp
   fromString "♮" = Natural
   fromString "𝄫" = DoubleFlat
@@ -186,7 +183,6 @@ instance IsString Accidental where
   fromString str
     | "custom " `isPrefixOf` str = Custom (read (drop 7 str) :: Rational)
     | otherwise = error $ "Invalid Accidental string: " ++ str
-
 
 {-
 >>> accStr1 :: Accidental
@@ -220,12 +216,12 @@ True
 True
 -}
 
-
 -- "𝄱" :: Accidental
 -- "𝄰" :: Accidental
 -- "𝄭" :: Accidental
 -- "𝄬" :: Accidental
 
+-- //ANCHOR - modifyAccidental
 
 -- | Modify the accidental by applying a function to its semitone value. Returns the modified accidental.
 -- >>> modifyAccidental Sharp (*2) == DoubleSharp
@@ -262,7 +258,9 @@ checkAccidental acc = semitonesToAccidental (accidentalToSemitones acc) == acc
 -- True
 -- True
 -- True
---
+
+-- //ANCHOR - addAccidental
+
 -- >>> addAccidental DoubleSharp (1 % 2)
 -- Custom (5 % 2)
 addAccidental ::
@@ -306,9 +304,7 @@ allAccidentals =
 allSemitones :: [Rational]
 allSemitones = map accidentalToSemitones allAccidentals
 
---------------------------------------------------------------------------------
--- QuickCheck Arbitrary
---------------------------------------------------------------------------------
+-- //ANCHOR  - QUICKCHECK
 
 instance Arbitrary Accidental where
   arbitrary =
@@ -317,36 +313,37 @@ instance Arbitrary Accidental where
         (1, Custom <$> arbitrary) -- Picking a custom accidental
       ]
 
-
 -- Newtype wrapper for specific accidental strings
 newtype AccidentalString = AccidentalString String
-    deriving (Show)
+  deriving (Show)
 
 -- Arbitrary instance for AccidentalString (QuickCheck)
 instance Arbitrary AccidentalString where
-  arbitrary = AccidentalString <$> elements
-    [ "ff"
-    , "tqf"
-    , "f"
-    , "qf"
-    , ""
-    , "n"
-    , "qs"
-    , "s"
-    , "tqs"
-    , "ss"
-    , "sharp"
-    , "flat"
-    , "natural"
-    , "quartersharp"
-    , "semisharp"
-    , "quarterflat"
-    , "semiflat"
-    , "♭"
-    , "♯"
-    , "♮"
-    , "𝄫"
-    , "𝄪"
-    , "𝄳"
-    , "𝄲"
-    ]
+  arbitrary =
+    AccidentalString
+      <$> elements
+        [ "ff",
+          "tqf",
+          "f",
+          "qf",
+          "",
+          "n",
+          "qs",
+          "s",
+          "tqs",
+          "ss",
+          "sharp",
+          "flat",
+          "natural",
+          "quartersharp",
+          "semisharp",
+          "quarterflat",
+          "semiflat",
+          "♭",
+          "♯",
+          "♮",
+          "𝄫",
+          "𝄪",
+          "𝄳",
+          "𝄲"
+        ]

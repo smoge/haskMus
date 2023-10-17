@@ -1,9 +1,9 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 
@@ -11,12 +11,13 @@ module Music.Pitch.Pitch where
 
 import Control.Lens hiding (elements)
 import Data.Ratio ((%))
-import Music.Pitch.Accidental
 import Data.String
 import qualified Data.Text as T
+import Music.Pitch.Accidental
 import Test.QuickCheck
 
--- | Represents a note name (C, D, E, etc.).
+-- .// SECTION PITCH / PITCHCLASS
+
 data NoteName = C | D | E | F | G | A | B
   deriving (Eq, Ord, Show, Enum, Bounded)
 
@@ -31,29 +32,21 @@ instance IsString NoteName where
   fromString "b" = B
   fromString s = error $ "Invalid NoteName string: " ++ s
 
--- |
--- This type represents standard basis for intervals.
 data IntervalBasis = Chromatic | Diatonic
   deriving (Eq, Ord, Show, Enum)
 
--- | Represents a pitch class (C, C#, D, D#, etc.).
 data PitchClass where
   PitchClass ::
     { _noteName :: NoteName,
-      -- | ^ The note name (C, D, E, etc.).
       _accidental :: Accidental
     } ->
-    -- \^ The accidental for the note.
     PitchClass
   deriving (Eq, Ord)
-
-
 
 instance Show PitchClass where
   show :: PitchClass -> String
   show (PitchClass name acc) = show name ++ " " ++ show acc
 
--- | Represents an octave.
 newtype Octave = Octave {getOctaves :: Int}
   deriving (Eq, Ord)
 
@@ -62,18 +55,20 @@ instance Show Octave where
 
 data Pitch where
   Pitch ::
-    { -- | The note name (C, D, E, etc.).
+    { 
       _noteName :: NoteName,
-      -- | The accidental for the note.
       _accidental :: Accidental,
       _octave :: Octave
     } ->
     Pitch
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Show)
 
-instance Show Pitch where
-  show :: Pitch -> String
-  show (Pitch name acc oct) = show name ++ " " ++ show acc ++ " " ++ show oct
+-- instance Show Pitch where
+--   show :: Pitch -> String
+--   show (Pitch name acc oct) = show name ++ " " ++ show acc ++ " " ++ show oct
+
+
+-- //ANCHOR - LENSES 
 
 makeLensesFor
   [ ("PitchClass", "_noteName"),
@@ -122,6 +117,7 @@ instance HasOctave Pitch where
   octave = lens _octave (\(Pitch nn acc _) o -> Pitch nn acc o)
 
 
+-- //ANCHOR - OVERLOADED STRINGS
 
 instance IsString PitchClass where
   fromString :: String -> PitchClass
@@ -152,7 +148,6 @@ instance IsString PitchClass where
   fromString "B" = PitchClass B Natural
   fromString "b" = PitchClass B Natural
   fromString s = error $ "Invalid PitchClass string: " ++ s
-  
 
 {-
 >>> c = PitchClass C Natural
@@ -217,9 +212,8 @@ C Natural Octave 5
 C Natural Octave 5
 -}
 
----------------------------------------------------------------------------------
--- QuickCheck
----------------------------------------------------------------------------------
+
+-- //ANCHOR - QuickCheck 
 
 instance Arbitrary NoteName where
   arbitrary = elements [C, D, E, F, G, A, B]
@@ -233,7 +227,3 @@ instance Arbitrary Octave where
 
 instance Arbitrary Pitch where
   arbitrary = Pitch <$> arbitrary <*> arbitrary <*> arbitrary
-
-
-  
-  
