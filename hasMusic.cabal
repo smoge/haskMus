@@ -2,15 +2,16 @@ cabal-version:       2.2
 
 name:                hasMusic
 version:             0.1.0.0
--- synopsis:
--- description:
+synopsis:            algorithm composition toolkit in haskell
+description:         algorithm composition toolkit in haskell
 homepage:            https://github.com/githubuser/hasMusic#readme
 license:             GPL-3.0-or-later
--- license-file:        license
+--license-file:        license
 author:              bernardo barros
 maintainer:          example@example.com
 copyright:           2023 Bernardo Barros
 category:            music
+build-type:          Simple
 -- build-type:          Simple
 -- extra-source-files:  readme.md
 --                      changelog.md
