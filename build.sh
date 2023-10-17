@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-stack build --fast --file-watch
