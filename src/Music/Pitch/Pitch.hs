@@ -49,35 +49,6 @@ data PitchClass where
 
 makeLenses ''PitchClass
 
-instance IsString PitchClass where
-  fromString :: String -> PitchClass
-  fromString "C" = PitchClass C Natural
-  fromString "c" = PitchClass C Natural
-  fromString "C#" = PitchClass C Sharp
-  fromString "c#" = PitchClass C Sharp
-  fromString "D" = PitchClass D Natural
-  fromString "d" = PitchClass D Natural
-  fromString "D#" = PitchClass D Sharp
-  fromString "d#" = PitchClass D Sharp
-  fromString "E" = PitchClass E Natural
-  fromString "e" = PitchClass E Natural
-  fromString "E#" = PitchClass E Sharp
-  fromString "e#" = PitchClass E Sharp
-  fromString "F" = PitchClass F Natural
-  fromString "f" = PitchClass F Natural
-  fromString "F#" = PitchClass F Sharp
-  fromString "f#" = PitchClass F Sharp
-  fromString "G" = PitchClass G Natural
-  fromString "g" = PitchClass G Natural
-  fromString "G#" = PitchClass G Sharp
-  fromString "g#" = PitchClass G Sharp
-  fromString "A" = PitchClass A Natural
-  fromString "a" = PitchClass A Natural
-  fromString "A#" = PitchClass A Sharp
-  fromString "a#" = PitchClass A Sharp
-  fromString "B" = PitchClass B Natural
-  fromString "b" = PitchClass B Natural
-  fromString s = error $ "Invalid PitchClass string: " ++ s
 
 instance Show PitchClass where
   show :: PitchClass -> String
@@ -142,6 +113,38 @@ instance HasOctave Octave where
 instance HasOctave Pitch where
   octave :: Lens' Pitch Octave
   octave = lens _octave (\(Pitch nn acc _) o -> Pitch nn acc o)
+
+
+instance IsString PitchClass where
+  fromString :: String -> PitchClass
+  fromString "C" = PitchClass C Natural
+  fromString "c" = PitchClass C Natural
+  fromString "C#" = PitchClass C Sharp
+  fromString "c#" = PitchClass C Sharp
+  fromString "D" = PitchClass D Natural
+  fromString "d" = PitchClass D Natural
+  fromString "D#" = PitchClass D Sharp
+  fromString "d#" = PitchClass D Sharp
+  fromString "E" = PitchClass E Natural
+  fromString "e" = PitchClass E Natural
+  fromString "E#" = PitchClass E Sharp
+  fromString "e#" = PitchClass E Sharp
+  fromString "F" = PitchClass F Natural
+  fromString "f" = PitchClass F Natural
+  fromString "F#" = PitchClass F Sharp
+  fromString "f#" = PitchClass F Sharp
+  fromString "G" = PitchClass G Natural
+  fromString "g" = PitchClass G Natural
+  fromString "G#" = PitchClass G Sharp
+  fromString "g#" = PitchClass G Sharp
+  fromString "A" = PitchClass A Natural
+  fromString "a" = PitchClass A Natural
+  fromString "A#" = PitchClass A Sharp
+  fromString "a#" = PitchClass A Sharp
+  fromString "B" = PitchClass B Natural
+  fromString "b" = PitchClass B Natural
+  fromString s = error $ "Invalid PitchClass string: " ++ s
+  
 
 {-
 >>> c = PitchClass C Natural
