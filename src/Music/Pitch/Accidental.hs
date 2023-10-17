@@ -53,7 +53,7 @@ data Accidental
 -- QuarterSharp
 -- QuarterFlat
 
-i
+
 
 
 instance Num Accidental where
