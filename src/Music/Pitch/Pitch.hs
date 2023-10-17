@@ -222,3 +222,7 @@ instance Arbitrary Octave where
 
 instance Arbitrary Pitch where
   arbitrary = Pitch <$> arbitrary <*> arbitrary <*> arbitrary
+
+
+  
+  

@@ -23,6 +23,7 @@ where
 
 import Data.List (isPrefixOf)
 import Data.Ratio
+
 import Data.String
 import qualified Data.Text as T
 import Test.QuickCheck
