@@ -15,7 +15,7 @@ test:
 
 # make github ci from cabal file
 make-ci:
-    haskell-ci github hasMusic.cabal
+    haskell-ci github haskMus.cabal
 
 cabal-bounds:
     cabal gen-bounds    
