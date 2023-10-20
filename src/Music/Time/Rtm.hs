@@ -3,12 +3,8 @@
 {-# HLINT ignore "Use newtype instead of data" #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
-module Rtm where
+module Music.Time.Rtm where
 
--- import Text.Printf
-
-
-type Duration = Rational
 
 
 data RtmValue
@@ -21,8 +17,6 @@ data RtmProportions = RtmProportions [RtmValue] -- Represents a sequence of musi
   deriving (Eq, Ord, Show)
 
 
-type RtmMeasure = (Duration, RtmProportions)
-type Rtm = [RtmMeasure]
 
 
 data RtmStructure
@@ -46,16 +40,13 @@ structureOfRtm (RtmLeaf _ proportions) = RtmVector (countRtmProportions proporti
 {- 
 >>> tree1 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
 >>> tree2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
-
->>> structureOfRtm tree1
-RtmVector 1 [RtmScalar,RtmVector 1 [RtmScalar,RtmScalar],RtmScalar]
-
->>> structureOfRtm' tree2
-[RtmScalar,RtmVector 1 [RtmScalar,RtmScalar],RtmScalar]
-
 >>> tree3 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4, RtmLeaf 3 (RtmProportions [RtmRest 2])]), RtmRest 3])
->>> structureOfRtm tree3
-RtmVector 1 [RtmScalar,RtmVector 1 [RtmScalar,RtmScalar,RtmVector 1 [RtmScalar]],RtmScalar]
+
+>>> structureOfRtm tree1 == RtmVector 1 [RtmScalar,RtmVector 1 [RtmScalar,RtmScalar],RtmScalar]
+
+>>> structureOfRtm' tree2 == [RtmScalar,RtmVector 1 [RtmScalar,RtmScalar],RtmScalar]
+
+>>> structureOfRtm tree3 == RtmVector 1 [RtmScalar,RtmVector 1 [RtmScalar,RtmScalar,RtmVector 1 [RtmScalar]],RtmScalar]
 -}
 
 shapeOfRtm :: RtmValue -> [Int]

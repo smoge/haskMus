@@ -24,6 +24,7 @@ library
   exposed-modules:     
     Music.Pitch.Accidental
     Music.Pitch.Pitch
+    Music.Time.Rtm
   build-depends:       base >= 4.7 && < 5
                      , containers >= 0.6.7 && < 0.7
                      , text >= 2.0.2 && < 2.1
