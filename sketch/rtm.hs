@@ -73,6 +73,7 @@ mergeShapes = foldr (zipWithMax) []
   where 
     zipWithMax xs ys = zipWith max xs (ys ++ repeat 0) ++ drop (length xs) ys
 
+{- 
 main :: IO ()
 main = do
     let tree1 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
@@ -88,7 +89,7 @@ main = do
     print $ mergeShapes [[1, 2, 3], [1], [1, 2]]
     print $ mergeShapes [[1, 2], [1, 2], [1, 2]]
 
-
+ -}
 
 leafRanks :: RtmValue -> [(RtmValue, Int)]
 leafRanks val = leafRanksHelper val 0
@@ -213,26 +214,6 @@ result1 = aplReduce (\x y -> RtmNote (getValue x + getValue y)) input1
 -- Got: RtmProportions [RtmNote 10]
 
 
---  Custom reduction operation
-input3 = RtmProportions [RtmNote 5, RtmNote 3, RtmRest 2, RtmNote 3]
-result3 = aplReduce (\x y -> case (x, y) of
-                              (RtmNote a, RtmNote b) -> RtmNote (a + b)
-                              (RtmRest a, RtmNote _) -> RtmRest (a )
-                              (RtmNote a, RtmRest _) -> RtmNote (a )
-                              (RtmRest a, RtmRest b) -> RtmRest (a + b)
-                              _ -> RtmRest 0) input3
--- Expected result: RtmProportions [RtmNote 15, RtmRest 8]
--- Got: RtmProportions [RtmNote 8]
-
---  No reduction for a single value
-input4 = RtmProportions [RtmNote 5]
-result4 = aplReduce (\x y -> RtmNote (getValue x + getValue y)) input4
--- Expected result: RtmProportions [RtmNote 5]
--- Got: RtmProportions [RtmNote 5]
-
-
-
-
   -}
 
 aplMap :: (RtmValue -> RtmValue) -> RtmProportions -> RtmProportions
@@ -246,37 +227,6 @@ aplMapValue f value = f value
 transposeNote :: RtmValue -> RtmValue
 transposeNote (RtmNote pitch) = RtmNote (pitch + 2)
 transposeNote value = value
-
-{- -- Apply the transposeNote function to all elements in an RtmProportions
-inputProportions = RtmProportions [RtmNote 5, RtmNote 3, RtmNote 2]
-resultProportions = aplMap transposeNote inputProportions
--- Expected result: RtmProportions [RtmNote 7, RtmNote 5, RtmNote 4]
- -}
-
--- Define a function to sum two musical rests
--- sumRests :: RtmValue -> RtmValue -> RtmValue
--- sumRests (RtmRest pitch1) (RtmRest pitch2) = RtmRest (pitch1 + pitch2)
--- sumRests value1 value2 = value1
-
--- Reduce an RtmProportions by summing its elements
--- inputProportions = RtmProportions [RtmNote 5, RtmNote 3, RtmRest 3, RtmRest 2, RtmNote 2]
--- resultProportions = aplReduce sumRests inputProportions
--- Expected result: RtmProportions [RtmNote 5, RtmNote 3, RtmRest 5, RtmNote 2]
--- Got this: RtmProportions [RtmNote 5]
-
-{- 
-aplReduce :: (RtmValue -> RtmValue -> RtmValue) -> RtmProportions -> RtmProportions
-aplReduce f (RtmProportions values) = RtmProportions (reduceValues f values)
-
-reduceValues :: (RtmValue -> RtmValue -> RtmValue) -> [RtmValue] -> [RtmValue]
-reduceValues _ [] = []
-reduceValues _ [x] = [x]
-reduceValues f (x:y:rest)
-  | isReducible x && isReducible y = f x y : reduceValues f rest
-  | otherwise = x : reduceValues f (y : rest)
-  where
-    isReducible (RtmRest _) = True
-    isReducible _ = False -}
 
 
 
