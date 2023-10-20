@@ -24,7 +24,19 @@ data RtmStructure
     | RtmVector Int [RtmStructure]
     deriving (Eq, Ord, Show)
 
+{- | structureOfRtm / structureOfRtm'takes a RtmValue / RtmProportions and returns a RtmStructure
+>>> tree1 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
+>>> structureOfRtm tree1 
+RtmVector 3 [RtmScalar,RtmVector 2 [RtmScalar,RtmScalar],RtmScalar]
 
+>>> tree2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
+>>> structureOfRtm' tree2 
+[RtmScalar,RtmVector 2 [RtmScalar,RtmScalar],RtmScalar]
+
+>>> tree3 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4, RtmLeaf 3 (RtmProportions [RtmRest 2])]), RtmRest 3])
+>>> structureOfRtm tree3 
+RtmVector 3 [RtmScalar,RtmVector 3 [RtmScalar,RtmScalar,RtmVector 1 [RtmScalar]],RtmScalar]
+-}
 structureOfRtm' :: RtmProportions -> [RtmStructure]
 structureOfRtm' (RtmProportions values) = map structureOfRtm values
 
@@ -37,17 +49,7 @@ structureOfRtm (RtmRest _) = RtmScalar
 structureOfRtm (RtmLeaf _ proportions) = RtmVector (countRtmProportions proportions) (structureOfRtm' proportions)
 
 
-{- 
->>> tree1 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
->>> tree2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
->>> tree3 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4, RtmLeaf 3 (RtmProportions [RtmRest 2])]), RtmRest 3])
 
->>> structureOfRtm tree1 == RtmVector 1 [RtmScalar,RtmVector 1 [RtmScalar,RtmScalar],RtmScalar]
-
->>> structureOfRtm' tree2 == [RtmScalar,RtmVector 1 [RtmScalar,RtmScalar],RtmScalar]
-
->>> structureOfRtm tree3 == RtmVector 1 [RtmScalar,RtmVector 1 [RtmScalar,RtmScalar,RtmVector 1 [RtmScalar]],RtmScalar]
--}
 
 shapeOfRtm :: RtmValue -> [Int]
 shapeOfRtm (RtmNote _) = []
@@ -55,13 +57,13 @@ shapeOfRtm (RtmRest _) = []
 shapeOfRtm (RtmLeaf _ proportions) = 1 : shapeOfRtmProportions proportions
 
 shapeOfRtmProportions :: RtmProportions -> [Int]
-shapeOfRtmProportions (RtmProportions values) = 
+shapeOfRtmProportions (RtmProportions values) =
     length values : mergeShapes (map shapeOfRtm values)
 
 -- Merge multiple shapes into one by taking the longest of each depth
 mergeShapes :: [[Int]] -> [Int]
 mergeShapes = foldr (zipWithMax) []
-  where 
+  where
     zipWithMax xs ys = zipWith max xs (ys ++ repeat 0) ++ drop (length xs) ys
 
 {- 
@@ -121,8 +123,8 @@ leafPaths val = leafPathsHelper val []
 leafPathsHelper :: RtmValue -> [Int] -> [(RtmValue, [Int])]
 leafPathsHelper (RtmLeaf _ (RtmProportions rtmVals)) path =
     concatMap (\(idx, v) -> leafPathsHelper v (idx : path)) (zip [0..] rtmVals)
-leafPathsHelper (RtmNote n) path = [((RtmNote n), reverse path)]
-leafPathsHelper (RtmRest n) path = [((RtmRest n), reverse path)]
+leafPathsHelper (RtmNote n) path = [(RtmNote n, reverse path)]
+leafPathsHelper (RtmRest n) path = [(RtmRest n, reverse path)]
 
 leafPaths' :: RtmValue -> [ [Int]]
 leafPaths' val = leafPathsHelper' val []
@@ -171,13 +173,13 @@ result3 = aplFilter (\x -> case x of RtmNote n -> n `mod` 2 == 0; _ -> True) tre
 
 aplReduce :: (RtmValue -> RtmValue -> RtmValue) -> RtmProportions -> RtmProportions
 aplReduce f (RtmProportions values) = RtmProportions (reduceValues f values)
-aplReduce _ x = x
+-- aplReduce _ x = x
 
 reduceValues :: (RtmValue -> RtmValue -> RtmValue) -> [RtmValue] -> [RtmValue]
 reduceValues _ [] = []
 reduceValues _ [x] = [x]
 reduceValues f (x:y:rest) = reduceValues f (f x y : reduceValues f rest)
-reduceValues _ xs = xs  -- Handle the cases for RtmNote and RtmRest
+-- reduceValues _ xs = xs  -- Handle the cases for RtmNote and RtmRest
 
 
 -- Example: Sum a list of numbers
@@ -225,7 +227,7 @@ transposeNote value = value
 -- Define a function to sum two musical rests
 combineRests :: RtmValue -> RtmValue -> RtmValue
 combineRests (RtmRest pitch1) (RtmRest pitch2) = RtmRest (pitch1 + pitch2)
-combineRests value1 value2 = value1
+combineRests value1 _ = value1
 
 -- Reduce an RtmProportions by combining its elements
 combineProportions :: RtmProportions -> RtmProportions
