@@ -49,30 +49,31 @@ structureOfRtm (RtmRest _) = RtmScalar
 structureOfRtm (RtmLeaf _ proportions) = RtmVector (countRtmProportions proportions) (structureOfRtm' proportions)
 
 
-{-
-tree5 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
-shapeOfRtm tree5 
--- [1,3,1,2]
-
-tree2 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4, RtmLeaf 3 (RtmProportions [RtmRest 2])]), RtmRest 3])
-shapeOfRtm tree2 
--- [1,3,1,3,1,1]
-
-tree3 = RtmLeaf 4 (RtmProportions [RtmRest 3])
-shapeOfRtm tree3 
--- [1,1]
--}
 shapeOfRtm :: RtmValue -> [Int]
 shapeOfRtm (RtmNote _) = []
 shapeOfRtm (RtmRest _) = []
 shapeOfRtm (RtmLeaf _ proportions) = 1 : shapeOfRtmProportions proportions
 
-
 shapeOfRtmProportions :: RtmProportions -> [Int]
 shapeOfRtmProportions (RtmProportions values) =
     length values : mergeShapes (map shapeOfRtm values)
 
-{- | Merge multiple shapes into one by taking the longest of each depth
+{- 
+>>> tree5 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
+>>> shapeOfRtm tree5 
+[1,3,1,2]
+
+>>> shapeOfRtm $ RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
+[1,3,1,2]
+
+>>> tree2 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4, RtmLeaf 3 (RtmProportions [RtmRest 2])]), RtmRest 3])
+>>> shapeOfRtm tree2 
+[1,3,1,3,1,1]
+
+>>> tree3 = RtmLeaf 4 (RtmProportions [RtmRest 3])
+>>> shapeOfRtm tree3 
+[1,1]
+
 >>> mergeShapes [[1, 2], [1, 2, 3], [1]] == [1,2,3]
 >>> mergeShapes [[1, 2, 3], [1], [1, 2]] == [1,2,3]
 >>> mergeShapes [[1, 2], [1, 2], [1, 2]] == [1,2]
@@ -80,6 +81,7 @@ True
 True
 True
 -}
+
 mergeShapes :: [[Int]] -> [Int]
 mergeShapes = foldr zipWithMax []
   where
@@ -110,7 +112,6 @@ leafRanksHelper' (RtmRest n) depth = [(RtmRest n, depth)]
 {- 
 >>> tree1 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
 >>> tree2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
-
 >>> leafRanks tree1
 [(RtmNote 5,1),(RtmNote 6,2),(RtmRest 4,2),(RtmRest 3,1)]
 >>> leafRanksFromProportions tree2 
@@ -147,7 +148,6 @@ pathLengths val = map length (leafPaths' val)
 {- 
 >>> tree1 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
 >>> tree2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
-
 >>> leafPaths tree1
 [(RtmNote 5,[0]),(RtmNote 6,[1,0]),(RtmRest 4,[1,1]),(RtmRest 3,[2])]
 
