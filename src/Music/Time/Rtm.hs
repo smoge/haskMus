@@ -41,21 +41,17 @@ data RtmStructure
 --        )
 --    , RtmRest 3
 --    ]
-data ArrayShape
-  = Scalar
-  | Vector [ArrayShape]
-  deriving (Eq, Ord, Show)
 
 -- !! FIXME TRY THIS LATER
--- data ArrayShape
---   = Scalar
---   | VectorP [ArrayShape]  -- Represents RtmProportions
---   | VectorL [ArrayShape]  -- Represents RtmLeaf
---   deriving (Eq, Show)
+data ArrayShape
+  = Scalar
+  | VectorP [ArrayShape]  -- Represents RtmProportions
+  | VectorL [ArrayShape]  -- Represents RtmLeaf
+  deriving (Eq, Show)
 
 
 data RtmArray = RtmArray [Int] ArrayShape
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Show)
 
 -- | RtmProportion to RtmArray
 -- >>> rtm = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
@@ -91,45 +87,40 @@ toRtmArray (RtmProportions values) =
 flattenRtmValues :: [RtmValue] -> ([Int], ArrayShape)
 flattenRtmValues values =
   let (ints, shapes) = unzip (map flattenValue values)
-   in (concat ints, Vector shapes)
+   in (concat ints, VectorP shapes)  -- Updated Vector constructor to VectorP
 
 flattenValue :: RtmValue -> ([Int], ArrayShape)
 flattenValue (RtmNote n) = ([n], Scalar)
 flattenValue (RtmRest r) = ([-r], Scalar) -- Negative for rests
 flattenValue (RtmLeaf n (RtmProportions props)) =
   let (flattenedValues, shape) = flattenRtmValues props
-   in (n : flattenedValues, Vector [Scalar, shape])
+   in (n : flattenedValues, VectorL [Scalar, shape])
+
 
 extractValuesAndShape :: RtmProportions -> ([Int], ArrayShape)
 extractValuesAndShape (RtmProportions values) =
   let (flatValues, shapes) = unzip (map extractFromRtmValue values)
-   in (concat flatValues, Vector shapes)
+   in (concat flatValues, VectorP shapes)  -- Updated Vector constructor to VectorP
 
 extractFromRtmValue :: RtmValue -> ([Int], ArrayShape)
 extractFromRtmValue (RtmNote n) = ([n], Scalar)
 extractFromRtmValue (RtmRest n) = ([n], Scalar)
 extractFromRtmValue (RtmLeaf n props) =
   let (vals, shape) = extractValuesAndShape props
-   in (n : vals, Vector [Scalar, shape])
-
--- It seems there is an error with long lists in RtmProportions
+   in (n : vals, VectorL [Scalar, shape])
 
 -- ! FIXME
 {- 
 
 rtm = RtmProportions [RtmLeaf 11 (RtmProportions [RtmNote 4,RtmNote 3,RtmNote 3]),RtmLeaf 13 (RtmProportions [RtmRest 3,RtmNote 1]),RtmRest 12]
+
+RtmArray [11,4,3,3,13,-3,1,-12] (VectorP [VectorL [Scalar,VectorP [Scalar,Scalar,Scalar]],VectorL [Scalar,VectorP [Scalar,Scalar]],Scalar])
+
 ghci> toRtmArray rtm
 RtmArray [11,4,3,3,13,-3,1,-12] (Vector [Vector [Scalar,Vector [Scalar,Scalar,Scalar]],Vector [Scalar,Vector [Scalar,Scalar]],Scalar])
 ghci> 
 
-Maybe we need to avoid Vector can be either RtmLeaf or RtmProportions
-data ArrayShape
-  = Scalar
-  | VectorProportions [ArrayShape]  -- Represents RtmProportions
-  | VectorLeaf [ArrayShape]  -- Represents RtmLeaf
-  deriving (Eq, Show)
-
-
+(fromRtmArray . toRtmArray) rtm
  -}
 -- -- | RtmArray to RtmProportions
 fromRtmArray :: RtmArray -> RtmProportions
@@ -138,8 +129,9 @@ fromRtmArray (RtmArray values shape) =
    in RtmProportions rtmValues
 
 
+
 reconstructRtmValues :: [Int] -> ArrayShape -> ([RtmValue], [Int])
-reconstructRtmValues vals (Vector shapes) =
+reconstructRtmValues vals (VectorP shapes) =
   let (values, rest) =
         foldl'
           ( \(acc, remaining) shp ->
@@ -161,7 +153,14 @@ reconstructRtmValues xs Scalar =
    in (values, rest)
 
 reconstructValue :: [Int] -> ArrayShape -> ([RtmValue], [Int])
-reconstructValue (n : xs) (Vector (shp : shps))
+reconstructValue (n : xs) (VectorP (shp : shps))
+  | n >= 0 =
+      let (values, rest) = reconstructRtmValues (take n xs) shp
+       in ([RtmLeaf n (RtmProportions values)], drop n xs ++ reconstructRemainder rest shps)
+  | otherwise =
+      let (values, rest) = reconstructRtmValues (take (-n) xs) shp
+       in ([RtmLeaf (-n) (RtmProportions values)], drop (-n) xs ++ rest)
+reconstructValue (n : xs) (VectorL (shp : shps))
   | n >= 0 =
       let (values, rest) = reconstructRtmValues (take n xs) shp
        in ([RtmLeaf n (RtmProportions values)], drop n xs ++ reconstructRemainder rest shps)
@@ -172,9 +171,9 @@ reconstructValue (n : xs) Scalar
   | n >= 0 = ([RtmNote n], xs)
   | otherwise = ([RtmRest (-n)], xs)
 reconstructValue [] _ = error "Unexpected empty list"
-reconstructValue (_ : _) (Vector []) = error "Unexpected Vector shape with no sub-shapes"
+reconstructValue (_ : _) (VectorP []) = error "Unexpected VectorP shape with no sub-shapes"
+reconstructValue (_ : _) (VectorL []) = error "Unexpected VectorL shape with no sub-shapes"
 
--- Helper function to handle the remainder of the shapes
 reconstructRemainder :: [Int] -> [ArrayShape] -> [Int]
 reconstructRemainder vals [] = vals
 reconstructRemainder vals (shp : shps) =
