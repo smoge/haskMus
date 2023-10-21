@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use newtype instead of data" #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
@@ -7,7 +8,7 @@ module Music.Time.Rtm where
 
 import Data.List (foldl')
 import Test.QuickCheck
-
+import Text.Pretty.Simple 
 
 data RtmValue
   = RtmNote Int
@@ -18,15 +19,30 @@ data RtmValue
 data RtmProportions = RtmProportions [RtmValue]
   deriving (Eq, Ord, Show)
 
+
+
 data RtmStructure
   = RtmScalar
   | RtmVector Int [RtmStructure]
   deriving (Eq, Ord, Show)
 
 {- | RtmProportion to RtmStructure
+
 >>> tree2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
 >>> structureOfRtm' tree2 
 [RtmScalar,RtmVector 2 [RtmScalar,RtmScalar],RtmScalar]
+
+pPrint tree2
+RtmProportions
+    [ RtmNote 5
+    , RtmLeaf 2
+        ( RtmProportions
+            [ RtmNote 6
+            , RtmRest 4
+            ]
+        )
+    , RtmRest 3
+    ]
 -}
 
 data ArrayShape
@@ -49,9 +65,77 @@ RtmProportions [RtmNote 5,RtmLeaf 2 (RtmProportions [RtmNote 6,RtmRest 4]),RtmRe
 >>>  rtm == (fromRtmArray . toRtmArray) rtm
 True
 
+>>> rtm2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 3, RtmRest 4]), RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 3, RtmRest 4]), RtmRest 3]
+>>> toRtmArray rtm2
+>>> rtm2 == (fromRtmArray . toRtmArray) rtm2
+RtmArray [5,2,3,-4,5,2,3,-4,-3] (Vector [Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar])
+True
+
+
+>>> rtm3 = RtmProportions [RtmNote 2,RtmLeaf 4 (RtmProportions [RtmRest 1,RtmRest 3,RtmNote 4,RtmNote 2,RtmRest 1,RtmRest 4,RtmNote 4,RtmRest 4,RtmNote 2,RtmRest 1,RtmRest 1,RtmRest 2,RtmRest 1,RtmNote 3,RtmRest 3,RtmRest 4,RtmNote 4,RtmRest 1]),RtmLeaf 2 (RtmProportions [RtmNote 1,RtmNote 4,RtmNote 4]),RtmNote 2]
+>>> array 3 = toRtmArray rtm3
+>>> rtm3 == (fromRtmArray . toRtmArray) rtm3
+
+array3 = toRtmArray rtm3
+pPrint array3
 -}
--- toRtmArray :: RtmProportions -> RtmArray
--- toRtmArray props = let (vals, shape) = extractValuesAndShape props in RtmArray vals shape
+{- 
+pPrint rtm3
+RtmProportions
+    [ RtmNote 2
+    , RtmLeaf 4
+        ( RtmProportions
+            [ RtmRest 1
+            , RtmRest 3
+            , RtmNote 4
+            , RtmNote 2
+            , RtmRest 1
+            , RtmRest 4
+            , RtmNote 4
+            , RtmRest 4
+            , RtmNote 2
+            , RtmRest 1
+            , RtmRest 1
+            , RtmRest 2
+            , RtmRest 1
+            , RtmNote 3
+            , RtmRest 3
+            , RtmRest 4
+            , RtmNote 4
+            , RtmRest 1
+            ]
+        )
+    , RtmLeaf 2
+        ( RtmProportions
+            [ RtmNote 1
+            , RtmNote 4
+            , RtmNote 4
+            ]
+        )
+    , RtmNote 2
+    ]
+
+
+pPrint $ (fromRtmArray . toRtmArray) rtm3
+
+RtmProportions
+    [ RtmNote 2
+    , RtmLeaf 4
+        ( RtmProportions
+            [ RtmRest 1
+            , RtmRest 3
+            , RtmNote 4
+            , RtmNote 2
+            ]
+        )
+    , RtmLeaf 1
+        ( RtmProportions
+            [ RtmRest 4 ]
+        )
+    , RtmNote 4
+    ]
+
+ -}
 
 toRtmArray :: RtmProportions -> RtmArray
 toRtmArray (RtmProportions values) =
@@ -83,44 +167,61 @@ extractFromRtmValue (RtmLeaf n props) =
   let (vals, shape) = extractValuesAndShape props
   in (n:vals, Vector [Scalar, shape])
 
--- | RtmArray to RtmProportions
 
+-- ! FIXME
+-- | RtmArray to RtmProportions
 fromRtmArray :: RtmArray -> RtmProportions
 fromRtmArray (RtmArray values shape) =
   let (rtmValues, _) = reconstructRtmValues values shape
   in RtmProportions rtmValues
 
+
 reconstructRtmValues :: [Int] -> ArrayShape -> ([RtmValue], [Int])
-reconstructRtmValues vals (Vector shapes) = 
-  let (values, rest) = foldl' (\(acc, remaining) shp -> 
-          let (v, r) = reconstructValue remaining shp 
+reconstructRtmValues vals (Vector shapes) =
+  let (values, rest) = foldl' (\(acc, remaining) shp ->
+          let (v, r) = reconstructValue remaining shp
           in (acc ++ v, r)) ([], vals) shapes
   in (values, rest)
-reconstructRtmValues xs Scalar = 
-  let (values, rest) = foldr (\x (accVals, accRest) -> 
-                                let (v, r) = reconstructValue [x] Scalar 
+reconstructRtmValues xs Scalar =
+  let (values, rest) = foldr (\x (accVals, accRest) ->
+                                let (v, r) = reconstructValue [x] Scalar
                                 in (v ++ accVals, r ++ accRest)
                             ) ([], []) xs
   in (values, rest)
 
+-- reconstructValue :: [Int] -> ArrayShape -> ([RtmValue], [Int])
+-- reconstructValue (n:xs) (Vector (shp:shps))
+--   | n >= 0 = -- FIXME
+--       let (values, rest) = reconstructRtmValues (take n xs) shp
+--       in ([RtmLeaf n (RtmProportions values)], drop n xs ++ reconstructRemainder rest shps)
+--   | otherwise =
+--       let (values, rest) = reconstructRtmValues (take (-n) xs) shp
+--       in ([RtmLeaf (-n) (RtmProportions values)], drop (-n) xs ++ reconstructRemainder rest shps)
+-- reconstructValue (n:xs) Scalar
+--   | n >= 0 = ([RtmNote n], xs)
+--   | otherwise = ([RtmRest (-n)], xs)
+-- reconstructValue [] _ = error "Unexpected empty list"
+-- reconstructValue (_:_) (Vector []) = error "Unexpected Vector shape with no sub-shapes"
+
 reconstructValue :: [Int] -> ArrayShape -> ([RtmValue], [Int])
-reconstructValue (n:xs) (Vector (shp:shps)) 
-  | n >= 0 = 
+reconstructValue (n:xs) (Vector (shp:shps))
+  | n >= 0 =
       let (values, rest) = reconstructRtmValues (take n xs) shp
       in ([RtmLeaf n (RtmProportions values)], drop n xs ++ reconstructRemainder rest shps)
-  | otherwise = 
+  | otherwise =
       let (values, rest) = reconstructRtmValues (take (-n) xs) shp
-      in ([RtmLeaf (-n) (RtmProportions values)], drop (-n) xs ++ reconstructRemainder rest shps)
+      in ([RtmLeaf (-n) (RtmProportions values)], drop (-n) xs ++ rest)
 reconstructValue (n:xs) Scalar
   | n >= 0 = ([RtmNote n], xs)
   | otherwise = ([RtmRest (-n)], xs)
 reconstructValue [] _ = error "Unexpected empty list"
 reconstructValue (_:_) (Vector []) = error "Unexpected Vector shape with no sub-shapes"
 
+
 -- Helper function to handle the remainder of the shapes
 reconstructRemainder :: [Int] -> [ArrayShape] -> [Int]
 reconstructRemainder vals [] = vals
-reconstructRemainder vals (shp:shps) = 
+reconstructRemainder vals (shp:shps) =
     let (_, rest) = reconstructRtmValues vals shp
     in reconstructRemainder rest shps
 
@@ -372,16 +473,102 @@ combineProportions inputProportions
 
 -- # SECTION QuickCheck
 
+
+-- Let's limit the depth to prevent infinite recursion and massive structures
+maxDepth :: Int
+maxDepth = 3
+
+
 instance Arbitrary RtmValue where
-  arbitrary = oneof [ RtmNote <$> arbitraryPositive,
-                      RtmRest <$> arbitraryPositive,
-                      RtmLeaf <$> arbitraryPositive <*> arbitrary ]
-    where
-      arbitraryPositive :: Gen Int
-      arbitraryPositive = getPositive <$> arbitrary
+    arbitrary = sized arbRtmValue
+
+
+-- arbRtmValue :: Int -> Gen RtmValue
+-- arbRtmValue n
+--   | n <= 0 = oneof [RtmNote <$> choose (1, 4), RtmRest <$> choose (1, 4)]
+--   | otherwise = oneof
+--       [ RtmNote <$> choose (1, 4)
+--       , RtmRest <$> choose (1, 4)
+--       , RtmLeaf <$> choose (1, 4) <*> resize (n - 1) arbitrary
+--       ]
+
+arbRtmValue :: Int -> Gen RtmValue
+arbRtmValue n
+  | n <= 0 = oneof [RtmNote <$> choose (1, 4), RtmRest <$> choose (1, 4)]
+  | n > maxDepth = oneof [RtmNote <$> choose (1, 4), RtmRest <$> choose (1, 4)]
+  | otherwise = oneof
+      [ RtmNote <$> choose (1, 4)
+      , RtmRest <$> choose (1, 4)
+      , RtmLeaf <$> choose (1, 4) <*> resize (n - 1) arbitrary
+      ]
+
+
+-- instance Arbitrary RtmProportions where
+--     arbitrary = do
+--         rtmValue <- arbitrary
+--         rtmValues <- listOf arbitrary
+--         return $ RtmProportions (rtmValue : rtmValues)
 
 instance Arbitrary RtmProportions where
-  arbitrary = RtmProportions <$> listOf arbitrary
+    arbitrary = do
+        depth <- choose (1, maxDepth)
+        generateRtmProportions depth
+      where
+        generateRtmProportions :: Int -> Gen RtmProportions
+        generateRtmProportions 1 = do
+            rtmValue <- arbitrary
+            return (RtmProportions [rtmValue])
+
+        generateRtmProportions depth = do
+            rtmValue <- arbitrary
+            numChildren <- choose (2, 6)  -- Adjust the number of children as needed
+            children <- vectorOf numChildren (generateRtmProportions (depth - 1))
+            return (RtmProportions (rtmValue : concatMap (\(RtmProportions xs) -> xs) children))
+
+
+
+-- generateRtmProportions :: Int -> Gen [RtmValue]
+-- generateRtmProportions 1 = do
+--     rtmValue <- arbitrary
+--     return [rtmValue]
+
+-- generateRtmProportions depth = do
+--     rtmValue <- arbitrary
+--     numChildren <- choose (1, 5)  -- Adjust the number of children as needed
+--     children <- vectorOf numChildren (generateRtmProportions (depth - 1))
+--     return (rtmValue : concat children)
+
+
+-- instance Arbitrary RtmStructure where
+--   arbitrary = sized arbRtmStructure
+
+
+-- arbRtmStructure :: Int -> Gen RtmStructure
+-- arbRtmStructure 0 = return RtmScalar
+-- arbRtmStructure n = oneof
+--   [ return RtmScalar
+--   , RtmVector <$> arbitrary <*> (resize (n - 1) (listOf $ arbRtmStructure (n `div` 2)))
+--   ]
+
+-- instance Arbitrary ArrayShape where
+--   arbitrary = sized arbArrayShape
+
+-- arbArrayShape :: Int -> Gen ArrayShape
+-- arbArrayShape 0 = return Scalar
+-- arbArrayShape n = oneof
+--   [ return Scalar
+--   , Vector <$> (resize (n - 1) (listOf $ arbArrayShape (n `div` 2)))
+--   ]
+
+-- instance Arbitrary RtmArray where
+--   arbitrary = do
+--     shape <- arbitrary
+--     vals <- case shape of
+--       Scalar -> return [1]  -- just a simple scalar case
+--       Vector shapes -> vectorOf (length shapes) arbitrary
+--     return $ RtmArray vals shape
+
+
 
 {- 
 

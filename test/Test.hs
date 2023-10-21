@@ -7,6 +7,7 @@ import AccidentalProperties (runTests)
 import PitchProperties (runTests)
 import PitchSpec (spec)
 import Test.Hspec (hspec)
+import RtmProperties (runTests, prop_toFromRtmArray)
 
 reportResults :: String -> IO Bool -> IO ()
 reportResults testName action = do
@@ -23,3 +24,5 @@ main = do
   reportResults "AccidentalTests" AccidentalProperties.runTests
   putStrLn "+++ Run the QuickCheck properties from PitchProperties.hs"
   reportResults "PitchProperties" PitchProperties.runTests
+  putStrLn "+++ Run the QuickCheck properties from RtmProperties.hs"
+  reportResults "RtmProperties" RtmProperties.runTests
