@@ -21,8 +21,67 @@ data RtmStructure
 
 {- | RtmProportion to RtmStructure
 >>> tree2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
->>> structureOfRtm' tree2 == [RtmScalar,RtmVector 2 [RtmScalar,RtmScalar],RtmScalar]
-True
+>>> structureOfRtm' tree2 
+[RtmScalar,RtmVector 2 [RtmScalar,RtmScalar],RtmScalar]
+-}
+
+data ArrayShape
+  = Scalar
+  | Vector [ArrayShape]
+  deriving (Eq, Ord, Show)
+
+data RtmArray = RtmArray [Int] ArrayShape
+  deriving (Eq, Ord, Show)
+
+{- | RtmProportion to RtmArray
+>>> rtm = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
+>>> toRtmArray rtm
+RtmArray [5,2,6,4,3] (Vector [Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar])
+
+-}
+toRtmArray :: RtmProportions -> RtmArray
+toRtmArray props = let (vals, shape) = extractValuesAndShape props in RtmArray vals shape
+
+extractValuesAndShape :: RtmProportions -> ([Int], ArrayShape)
+extractValuesAndShape (RtmProportions values) = 
+  let (flatValues, shapes) = unzip (map extractFromRtmValue values)
+  in (concat flatValues, Vector shapes)
+
+extractFromRtmValue :: RtmValue -> ([Int], ArrayShape)
+extractFromRtmValue (RtmNote n) = ([n], Scalar)
+extractFromRtmValue (RtmRest n) = ([n], Scalar)
+extractFromRtmValue (RtmLeaf n props) = 
+  let (vals, shape) = extractValuesAndShape props
+  in (n:vals, Vector [Scalar, shape])
+
+
+-- TODO Reconstruct from RtmArray
+{- |
+rtm = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
+array = toRtmArray rtm
+show array
+-- "RtmArray [5,2,6,4,3] (Vector [Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar])"
+
+fromRtmArray
+ -}
+
+
+
+{-
+--??
+size = 5
+shape = [Int, Int [Int,Int],Int]
+
+RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
+
+-- ?? 
+Array [5, 2, 6, 4, 3]
+
+tree2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
+
+RtmArray [5,2,6,4,3] (Vector [Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar])
+
+
 -}
 structureOfRtm' :: RtmProportions -> [RtmStructure]
 structureOfRtm' (RtmProportions values) = map structureOfRtm values
@@ -183,14 +242,14 @@ reduceValues f (x : y : rest) = reduceValues f (f x y : reduceValues f rest)
 -- reduceValues _ xs = xs  -- Handle the cases for RtmNote and RtmRest
 
 sumList :: [RtmValue] -> RtmValue
-sumList values = case reduceValues (\x y -> RtmNote (getValue x + getValue y)) values of
+sumList values = case reduceValues (\x y -> RtmNote (getValue' x + getValue' y)) values of
   [result] -> result
   _ -> RtmRest 0
 
 -- Define a function to extract the value from RtmValue
-getValue :: RtmValue -> Int
-getValue (RtmNote n) = n
-getValue _ = 0
+getValue' :: RtmValue -> Int
+getValue' (RtmNote n) = n
+getValue' _ = 0
 
 {-
 inputList = [RtmNote 1, RtmNote 2, RtmNote 3]

@@ -1,21 +1,20 @@
-
-
-# git push github bitbucket
+# Git push all repos
 push:
     git push -u gh-origin main
     git push -u origin main
 
-# stack build file-watch
+# Stack build file-watch
 build:
     stack build --fast --file-watch
 
-# stack test file-watch
+# Stack test file-watch
 test: 
     stack test --file-watch
 
-# make github ci from cabal file
-make-ci:
+# Make GitHub CI from cabal file
+make_ci:
     haskell-ci github haskMus.cabal
 
-cabal-bounds:
-    cabal gen-bounds    
+# Make cabal package version bounds
+cabal_bounds:
+    cabal gen-bounds
