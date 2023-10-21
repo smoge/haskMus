@@ -5,6 +5,8 @@
 
 module Music.Time.Rtm where
 
+import Data.List (foldl')
+
 data RtmValue
   = RtmNote Int
   | RtmRest Int
@@ -36,39 +38,98 @@ data RtmArray = RtmArray [Int] ArrayShape
 {- | RtmProportion to RtmArray
 >>> rtm = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
 >>> toRtmArray rtm
-RtmArray [5,2,6,4,3] (Vector [Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar])
+RtmArray [5,2,6,-4,-3] (Vector [Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar])
+
+>>> array = toRtmArray rtm
+>>> fromRtmArray array
+RtmProportions [RtmNote 5,RtmLeaf 2 (RtmProportions [RtmNote 6,RtmRest 4]),RtmRest 3]
+
+>>>  rtm == (fromRtmArray . toRtmArray) rtm
+True
 
 -}
+-- toRtmArray :: RtmProportions -> RtmArray
+-- toRtmArray props = let (vals, shape) = extractValuesAndShape props in RtmArray vals shape
+
 toRtmArray :: RtmProportions -> RtmArray
-toRtmArray props = let (vals, shape) = extractValuesAndShape props in RtmArray vals shape
+toRtmArray (RtmProportions values) =
+  let (flattenedValues, shape) = flattenRtmValues values
+  in RtmArray flattenedValues shape
+
+flattenRtmValues :: [RtmValue] -> ([Int], ArrayShape)
+flattenRtmValues values =
+  let (ints, shapes) = unzip (map flattenValue values)
+  in (concat ints, Vector shapes)
+
+flattenValue :: RtmValue -> ([Int], ArrayShape)
+flattenValue (RtmNote n) = ([n], Scalar)
+flattenValue (RtmRest r) = ([-r], Scalar)  -- Negative for rests
+flattenValue (RtmLeaf n (RtmProportions props)) =
+  let (flattenedValues, shape) = flattenRtmValues props
+  in (n : flattenedValues, Vector [Scalar, shape])
+
 
 extractValuesAndShape :: RtmProportions -> ([Int], ArrayShape)
-extractValuesAndShape (RtmProportions values) = 
+extractValuesAndShape (RtmProportions values) =
   let (flatValues, shapes) = unzip (map extractFromRtmValue values)
   in (concat flatValues, Vector shapes)
 
 extractFromRtmValue :: RtmValue -> ([Int], ArrayShape)
 extractFromRtmValue (RtmNote n) = ([n], Scalar)
 extractFromRtmValue (RtmRest n) = ([n], Scalar)
-extractFromRtmValue (RtmLeaf n props) = 
+extractFromRtmValue (RtmLeaf n props) =
   let (vals, shape) = extractValuesAndShape props
   in (n:vals, Vector [Scalar, shape])
 
+-- | RtmArray to RtmProportions
 
--- TODO Reconstruct from RtmArray
-{- |
-rtm = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
-array = toRtmArray rtm
-show array
--- "RtmArray [5,2,6,4,3] (Vector [Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar])"
+fromRtmArray :: RtmArray -> RtmProportions
+fromRtmArray (RtmArray values shape) =
+  let (rtmValues, _) = reconstructRtmValues values shape
+  in RtmProportions rtmValues
 
-fromRtmArray
- -}
+reconstructRtmValues :: [Int] -> ArrayShape -> ([RtmValue], [Int])
+reconstructRtmValues vals (Vector shapes) = 
+  let (values, rest) = foldl' (\(acc, remaining) shp -> 
+          let (v, r) = reconstructValue remaining shp 
+          in (acc ++ v, r)) ([], vals) shapes
+  in (values, rest)
+reconstructRtmValues xs Scalar = 
+  let (values, rest) = foldr (\x (accVals, accRest) -> 
+                                let (v, r) = reconstructValue [x] Scalar 
+                                in (v ++ accVals, r ++ accRest)
+                            ) ([], []) xs
+  in (values, rest)
 
+reconstructValue :: [Int] -> ArrayShape -> ([RtmValue], [Int])
+reconstructValue (n:xs) (Vector (shp:shps)) 
+  | n >= 0 = 
+      let (values, rest) = reconstructRtmValues (take n xs) shp
+      in ([RtmLeaf n (RtmProportions values)], drop n xs ++ reconstructRemainder rest shps)
+  | otherwise = 
+      let (values, rest) = reconstructRtmValues (take (-n) xs) shp
+      in ([RtmLeaf (-n) (RtmProportions values)], drop (-n) xs ++ reconstructRemainder rest shps)
+reconstructValue (n:xs) Scalar
+  | n >= 0 = ([RtmNote n], xs)
+  | otherwise = ([RtmRest (-n)], xs)
+reconstructValue [] _ = error "Unexpected empty list"
+reconstructValue (_:_) (Vector []) = error "Unexpected Vector shape with no sub-shapes"
+
+-- Helper function to handle the remainder of the shapes
+reconstructRemainder :: [Int] -> [ArrayShape] -> [Int]
+reconstructRemainder vals [] = vals
+reconstructRemainder vals (shp:shps) = 
+    let (_, rest) = reconstructRtmValues vals shp
+    in reconstructRemainder rest shps
 
 
 {-
---??
+
+RtmProportions [RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 3])]
+-- This would flatten to:
+[2, 6, -3], Vector [Scalar, Scalar]
+
+
 size = 5
 shape = [Int, Int [Int,Int],Int]
 
