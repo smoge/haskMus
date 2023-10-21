@@ -6,6 +6,8 @@
 module Music.Time.Rtm where
 
 import Data.List (foldl')
+import Test.QuickCheck
+
 
 data RtmValue
   = RtmNote Int
@@ -363,5 +365,27 @@ inputProportions = RtmProportions [RtmNote 5, RtmNote 3, RtmRest 3, RtmRest 2, R
 combineProportions inputProportions
 
 -- RtmProportions [RtmNote 5,RtmNote 3,RtmRest 5,RtmNote 2]
+
+ -}
+
+
+
+-- # SECTION QuickCheck
+
+instance Arbitrary RtmValue where
+  arbitrary = oneof [ RtmNote <$> arbitraryPositive,
+                      RtmRest <$> arbitraryPositive,
+                      RtmLeaf <$> arbitraryPositive <*> arbitrary ]
+    where
+      arbitraryPositive :: Gen Int
+      arbitraryPositive = getPositive <$> arbitrary
+
+instance Arbitrary RtmProportions where
+  arbitrary = RtmProportions <$> listOf arbitrary
+
+{- 
+
+prop_toFromRtmArray :: RtmProportions -> Bool
+prop_toFromRtmArray rtm = rtm == (fromRtmArray . toRtmArray) rtm
 
  -}
