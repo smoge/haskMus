@@ -19,211 +19,169 @@ data RtmValue
 data RtmProportions = RtmProportions [RtmValue]
   deriving (Eq, Ord, Show)
 
-
-
 data RtmStructure
   = RtmScalar
   | RtmVector Int [RtmStructure]
   deriving (Eq, Ord, Show)
 
-{- | RtmProportion to RtmStructure
-
->>> tree2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
->>> structureOfRtm' tree2 
-[RtmScalar,RtmVector 2 [RtmScalar,RtmScalar],RtmScalar]
-
-pPrint tree2
-RtmProportions
-    [ RtmNote 5
-    , RtmLeaf 2
-        ( RtmProportions
-            [ RtmNote 6
-            , RtmRest 4
-            ]
-        )
-    , RtmRest 3
-    ]
--}
-
+-- | RtmProportion to RtmStructure
+--
+-- >>> tree2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
+-- >>> structureOfRtm' tree2
+-- [RtmScalar,RtmVector 2 [RtmScalar,RtmScalar],RtmScalar]
+--
+-- pPrint tree2
+-- RtmProportions
+--    [ RtmNote 5
+--    , RtmLeaf 2
+--        ( RtmProportions
+--            [ RtmNote 6
+--            , RtmRest 4
+--            ]
+--        )
+--    , RtmRest 3
+--    ]
 data ArrayShape
   = Scalar
   | Vector [ArrayShape]
   deriving (Eq, Ord, Show)
 
+-- !! FIXME TRY THIS LATER
+-- data ArrayShape
+--   = Scalar
+--   | VectorP [ArrayShape]  -- Represents RtmProportions
+--   | VectorL [ArrayShape]  -- Represents RtmLeaf
+--   deriving (Eq, Show)
+
+
 data RtmArray = RtmArray [Int] ArrayShape
   deriving (Eq, Ord, Show)
 
-{- | RtmProportion to RtmArray
->>> rtm = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
->>> toRtmArray rtm
-RtmArray [5,2,6,-4,-3] (Vector [Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar])
-
->>> array = toRtmArray rtm
->>> fromRtmArray array
-RtmProportions [RtmNote 5,RtmLeaf 2 (RtmProportions [RtmNote 6,RtmRest 4]),RtmRest 3]
-
->>>  rtm == (fromRtmArray . toRtmArray) rtm
-True
-
->>> rtm2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 3, RtmRest 4]), RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 3, RtmRest 4]), RtmRest 3]
->>> toRtmArray rtm2
->>> rtm2 == (fromRtmArray . toRtmArray) rtm2
-RtmArray [5,2,3,-4,5,2,3,-4,-3] (Vector [Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar])
-True
-
-
->>> rtm3 = RtmProportions [RtmNote 2,RtmLeaf 4 (RtmProportions [RtmRest 1,RtmRest 3,RtmNote 4,RtmNote 2,RtmRest 1,RtmRest 4,RtmNote 4,RtmRest 4,RtmNote 2,RtmRest 1,RtmRest 1,RtmRest 2,RtmRest 1,RtmNote 3,RtmRest 3,RtmRest 4,RtmNote 4,RtmRest 1]),RtmLeaf 2 (RtmProportions [RtmNote 1,RtmNote 4,RtmNote 4]),RtmNote 2]
->>> array 3 = toRtmArray rtm3
->>> rtm3 == (fromRtmArray . toRtmArray) rtm3
-
-array3 = toRtmArray rtm3
-pPrint array3
--}
-{- 
-pPrint rtm3
-RtmProportions
-    [ RtmNote 2
-    , RtmLeaf 4
-        ( RtmProportions
-            [ RtmRest 1
-            , RtmRest 3
-            , RtmNote 4
-            , RtmNote 2
-            , RtmRest 1
-            , RtmRest 4
-            , RtmNote 4
-            , RtmRest 4
-            , RtmNote 2
-            , RtmRest 1
-            , RtmRest 1
-            , RtmRest 2
-            , RtmRest 1
-            , RtmNote 3
-            , RtmRest 3
-            , RtmRest 4
-            , RtmNote 4
-            , RtmRest 1
-            ]
-        )
-    , RtmLeaf 2
-        ( RtmProportions
-            [ RtmNote 1
-            , RtmNote 4
-            , RtmNote 4
-            ]
-        )
-    , RtmNote 2
-    ]
-
-
-pPrint $ (fromRtmArray . toRtmArray) rtm3
-
-RtmProportions
-    [ RtmNote 2
-    , RtmLeaf 4
-        ( RtmProportions
-            [ RtmRest 1
-            , RtmRest 3
-            , RtmNote 4
-            , RtmNote 2
-            ]
-        )
-    , RtmLeaf 1
-        ( RtmProportions
-            [ RtmRest 4 ]
-        )
-    , RtmNote 4
-    ]
-
- -}
+-- | RtmProportion to RtmArray
+-- >>> rtm = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
+-- >>> toRtmArray rtm
+-- RtmArray [5,2,6,-4,-3] (Vector [Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar])
+--
+-- >>> array = toRtmArray rtm
+-- >>> fromRtmArray array
+-- RtmProportions [RtmNote 5,RtmLeaf 2 (RtmProportions [RtmNote 6,RtmRest 4]),RtmRest 3]
+--
+-- >>>  rtm == (fromRtmArray . toRtmArray) rtm
+-- True
+--
+-- >>> rtm2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 3, RtmRest 4]), RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 3, RtmRest 4]), RtmRest 3]
+-- >>> toRtmArray rtm2
+-- >>> rtm2 == (fromRtmArray . toRtmArray) rtm2
+-- RtmArray [5,2,3,-4,5,2,3,-4,-3] (Vector [Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar])
+-- True
+--
+--
+-- >>> rtm3 = RtmProportions [RtmNote 2,RtmLeaf 4 (RtmProportions [RtmRest 1,RtmRest 3,RtmNote 4,RtmNote 2,RtmRest 1,RtmRest 4,RtmNote 4,RtmRest 4,RtmNote 2,RtmRest 1,RtmRest 1,RtmRest 2,RtmRest 1,RtmNote 3,RtmRest 3,RtmRest 4,RtmNote 4,RtmRest 1]),RtmLeaf 2 (RtmProportions [RtmNote 1,RtmNote 4,RtmNote 4]),RtmNote 2]
+-- >>> array 3 = toRtmArray rtm3
+-- >>> rtm3 == (fromRtmArray . toRtmArray) rtm3
+--
+-- array3 = toRtmArray rtm3
+-- pPrint array3
 
 toRtmArray :: RtmProportions -> RtmArray
 toRtmArray (RtmProportions values) =
   let (flattenedValues, shape) = flattenRtmValues values
-  in RtmArray flattenedValues shape
+   in RtmArray flattenedValues shape
 
 flattenRtmValues :: [RtmValue] -> ([Int], ArrayShape)
 flattenRtmValues values =
   let (ints, shapes) = unzip (map flattenValue values)
-  in (concat ints, Vector shapes)
+   in (concat ints, Vector shapes)
 
 flattenValue :: RtmValue -> ([Int], ArrayShape)
 flattenValue (RtmNote n) = ([n], Scalar)
-flattenValue (RtmRest r) = ([-r], Scalar)  -- Negative for rests
+flattenValue (RtmRest r) = ([-r], Scalar) -- Negative for rests
 flattenValue (RtmLeaf n (RtmProportions props)) =
   let (flattenedValues, shape) = flattenRtmValues props
-  in (n : flattenedValues, Vector [Scalar, shape])
-
+   in (n : flattenedValues, Vector [Scalar, shape])
 
 extractValuesAndShape :: RtmProportions -> ([Int], ArrayShape)
 extractValuesAndShape (RtmProportions values) =
   let (flatValues, shapes) = unzip (map extractFromRtmValue values)
-  in (concat flatValues, Vector shapes)
+   in (concat flatValues, Vector shapes)
 
 extractFromRtmValue :: RtmValue -> ([Int], ArrayShape)
 extractFromRtmValue (RtmNote n) = ([n], Scalar)
 extractFromRtmValue (RtmRest n) = ([n], Scalar)
 extractFromRtmValue (RtmLeaf n props) =
   let (vals, shape) = extractValuesAndShape props
-  in (n:vals, Vector [Scalar, shape])
+   in (n : vals, Vector [Scalar, shape])
 
+-- It seems there is an error with long lists in RtmProportions
 
 -- ! FIXME
--- | RtmArray to RtmProportions
+{- 
+
+rtm = RtmProportions [RtmLeaf 11 (RtmProportions [RtmNote 4,RtmNote 3,RtmNote 3]),RtmLeaf 13 (RtmProportions [RtmRest 3,RtmNote 1]),RtmRest 12]
+ghci> toRtmArray rtm
+RtmArray [11,4,3,3,13,-3,1,-12] (Vector [Vector [Scalar,Vector [Scalar,Scalar,Scalar]],Vector [Scalar,Vector [Scalar,Scalar]],Scalar])
+ghci> 
+
+Maybe we need to avoid Vector can be either RtmLeaf or RtmProportions
+data ArrayShape
+  = Scalar
+  | VectorProportions [ArrayShape]  -- Represents RtmProportions
+  | VectorLeaf [ArrayShape]  -- Represents RtmLeaf
+  deriving (Eq, Show)
+
+
+ -}
+-- -- | RtmArray to RtmProportions
 fromRtmArray :: RtmArray -> RtmProportions
 fromRtmArray (RtmArray values shape) =
   let (rtmValues, _) = reconstructRtmValues values shape
-  in RtmProportions rtmValues
+   in RtmProportions rtmValues
 
 
 reconstructRtmValues :: [Int] -> ArrayShape -> ([RtmValue], [Int])
 reconstructRtmValues vals (Vector shapes) =
-  let (values, rest) = foldl' (\(acc, remaining) shp ->
-          let (v, r) = reconstructValue remaining shp
-          in (acc ++ v, r)) ([], vals) shapes
-  in (values, rest)
+  let (values, rest) =
+        foldl'
+          ( \(acc, remaining) shp ->
+              let (v, r) = reconstructValue remaining shp
+               in (acc ++ v, r)
+          )
+          ([], vals)
+          shapes
+   in (values, rest)
 reconstructRtmValues xs Scalar =
-  let (values, rest) = foldr (\x (accVals, accRest) ->
-                                let (v, r) = reconstructValue [x] Scalar
-                                in (v ++ accVals, r ++ accRest)
-                            ) ([], []) xs
-  in (values, rest)
-
--- reconstructValue :: [Int] -> ArrayShape -> ([RtmValue], [Int])
--- reconstructValue (n:xs) (Vector (shp:shps))
---   | n >= 0 = -- FIXME
---       let (values, rest) = reconstructRtmValues (take n xs) shp
---       in ([RtmLeaf n (RtmProportions values)], drop n xs ++ reconstructRemainder rest shps)
---   | otherwise =
---       let (values, rest) = reconstructRtmValues (take (-n) xs) shp
---       in ([RtmLeaf (-n) (RtmProportions values)], drop (-n) xs ++ reconstructRemainder rest shps)
--- reconstructValue (n:xs) Scalar
---   | n >= 0 = ([RtmNote n], xs)
---   | otherwise = ([RtmRest (-n)], xs)
--- reconstructValue [] _ = error "Unexpected empty list"
--- reconstructValue (_:_) (Vector []) = error "Unexpected Vector shape with no sub-shapes"
+  let (values, rest) =
+        foldr
+          ( \x (accVals, accRest) ->
+              let (v, r) = reconstructValue [x] Scalar
+               in (v ++ accVals, r ++ accRest)
+          )
+          ([], [])
+          xs
+   in (values, rest)
 
 reconstructValue :: [Int] -> ArrayShape -> ([RtmValue], [Int])
-reconstructValue (n:xs) (Vector (shp:shps))
+reconstructValue (n : xs) (Vector (shp : shps))
   | n >= 0 =
       let (values, rest) = reconstructRtmValues (take n xs) shp
-      in ([RtmLeaf n (RtmProportions values)], drop n xs ++ reconstructRemainder rest shps)
+       in ([RtmLeaf n (RtmProportions values)], drop n xs ++ reconstructRemainder rest shps)
   | otherwise =
       let (values, rest) = reconstructRtmValues (take (-n) xs) shp
-      in ([RtmLeaf (-n) (RtmProportions values)], drop (-n) xs ++ rest)
-reconstructValue (n:xs) Scalar
+       in ([RtmLeaf (-n) (RtmProportions values)], drop (-n) xs ++ rest)
+reconstructValue (n : xs) Scalar
   | n >= 0 = ([RtmNote n], xs)
   | otherwise = ([RtmRest (-n)], xs)
 reconstructValue [] _ = error "Unexpected empty list"
-reconstructValue (_:_) (Vector []) = error "Unexpected Vector shape with no sub-shapes"
-
+reconstructValue (_ : _) (Vector []) = error "Unexpected Vector shape with no sub-shapes"
 
 -- Helper function to handle the remainder of the shapes
 reconstructRemainder :: [Int] -> [ArrayShape] -> [Int]
 reconstructRemainder vals [] = vals
-reconstructRemainder vals (shp:shps) =
-    let (_, rest) = reconstructRtmValues vals shp
-    in reconstructRemainder rest shps
+reconstructRemainder vals (shp : shps) =
+  let (_, rest) = reconstructRtmValues vals shp
+   in reconstructRemainder rest shps
+
+
 
 
 {-
@@ -232,19 +190,17 @@ RtmProportions [RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 3])]
 -- This would flatten to:
 [2, 6, -3], Vector [Scalar, Scalar]
 
-
 size = 5
 shape = [Int, Int [Int,Int],Int]
 
 RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
 
--- ?? 
+-- ??
 Array [5, 2, 6, 4, 3]
 
 tree2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
 
 RtmArray [5,2,6,4,3] (Vector [Scalar,Vector [Scalar,Vector [Scalar,Scalar]],Scalar])
-
 
 -}
 structureOfRtm' :: RtmProportions -> [RtmStructure]
@@ -253,69 +209,63 @@ structureOfRtm' (RtmProportions values) = map structureOfRtm values
 countRtmProportions :: RtmProportions -> Int
 countRtmProportions (RtmProportions values) = length values
 
-{- | RtmValue to RtmStructure
->>> tree1 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
->>> structureOfRtm tree1 == RtmVector 3 [RtmScalar,RtmVector 2 [RtmScalar,RtmScalar],RtmScalar]
-True
-
->>> tree3 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4, RtmLeaf 3 (RtmProportions [RtmRest 2])]), RtmRest 3])
->>> structureOfRtm tree3 == RtmVector 3 [RtmScalar,RtmVector 3 [RtmScalar,RtmScalar,RtmVector 1 [RtmScalar]],RtmScalar]
-True
--}
+-- | RtmValue to RtmStructure
+-- >>> tree1 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
+-- >>> structureOfRtm tree1 == RtmVector 3 [RtmScalar,RtmVector 2 [RtmScalar,RtmScalar],RtmScalar]
+-- True
+--
+-- >>> tree3 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4, RtmLeaf 3 (RtmProportions [RtmRest 2])]), RtmRest 3])
+-- >>> structureOfRtm tree3 == RtmVector 3 [RtmScalar,RtmVector 3 [RtmScalar,RtmScalar,RtmVector 1 [RtmScalar]],RtmScalar]
+-- True
 structureOfRtm :: RtmValue -> RtmStructure
 structureOfRtm (RtmNote _) = RtmScalar
 structureOfRtm (RtmRest _) = RtmScalar
 structureOfRtm (RtmLeaf _ proportions) = RtmVector (countRtmProportions proportions) (structureOfRtm' proportions)
 
-
 shapeOfRtmProportions :: RtmProportions -> [Int]
 shapeOfRtmProportions (RtmProportions values) =
   length values : mergeShapes (map shapeOfRtm values)
 
-{- | 
->>> tree5 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
->>> shapeOfRtm tree5 == [1,3,1,2]
-True
-
->>> tree_test = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
->>> shapeOfRtm tree_test ==  [1,3,1,2]
-True
-
->>> tree2 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4, RtmLeaf 3 (RtmProportions [RtmRest 2])]), RtmRest 3])
->>> shapeOfRtm tree2 == [1,3,1,3,1,1]
-True
-
->>> tree3 = RtmLeaf 4 (RtmProportions [RtmRest 3])
->>> shapeOfRtm tree3 == [1,1]
-True
--}
+-- |
+-- >>> tree5 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
+-- >>> shapeOfRtm tree5 == [1,3,1,2]
+-- True
+--
+-- >>> tree_test = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
+-- >>> shapeOfRtm tree_test ==  [1,3,1,2]
+-- True
+--
+-- >>> tree2 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4, RtmLeaf 3 (RtmProportions [RtmRest 2])]), RtmRest 3])
+-- >>> shapeOfRtm tree2 == [1,3,1,3,1,1]
+-- True
+--
+-- >>> tree3 = RtmLeaf 4 (RtmProportions [RtmRest 3])
+-- >>> shapeOfRtm tree3 == [1,1]
+-- True
 shapeOfRtm :: RtmValue -> [Int]
 shapeOfRtm (RtmNote _) = []
 shapeOfRtm (RtmRest _) = []
 shapeOfRtm (RtmLeaf _ proportions) = 1 : shapeOfRtmProportions proportions
-
-
 
 mergeShapes :: [[Int]] -> [Int]
 mergeShapes = foldr zipWithMax []
   where
     zipWithMax xs ys = zipWith max xs (ys ++ repeat 0) ++ drop (length xs) ys
 
-{- |
->>> tree1 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
->>> tree2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
->>> leafRanks tree1 == [(RtmNote 5,1),(RtmNote 6,2),(RtmRest 4,2),(RtmRest 3,1)]
->>> leafRanksFromProportions tree2 == [(RtmNote 5,1),(RtmNote 6,2),(RtmRest 4,2),(RtmRest 3,1)]
-True
-True
-
->>> mergeShapes [[1, 2], [1, 2, 3], [1]] == [1,2,3]
->>> mergeShapes [[1, 2, 3], [1], [1, 2]] == [1,2,3]
->>> mergeShapes [[1, 2], [1, 2], [1, 2]] == [1,2]
-True
-True
-True
- -}
+-- |
+-- >>> tree1 = RtmLeaf 1 (RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3])
+-- >>> tree2 = RtmProportions [RtmNote 5, RtmLeaf 2 (RtmProportions [RtmNote 6, RtmRest 4]), RtmRest 3]
+-- >>> leafRanks tree1 == [(RtmNote 5,1),(RtmNote 6,2),(RtmRest 4,2),(RtmRest 3,1)]
+-- >>> leafRanksFromProportions tree2 == [(RtmNote 5,1),(RtmNote 6,2),(RtmRest 4,2),(RtmRest 3,1)]
+-- True
+-- True
+--
+-- >>> mergeShapes [[1, 2], [1, 2, 3], [1]] == [1,2,3]
+-- >>> mergeShapes [[1, 2, 3], [1], [1, 2]] == [1,2,3]
+-- >>> mergeShapes [[1, 2], [1, 2], [1, 2]] == [1,2]
+-- True
+-- True
+-- True
 leafRanks :: RtmValue -> [(RtmValue, Int)]
 leafRanks val = leafRanksHelper val 0
 
@@ -334,8 +284,6 @@ leafRanksHelper' :: RtmValue -> Int -> [(RtmValue, Int)]
 leafRanksHelper' (RtmLeaf _ (RtmProportions rtmVals)) depth = concatMap (\v -> leafRanksHelper' v (depth + 1)) rtmVals
 leafRanksHelper' (RtmNote n) depth = [(RtmNote n, depth)]
 leafRanksHelper' (RtmRest n) depth = [(RtmRest n, depth)]
-
-
 
 data Path = Path {indices :: [Int], value :: RtmValue}
   deriving (Show)
@@ -461,118 +409,62 @@ combineValues (x : y : rest)
     isCombinable (RtmRest _) = True
     isCombinable _ = False
 
-{-
-inputProportions = RtmProportions [RtmNote 5, RtmNote 3, RtmRest 3, RtmRest 2, RtmNote 2]
-combineProportions inputProportions
-
--- RtmProportions [RtmNote 5,RtmNote 3,RtmRest 5,RtmNote 2]
-
- -}
-
-
-
 -- # SECTION QuickCheck
 
-
--- Let's limit the depth to prevent infinite recursion and massive structures
 maxDepth :: Int
-maxDepth = 3
-
+maxDepth = 1 -- Adjust the maxDepth as needed
 
 instance Arbitrary RtmValue where
-    arbitrary = sized arbRtmValue
-
-
--- arbRtmValue :: Int -> Gen RtmValue
--- arbRtmValue n
---   | n <= 0 = oneof [RtmNote <$> choose (1, 4), RtmRest <$> choose (1, 4)]
---   | otherwise = oneof
---       [ RtmNote <$> choose (1, 4)
---       , RtmRest <$> choose (1, 4)
---       , RtmLeaf <$> choose (1, 4) <*> resize (n - 1) arbitrary
---       ]
+  arbitrary = sized arbRtmValue
 
 arbRtmValue :: Int -> Gen RtmValue
 arbRtmValue n
   | n <= 0 = oneof [RtmNote <$> choose (1, 4), RtmRest <$> choose (1, 4)]
-  | n > maxDepth = oneof [RtmNote <$> choose (1, 4), RtmRest <$> choose (1, 4)]
-  | otherwise = oneof
-      [ RtmNote <$> choose (1, 4)
-      , RtmRest <$> choose (1, 4)
-      , RtmLeaf <$> choose (1, 4) <*> resize (n - 1) arbitrary
-      ]
-
-
--- instance Arbitrary RtmProportions where
---     arbitrary = do
---         rtmValue <- arbitrary
---         rtmValues <- listOf arbitrary
---         return $ RtmProportions (rtmValue : rtmValues)
+  | n > maxDepth = oneof [RtmNote <$> choose (4, 9), RtmRest <$> choose (4, 9)]
+  | otherwise =
+      oneof
+        [ RtmNote <$> choose (10, 14),
+          RtmRest <$> choose (10, 14),
+          RtmLeaf <$> choose (10, 14) <*> resize (n - 1) arbitrary
+        ]
 
 instance Arbitrary RtmProportions where
-    arbitrary = do
-        depth <- choose (1, maxDepth)
-        generateRtmProportions depth
-      where
-        generateRtmProportions :: Int -> Gen RtmProportions
-        generateRtmProportions 1 = do
-            rtmValue <- arbitrary
-            return (RtmProportions [rtmValue])
+  arbitrary = do
+    depth <- choose (1, maxDepth)
+    generateRtmProportions depth
+    where
+      generateRtmProportions :: Int -> Gen RtmProportions
+      generateRtmProportions 1 = do
+        numChildren <- choose (2, 4)
+        rtmValues <- vectorOf numChildren arbitrary
+        return (RtmProportions rtmValues)
+      generateRtmProportions depth = do
+        rtmValue <- arbitrary
+        -- Ensure at least three children when depth allows for it
+        numChildren <- choose (2, 4) -- Adjust the number of children as needed
+        children <- vectorOf numChildren (generateRtmProportions (depth - 1))
+        return (RtmProportions (rtmValue : concatMap (\(RtmProportions xs) -> xs) children))
 
-        generateRtmProportions depth = do
-            rtmValue <- arbitrary
-            numChildren <- choose (2, 6)  -- Adjust the number of children as needed
-            children <- vectorOf numChildren (generateRtmProportions (depth - 1))
-            return (RtmProportions (rtmValue : concatMap (\(RtmProportions xs) -> xs) children))
-
-
-
--- generateRtmProportions :: Int -> Gen [RtmValue]
--- generateRtmProportions 1 = do
---     rtmValue <- arbitrary
---     return [rtmValue]
-
--- generateRtmProportions depth = do
---     rtmValue <- arbitrary
---     numChildren <- choose (1, 5)  -- Adjust the number of children as needed
---     children <- vectorOf numChildren (generateRtmProportions (depth - 1))
---     return (rtmValue : concat children)
+-- genRtmProportions :: Gen RtmProportions
+-- genRtmProportions = do
+--   -- Generate a list of RtmValues
+--   rtmValues <- listOf1 genRtmValue -- Ensure at least one element
+--   return (RtmProportions rtmValues)
 
 
--- instance Arbitrary RtmStructure where
---   arbitrary = sized arbRtmStructure
+genRtmProportions :: Gen RtmProportions
+genRtmProportions = do
+  numElements <- choose (2, 4)
+  rtmValues <- vectorOf numElements genRtmValue
+  return (RtmProportions rtmValues)
 
 
--- arbRtmStructure :: Int -> Gen RtmStructure
--- arbRtmStructure 0 = return RtmScalar
--- arbRtmStructure n = oneof
---   [ return RtmScalar
---   , RtmVector <$> arbitrary <*> (resize (n - 1) (listOf $ arbRtmStructure (n `div` 2)))
---   ]
+-- Define a custom generator for RtmValue
+genRtmValue :: Gen RtmValue
+genRtmValue =
+  oneof
+    [ RtmNote <$> arbitrary,
+      RtmRest <$> arbitrary
+      -- You can add more cases for other RtmValue constructors
+    ]
 
--- instance Arbitrary ArrayShape where
---   arbitrary = sized arbArrayShape
-
--- arbArrayShape :: Int -> Gen ArrayShape
--- arbArrayShape 0 = return Scalar
--- arbArrayShape n = oneof
---   [ return Scalar
---   , Vector <$> (resize (n - 1) (listOf $ arbArrayShape (n `div` 2)))
---   ]
-
--- instance Arbitrary RtmArray where
---   arbitrary = do
---     shape <- arbitrary
---     vals <- case shape of
---       Scalar -> return [1]  -- just a simple scalar case
---       Vector shapes -> vectorOf (length shapes) arbitrary
---     return $ RtmArray vals shape
-
-
-
-{- 
-
-prop_toFromRtmArray :: RtmProportions -> Bool
-prop_toFromRtmArray rtm = rtm == (fromRtmArray . toRtmArray) rtm
-
- -}
