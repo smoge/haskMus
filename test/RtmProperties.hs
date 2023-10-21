@@ -25,5 +25,6 @@ main = do
 return []
 
 runTests :: IO Bool
-runTests = $quickCheckAll
+runTests = $verboseCheckAll
+--runTests = $quickCheckAll
 

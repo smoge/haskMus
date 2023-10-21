@@ -42,12 +42,13 @@ data RtmStructure
 --    , RtmRest 3
 --    ]
 
--- !! FIXME TRY THIS LATER
 data ArrayShape
   = Scalar
   | VectorP [ArrayShape]  -- Represents RtmProportions
   | VectorL [ArrayShape]  -- Represents RtmLeaf
   deriving (Eq, Show)
+
+-- ! FIXME: Maybe it's better the other way, but something is buggy here
 
 
 data RtmArray = RtmArray [Int] ArrayShape
@@ -443,13 +444,6 @@ instance Arbitrary RtmProportions where
         numChildren <- choose (2, 4) -- Adjust the number of children as needed
         children <- vectorOf numChildren (generateRtmProportions (depth - 1))
         return (RtmProportions (rtmValue : concatMap (\(RtmProportions xs) -> xs) children))
-
--- genRtmProportions :: Gen RtmProportions
--- genRtmProportions = do
---   -- Generate a list of RtmValues
---   rtmValues <- listOf1 genRtmValue -- Ensure at least one element
---   return (RtmProportions rtmValues)
-
 
 genRtmProportions :: Gen RtmProportions
 genRtmProportions = do
