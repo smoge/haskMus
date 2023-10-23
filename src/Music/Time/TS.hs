@@ -5,12 +5,13 @@
 {-# LANGUAGE TypeSynonymInstances       #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use isNothing" #-}
-
+{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE TypeApplications #-}
 module Music.Time.TS where
 
 import           Control.Lens    hiding (elements)
 import           Data.Bits       ((.&.))
-import Data.Ratio ( (%), denominator, numerator )
+import Data.Ratio
 import Test.QuickCheck
     ( elements,
       suchThat,
@@ -29,10 +30,55 @@ newtype Duration = Duration
 
 instance Show Duration where
   show (Duration r) =
-    "dur " ++ show (numerator r) ++ "/" ++ show (denominator r)
+    show (numerator r) ++ " %/ " ++ show (denominator r)
+
+
+class HasDuration a where
+    toDuration :: a -> Duration
+    fromDuration :: Duration -> a
+
+    default fromDuration :: (a ~ Duration) => Duration -> a
+    fromDuration = id
+
+instance HasDuration Duration where
+    toDuration = id
+    fromDuration = id
 
 dur :: Rational -> Duration
 dur = Duration
+
+infix 7 %/
+
+(%/) :: Integer -> Integer -> Duration
+n %/ d = dur (n % d)
+
+
+-- >>> [1, 1, 1, 1, 1] |/ 8 :: [Duration]
+-- [1 %/ 8,1 %/ 8,1 %/ 8,1 %/ 8,1 %/ 8]
+-- >>> [1%/2, 1%/2, 1%/2] |/ 8 :: [Duration]
+-- [1 %/ 16,1 %/ 16,1 %/ 16]
+-- >>> [1%/2, 1%/2, 1%/2] |/ 8 :: [Duration]
+-- [1 %/ 16,1 %/ 16,1 %/ 16]
+(|/) :: (HasDuration a) => [a] -> Integer -> [a]
+durations |/ d = map (\durVal -> 
+                     let durRational = durationToRational (toDuration durVal)
+                         divisor = fromInteger d
+                     in fromDuration $ dur (durRational / divisor)
+                  ) durations
+
+-- >>> [1%/64, 1%/64, 1%/64] |* 2 :: [Duration]
+-- [1 %/ 32,1 %/ 32,1 %/ 32]
+(|*) :: (HasDuration a) => [a] -> Integer -> [a]
+durations |* d = map (\durVal -> 
+                     let durRational = durationToRational (toDuration durVal)
+                         divisor = fromInteger d
+                     in fromDuration $ dur (durRational * divisor)
+                  ) durations
+
+durationToRational :: Duration -> Rational
+durationToRational (Duration r) = r
+
+
 
 -- | Represents a time signature with an upper and lower number.
 data TimeSignature = TimeSignature
@@ -57,14 +103,14 @@ n // d = TimeSignature n d
 -- | Convert a TimeSignature to a Duration.
 --
 -- >>> toDur $ TimeSignature 4 8
--- 1 % 2
+-- 1 %/ 2
 toDur :: TimeSignature -> Duration
 toDur (TimeSignature n d) = Duration $ n % d
 
 -- | Convert a Duration to a TimeSignature with a preferred denominator.
 --
--- >>> fromDur (1%2) 8
---  4//8
+-- >>> fromDur (1%/2) 8
+-- TS 4//8
 fromDur :: Duration -> Integer -> TimeSignature
 fromDur d preferredDenominator
   | numeratorRatio == 0 = error "Cannot convert zero Duration to TimeSignature"
