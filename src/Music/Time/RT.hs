@@ -1,5 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs     #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Music.Time.RT where
@@ -75,11 +77,34 @@ combineGaps []               = []
 combineGaps (Gap n:Gap m:xs) = combineGaps (Gap (n + m) : xs)
 combineGaps (x:xs)           = x : combineGaps xs
 
+
+
+
+-- data Capsule = [Component] deriving (Eq, Ord, Show)
+
+-- data Measure = Measure
+--   { ts :: TS -- TimeSignature
+--   , rt :: Capsule -- Vector / Rhythm Tree
+--   } deriving (Eq, Ord, Show)
+
+-- data Column = Column 
+-- { 
+--   tsColumn :: TS,
+--   capsules :: [Capsule]  -- One Capsule for each voice in the column
+-- } deriving (Eq, Ord, Show)
+
+-- type Voice = [Measure]
+
+-- type Matrix = [Column]
+
 data TS = TS
   { num :: Integer
   , den :: Integer
-  } deriving (Eq, Ord, Show)
+  } deriving (Eq, Ord)
 
+instance Show TS where
+  show (TS n d) = "TimeSig " ++ show n ++ "/" ++ show d
+  
 isValid :: TS -> Bool
 isValid (TS n d) = n > 0 && d > 0
 
@@ -92,10 +117,111 @@ isTSDenPowOfTwo (TS _ d) = isPowOfTwo d
 toDur :: TS -> Dur
 toDur (TS n d) = n % d
 
-data RMeasure = RMeasure
-  { ts :: TS
-  , rt :: [Component]
+
+newtype Proportions  = Proportions [Component] deriving (Eq, Ord, Show)
+
+data Capsule = Capsule
+  { ts :: TS -- Time Signature
+  , rhythm :: Proportions -- Rhythm Tree 
   } deriving (Eq, Ord, Show)
+
+data ScoreMeasure = ScoreMeasure { 
+  ts :: TS,
+  rhythm :: [Proportions]  -- One RhythmSegment for each voice in the column
+} deriving (Eq, Ord, Show)
+
+type ScoreVoice = [Capsule]
+
+type ScoreMatrix = [ScoreMeasure]
+
+newtype Matrix = Matrix [[(TS, Proportions)]] deriving (Eq, Ord, Show)
+
+-- VerticalSlice ?
+
+-- "
+--     | Measure 1 | Measure 2 | Measure 3 | ...
+-- ----------------------------------------------
+-- Voice 1 |   M1,1   |   M1,2   |   M1,3   | ...
+-- ----------------------------------------------
+-- Voice 2 |   M2,1   |   M2,2   |   M2,3   | ...
+-- ----------------------------------------------
+-- Voice 3 |   M3,1   |   M3,2   |   M3,3   | ...
+-- ----------------------------------------------
+--    .       .          .          . 
+--    .       .          .          .
+-- "
+
+ts1 :: TS
+ts1 = TS 4 4
+
+ts2 :: TS
+ts2 = TS 6 8
+
+ts3 :: TS
+ts3 = TS 3 4
+
+prop1 :: Proportions
+prop1 = Proportions [Scalar 2, Gap 1, Scalar 1]  
+
+prop2 :: Proportions
+prop2 = Proportions [Scalar 1, Scalar 2, Scalar 1]
+
+prop3 :: Proportions
+prop3 = Proportions [Vector 4 [Scalar 2, Gap 3], Vector 5 [Gap 2, Scalar 1]]
+
+prop4 :: Proportions
+prop4 = Proportions [Vector 3 [Scalar 1, Gap 2, Vector 2 [Scalar 1, Gap 1]], Scalar 3]
+
+
+capsule1 :: Capsule
+capsule1 = Capsule ts1 prop1
+
+capsule2 :: Capsule
+capsule2 = Capsule ts2 prop2
+
+capsule3 :: Capsule
+capsule3 = Capsule ts3 prop3
+
+capsule4 :: Capsule
+capsule4 = Capsule ts1 prop4
+
+
+scoreMeasure1 :: ScoreMeasure
+scoreMeasure1 = ScoreMeasure ts1 [prop1, prop2, prop3]
+
+scoreMeasure2 :: ScoreMeasure
+scoreMeasure2 = ScoreMeasure ts2 [prop2, prop4, prop3]
+
+scoreMeasure3 :: ScoreMeasure
+scoreMeasure3 = ScoreMeasure ts3 [prop1, prop3, prop4]
+
+
+scoreVoice1 :: ScoreVoice
+scoreVoice1 = [capsule1, capsule3, capsule4]
+
+scoreVoice2 :: ScoreVoice
+scoreVoice2 = [capsule2, capsule3]
+
+
+scoreMatrix1 :: ScoreMatrix
+scoreMatrix1 = [scoreMeasure1, scoreMeasure2, scoreMeasure3]
+
+-- pPrint scoreMatrix1
+
+matrix1 :: Matrix
+matrix1 = Matrix [[(ts1, prop1), (ts2, prop2)], [(ts2, prop3), (ts3, prop4)]]
+
+-- pPrint matrix1
+
+{- 
+
+pPrint scoreMatrix1
+
+pPrint matrix1
+
+ -}
+
+
 
 -- | TimeSignature examples
 -- >>> TS 4 4
