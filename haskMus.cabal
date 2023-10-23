@@ -27,7 +27,7 @@ library
     Music.Time.Rtm
     Music.Time.RT
     Music.Time.TS
-
+    Music.Time.Tree
   build-depends:       base >= 4.17.2 && < 4.19
                      , containers >= 0.6.7 && < 0.7
                      , text >= 2.0.2 && < 2.2
