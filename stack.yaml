@@ -1,5 +1,5 @@
 
-resolver: nightly-2023-10-22
+resolver: nightly-2023-10-23
 #resolver: lts-21.17
 
 packages:
@@ -7,5 +7,11 @@ packages:
 
 extra-deps: 
  - haskell-dap-0.0.16.0@sha256:5ee4fba7ce1b8220f486a5251a941e6cd739ab2330e8f25efc5af553a4e1c61d,944
-
+ - hie-bios-0.12.0@sha256:8848be37d68fdc932ab700ff3b79a59b74d3c10aa7d8dc5b844c1782f39f95a1,11866
+ - hie-compat-0.3.1.1@sha256:1d3244698adbe72dbb91b18782ee48948681e4f2d2f60876f0c579d70efba41f,1883
+ - hiedb-0.4.3.0@sha256:19083a9a4cc286d0cde5238d65eb48f823eabffde4f506fad5459861c8795d79,3017
+ - hls-graph-2.2.0.0@sha256:b4324d5f9896cbe34705b94eebc7344b201cc8563ebd51e2323b0619d0ef47ef,3288
+ - hls-plugin-api-2.2.0.0@sha256:04420a0eb762b0942403e72056dd8be10ab9c21a0686c116ee81f4ce9cb80a2d,3304
+ - implicit-hie-0.1.2.7@sha256:82bbbb1a8c05f99c8af3c16ac53e80c8648d8bf047b25ed5ce45a135bd736907,3122
+ - implicit-hie-cradle-0.5.0.1@sha256:dbc9414d4279ae7b7e169a0f5d0709c9c20ff91654a67856529c88c32f5c159c,2184
 extra-package-dbs: []
