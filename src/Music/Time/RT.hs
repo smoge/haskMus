@@ -14,6 +14,7 @@ import           Test.QuickCheck
 import           Text.Pretty.Simple
 import Control.Lens
 import Data.List (transpose, intercalate)
+import Music.Time.TS 
 
 type Dur = Rational -- ^ Duration
 
@@ -87,48 +88,6 @@ combineGaps []               = []
 combineGaps (Gap n:Gap m:xs) = combineGaps (Gap (n + m) : xs)
 combineGaps (x:xs)           = x : combineGaps xs
 
-
--- | TimeSignature
-data TS = TS
-  { _num :: Integer
-  , _den :: Integer
-  } deriving (Eq, Ord)
-makeLenses ''TS
-
--- instance Show TS where
---   show (TS n d) = " " ++ show n ++ "//" ++ show d
-
-instance Show TS where
-  show (TS n d) = " time " ++ show n ++ "/" ++ show d
-
-infixr 7 //
-
--- | Time Signature 
-(//) :: Integer -> Integer -> TS
-n // d = TS n d
-
-
-{- 
->>> ts1 = 4 // 4
->>> ts2 = ts1 & num .~ 7 & den .~ 8
->>> ts2
-TS 7//8
-
- -}
-isValidTS :: TS -> Bool
-isValidTS (TS n d) = n > 0 && d > 0
-
-isPowOfTwo :: Integer -> Bool
-isPowOfTwo n = n > 0 && n Data.Bits..&. (n - 1) == 0
-
-isTSDenPowOfTwo :: TS -> Bool
-isTSDenPowOfTwo (TS _ d) = isPowOfTwo d
-
-timeSigToDur :: TS -> Dur
-timeSigToDur (TS n d) = n % d
-
-checkPowerOfTwo :: TS -> Bool
-checkPowerOfTwo ts = isPowOfTwo $ ts ^. den
 
 
 newtype Proportions = Proportions
@@ -346,7 +305,7 @@ getCapsule (MatrixScore m) rowIndex colIndex = m ^? ix rowIndex . ix colIndex
 
 
 -- Access the Proportions inside a Matrix
-getProportions :: MatrixScore-> Int -> Int -> Maybe Proportions
+getProportions :: MatrixScore -> Int -> Int -> Maybe Proportions
 getProportions (MatrixScore m) rowIndex colIndex = m ^? ix rowIndex . ix colIndex . _2
 
 -- getProportions matrix1 1 1
