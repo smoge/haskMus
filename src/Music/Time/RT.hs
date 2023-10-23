@@ -214,30 +214,6 @@ reconstruct (sh:shps) vals =
           -- Return the created component and continue with the remaining shapes and integers.
        in Just val : reconstruct shps remVals
 
--- fromShapeAndComponents :: Shape -> [Int] -> Maybe Component
--- fromShapeAndComponents S (x:_)
---   | x > 0 = Just $ Scalar x
---   | x < 0 = Just $ Gap (-x)
---   | otherwise = Just $ Gap 0 -- or Nothing ?
--- fromShapeAndComponents (V shps) (n:xs) = do
---   (components, _) <- foldM go ([], xs) shps
---   --return $ Vector n Components
---   return $ Vector (abs n) components
---   where
---     go (acc, vals) shape = do
---       val <- fromShapeAndComponents shape vals
---       let remaining = drop (length (componentsOfArray [val])) vals
---       return (acc ++ [val], remaining)
--- fromShapeAndComponents _ _ = Nothing
--- reconstruct :: [Shape] -> [Int] -> [Maybe Component]
--- reconstruct [] _ = []
--- reconstruct (sh:shps) vals =
---   case fromShapeAndComponents sh vals of
---     Nothing -> Nothing : reconstruct shps vals
---     Just val ->
---       let usedVals = componentsOfArray [val]
---           remVals = drop (length usedVals) vals
---        in Just val : reconstruct shps remVals
 {- -- Test
 testArray :: [Component]
 testArray =
@@ -308,6 +284,7 @@ pPrint ranks
 ]
 
  -}
+
  {-
 simpleVector :: Component
 simpleVector = Vector 3 [Scalar 2, Gap 4, Scalar 6]
