@@ -47,7 +47,7 @@ fromDur dur preferredDenominator
 applyFunctionToTS :: (Dur -> Dur) -> TS -> TS
 applyFunctionToTS f ts =
     let dur = timeSigToDur ts
-            targetDenominator = findBestDenominator f dur
+        targetDenominator = findBestDenominator f dur
      in fromDur (f dur) targetDenominator
 
 -- | Apply a function to a TimeSignature with a preferred denominator
@@ -99,47 +99,3 @@ isTSDenPowOfTwo (TS _ d) = isPowOfTwo d
 checkPowerOfTwo :: TS -> Bool
 checkPowerOfTwo ts = isPowOfTwo $ ts ^. den
 
--- >>> applyFunctionToTS  (+ (1%8)) (4//8)
--- >>> applyFunctionToTS  (+ (3%8)) (4//8)
--- >>> applyFunctionToTS  (+ (3%8)) (4//4)
--- >>> applyFunctionToTS  (* (5%8)) (3//4)
---  5//8
---  7//8
---  11//8
---  15//32
-
-{- 
-
->>> applyFunctionToTS' (+ (1 % 8)) (Just 4) (4//4)
- 9//8
-
->>> applyFunctionToTS' (* 2) Nothing (5//8)
- 10//8
-
->>> applyFunctionToTS' (+ (1 % 4)) (Nothing) (3//4)
- 4//4
-
- -}
-
-
-{-
->>> fromDur (4%8) 8
->>> fromDur (5%8) 4
->>> fromDur (1%2) 16
->>> fromDur' (4%8) (Just 8)
->>> fromDur' (5%8) Nothing
->>> fromDur' (1%2) (Just 4)
- 4//8
- 5//8
- 8//16
- 4//8
- 5//8
- 2//4
-  -}
-{-
->>> ts1 = 4 // 4
->>> ts2 = ts1 & num .~ 7 & den .~ 8
->>> ts2
- 7//8
-
- -}
