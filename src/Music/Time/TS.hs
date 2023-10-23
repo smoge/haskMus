@@ -83,7 +83,6 @@ findBestDenominator f dur =
         targetDenominator = denominator newDur
      in lcm currentDenominator targetDenominator
 
-
 isValid :: TS -> Bool
 isValid (TS n d) = n > 0 && d > 0
 
@@ -98,4 +97,51 @@ isTSDenPowOfTwo (TS _ d) = isPowOfTwo d
 -- | Check if the denominator of a TimeSignature is a power of two
 checkPowerOfTwo :: TS -> Bool
 checkPowerOfTwo ts = isPowOfTwo $ ts ^. den
+
+
+{- 
+>>> applyFunctionToTS  (+ (1%8)) (4//8)
+ 5//8
+
+>>> applyFunctionToTS  (+ (3%8)) (4//8)
+ 7//8
+
+>>> applyFunctionToTS  (* (5%8)) (3//4)
+ 15//32
+
+>>> applyFunctionToTS  (+ (3%8)) (4//4)
+ 11//8
+
+>>> applyFunctionToTS' (+ (1 % 8)) (Just 4) (4//4)
+ 9//8
+
+>>> applyFunctionToTS' (* 2) Nothing (5//8)
+ 10//8
+
+>>> applyFunctionToTS' (+ (1 % 4)) (Nothing) (3//4)
+ 4//4
+
+>>> fromDur (4%8) 8
+ 4//8
+
+>>> fromDur (5%8) 4
+ 5//8
+
+>>> fromDur (1%2) 16
+ 8//16
+
+>>> fromDur' (4%8) (Just 8)
+ 4//8
+
+>>> fromDur' (5%8) Nothing
+ 5//8
+
+>>> fromDur' (1%2) (Just 4) 
+ 2//4
+
+>>>  (4//4) & num .~ 7 & den .~ 8
+ 7//8
+
+
+ -}
 
