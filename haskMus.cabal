@@ -75,8 +75,9 @@ test-suite haskMus-test
                      , PitchSpec
                      , PitchProperties
                      , RtmProperties
+                     , TSSpec
   build-depends:       base >= 4.17.2.0 && < 4.19.0.0
-                     , haskMus
+                     , haskMus 
                      , hspec >= 2.10.0 && < 2.12
                      , lens >= 5.2.3 && < 5.3
                      , HUnit >= 1.6.2 && < 1.7
