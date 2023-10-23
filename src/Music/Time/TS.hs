@@ -184,17 +184,6 @@ tsD = fromDur (dur 4/8) 8
 tsE :: TimeSignature
 tsE = fromDur' (dur 1/2) Nothing
  -}
--- instance Arbitrary TimeSignature where
---     arbitrary :: Gen TimeSignature
---     arbitrary = do
---         up <- getPositive <$> arbitrary
---         lo <- elements [1, 2, 4, 8, 16, 32, 64, 128]
---         return $ TimeSignature up lo
--- instance Arbitrary TimeSignature where
---   arbitrary = do
---     (Positive n) <- arbitrary
---     d <- arbitrary `suchThat` isPowOfTwo
---     return (n // d)
 
 instance Arbitrary TimeSignature where
     arbitrary = do
