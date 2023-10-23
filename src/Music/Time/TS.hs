@@ -10,8 +10,17 @@ module Music.Time.TS where
 
 import           Control.Lens    hiding (elements)
 import           Data.Bits       ((.&.))
-import           Data.Ratio
-import           Test.QuickCheck
+import Data.Ratio ( (%), denominator, numerator )
+import Test.QuickCheck
+    ( elements,
+      suchThat,
+      (==>),
+      quickCheck,
+      verboseCheck,
+      Arbitrary(arbitrary),
+      Gen,
+      Positive(Positive, getPositive),
+      Property )
 
 -- | A duration with a numerator and denominator
 newtype Duration = Duration
