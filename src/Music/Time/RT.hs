@@ -13,7 +13,7 @@ import           Data.Ratio
 import           Test.QuickCheck
 import           Text.Pretty.Simple
 import Control.Lens
-import Data.List (transpose)
+import Data.List (transpose, intercalate)
 
 type Dur = Rational -- ^ Duration
 
@@ -21,12 +21,12 @@ data Component
   = Scalar Int
   | Gap Int
   | Vector Int [Component]
-  deriving (Eq, Ord)
+  deriving (Eq, Show, Ord)
 
-instance Show Component where
-  show (Scalar n) = " " ++ show n
-  show (Gap n) = " -" ++ show n
-  show (Vector n xs) = " vector " ++ show n  ++ show xs
+-- instance Show Component where
+--   show (Scalar n) = " " ++ show n
+--   show (Gap n) = " -" ++ show n
+--   show (Vector n xs) = " vector " ++ show n  ++ show xs
 
 
 
@@ -165,6 +165,69 @@ newtype MatrixScore =
 -- newtype Matrix = Matrix [[[Component]]]
 --   deriving (Eq, Ord, Show)
 
+
+-- newtype TensorProportions = TensorProportions [Matrix Proportions]
+--   deriving (Eq, Ord, Show)
+
+newtype ProportionsRow = ProportionsRow [Proportions]
+  deriving (Eq, Ord, Show)
+
+newtype ProportionsMatrix = ProportionsMatrix [ProportionsRow]
+  deriving (Eq, Ord, Show)
+
+newtype ProportionsTensor = ProportionsTensor [ProportionsMatrix]
+  deriving (Eq, Ord, Show)
+
+
+{- 
+-- Define a function to access the Proportions at a specific row and column
+getProportions :: ProportionsMatrix -> Int -> Int -> Proportions
+getProportions (ProportionsMatrix rows) rowIndex colIndex =
+  let row = rows !! rowIndex
+  in case row of
+    ProportionsRow proportionsRow -> proportionsRow !! colIndex
+
+-- :Accessing a Proportions in the matrix
+let matrix = ProportionsMatrix [row1, row2]
+let rowIndex = 0
+let colIndex = 1
+let result = getProportions matrix rowIndex colIndex
+print result -- This will print the Proportions at row 0, column 1
+
+-- Define a function to access the ProportionsMatrix at a specific index
+getProportionsMatrix :: ProportionsTensor -> Int -> ProportionsMatrix
+getProportionsMatrix (ProportionsTensor matrices) matrixIndex =
+  matrices !! matrixIndex
+
+-- Accessing a ProportionsMatrix in the tensor
+let tensor = ProportionsTensor [matrix1, matrix2]
+let matrixIndex = 1
+let resultMatrix = getProportionsMatrix tensor matrixIndex
+print resultMatrix -- This will print the ProportionsMatrix at index 1 of the tensor
+
+-- Define a function to extract a submatrix from a matrix
+sliceMatrix :: Matrix a -> Int -> Int -> Int -> Int -> Matrix a
+sliceMatrix (Matrix rows) startRow endRow startCol endCol =
+  Matrix $ take (endRow - startRow + 1) $ drop startRow $
+  map (\row -> take (endCol - startCol + 1) $ drop startCol row) rows
+
+-- Slicing a submatrix from a matrix
+let matrix = Matrix [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+let slicedMatrix = sliceMatrix matrix 0 1 1 2
+print slicedMatrix
+
+-- Define a function to extract a subtensor from a tensor
+sliceTensor :: ProportionsTensor -> Int -> Int -> Int -> Int -> Int -> Int -> ProportionsTensor
+sliceTensor (ProportionsTensor matrices) startMatrix endMatrix startRow endRow startCol endCol =
+  ProportionsTensor $ take (endMatrix - startMatrix + 1) $ drop startMatrix $
+  map (\matrix -> sliceMatrix matrix startRow endRow startCol endCol) matrices
+
+-- Slicing a subtensor from a tensor
+let tensor = ProportionsTensor [matrix1, matrix2]
+let slicedTensor = sliceTensor tensor 0 0 0 1 1 2
+print slicedTensor
+
+ -}
 newtype Matrix a = Matrix [[[a]]]
   deriving (Eq, Ord, Show)
 
@@ -182,7 +245,80 @@ liftMatrixOp :: ([[a]] -> [[a]]) -> Matrix a -> Matrix a
 liftMatrixOp f (Matrix xs) = Matrix $ map f xs
 
 
+-- Define some sample components
+comp1 :: Component
+comp1 = Scalar 2
+
+comp2 :: Component
+comp2 = Gap 3
+
+comp3 :: Component
+comp3 = Vector 4 [Scalar 2, Gap 3]
+
+comp4 :: Component
+comp4 = Vector 5 [Gap 2, Scalar 1]
+
+-- Create a Matrix of components
+matrix1c :: Matrix Component
+matrix1c = Matrix [
+    [ [comp1, comp2]
+    , [comp3, comp4]
+  ], 
+  [ [comp1, comp2]
+  , [comp3, comp4]
+  ]]
+
+
+data Tree a = Node a [Tree a]
+  deriving (Show)
+
+-- Convert a Component to a tree node
+componentToTreeNode :: Component -> Tree String
+componentToTreeNode comp = case comp of
+  Scalar n -> Node ("Scalar " ++ show n) []
+  Gap n -> Node ("Gap " ++ show n) []
+  Vector n components -> Node ("Vector " ++ show n) (map componentToTreeNode components)
+
+-- Convert a Matrix Component to a tree
+matrixToTree :: [[Component]] -> Tree String
+matrixToTree rows = Node "Matrix" (map (Node "Row" . map componentToTreeNode) rows)
+
+-- Pretty-print a tree
+prettyPrintTree :: Tree String -> String
+prettyPrintTree (Node label children) =
+  label ++ if null children then "\n" else ":\n" ++ indent (concatMap prettyPrintTree children)
+  where
+    indent = unlines . map ("  "++) . lines
+
+
+-- Example usage:
+matrix1d :: [[Component]]
+matrix1d =
+  [ [ Scalar 2, Gap 3 ]
+  , [ Vector 4 [Scalar 2, Gap 3], Vector 5 [Gap 2, Scalar 1] ]
+  ]
+
+-- pPrint matrix1c 
+
+
+test :: IO ()
+test = putStrLn $ prettyPrintTree (matrixToTree matrix1d)
+
+
+-- Matrix:
+--   Row:
+--     Scalar 2
+--     Gap 3
+--   Row:
+--     Vector 4:
+--       Scalar 2
+--       Gap 3
+--     Vector 5:
+--       Gap 2
+--       Scalar 1
+
 -- Testing Lenses 
+
 
 
 addScalar :: Proportions -> Component -> Proportions
