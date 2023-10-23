@@ -3,46 +3,35 @@
 {-# LANGUAGE InstanceSigs               #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeSynonymInstances       #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Use isNothing" #-}
-{-# LANGUAGE DefaultSignatures #-}
-{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE DefaultSignatures          #-}
+{-# LANGUAGE TypeApplications           #-}
+
 module Music.Time.TS where
 
 import           Control.Lens    hiding (elements)
 import           Data.Bits       ((.&.))
-import Data.Ratio
-import Test.QuickCheck
-    ( elements,
-      suchThat,
-      (==>),
-      quickCheck,
-      verboseCheck,
-      Arbitrary(arbitrary),
-      Gen,
-      Positive(Positive, getPositive),
-      Property )
+import           Data.Ratio
+import           Test.QuickCheck (Arbitrary (arbitrary), Gen,
+                                  Positive (Positive, getPositive), Property,
+                                  elements, quickCheck, suchThat, verboseCheck,
+                                  (==>))
 
--- | A duration with a numerator and denominator
 newtype Duration = Duration
   { unDuration :: Rational
   } deriving (Eq, Ord, Num, Fractional)
 
 instance Show Duration where
-  show (Duration r) =
-    show (numerator r) ++ " %/ " ++ show (denominator r)
-
+  show (Duration r) = show (numerator r) ++ " %/ " ++ show (denominator r)
 
 class HasDuration a where
-    toDuration :: a -> Duration
-    fromDuration :: Duration -> a
-
-    default fromDuration :: (a ~ Duration) => Duration -> a
-    fromDuration = id
+  toDuration :: a -> Duration
+  fromDuration :: Duration -> a
+  default fromDuration :: (a ~ Duration) => Duration -> a
+  fromDuration = id
 
 instance HasDuration Duration where
-    toDuration = id
-    fromDuration = id
+  toDuration = id
+  fromDuration = id
 
 dur :: Rational -> Duration
 dur = Duration
@@ -52,38 +41,39 @@ infix 7 %/
 (%/) :: Integer -> Integer -> Duration
 n %/ d = dur (n % d)
 
-
--- >>> [1, 1, 1, 1, 1] |/ 8 :: [Duration]
+-- >>> [1, 1, 1, 1, 1]|/ 8 :: [Duration]
 -- [1 %/ 8,1 %/ 8,1 %/ 8,1 %/ 8,1 %/ 8]
--- >>> [1%/2, 1%/2, 1%/2] |/ 8 :: [Duration]
+-- >>> [1%/2, 1%/2, 1%/2]|/ 8 
 -- [1 %/ 16,1 %/ 16,1 %/ 16]
--- >>> [1%/2, 1%/2, 1%/2] |/ 8 :: [Duration]
+-- >>> [1%/2, 1%/2, 1%/2]|/ 8
 -- [1 %/ 16,1 %/ 16,1 %/ 16]
 (|/) :: (HasDuration a) => [a] -> Integer -> [a]
-durations |/ d = map (\durVal -> 
-                     let durRational = durationToRational (toDuration durVal)
-                         divisor = fromInteger d
-                     in fromDuration $ dur (durRational / divisor)
-                  ) durations
+durations |/ d =
+  map
+    (\durVal ->
+       let durRational = durationToRational (toDuration durVal)
+           divisor = fromInteger d
+        in fromDuration $ dur (durRational / divisor))
+    durations
 
--- >>> [1%/64, 1%/64, 1%/64] |* 2 :: [Duration]
+-- >>> [1%/64, 1%/64, 1%/64]|* 2 :: [Duration]
 -- [1 %/ 32,1 %/ 32,1 %/ 32]
 (|*) :: (HasDuration a) => [a] -> Integer -> [a]
-durations |* d = map (\durVal -> 
-                     let durRational = durationToRational (toDuration durVal)
-                         divisor = fromInteger d
-                     in fromDuration $ dur (durRational * divisor)
-                  ) durations
+durations |* d =
+  map
+    (\durVal ->
+       let durRational = durationToRational (toDuration durVal)
+           divisor = fromInteger d
+        in fromDuration $ dur (durRational * divisor))
+    durations
 
 durationToRational :: Duration -> Rational
 durationToRational (Duration r) = r
 
-
-
 -- | Represents a time signature with an upper and lower number.
 data TimeSignature = TimeSignature
-  { _upper :: Integer -- ^ TS Upper Number
-  , _lower :: Integer -- ^ TS Lower Number
+  { _upper :: Integer -- ^ TimeSignature Upper Number
+  , _lower :: Integer -- ^ TimeSignature Lower Number
   } deriving (Eq, Ord)
 
 makeLenses ''TimeSignature
@@ -94,9 +84,9 @@ time = TimeSignature
 instance Show TimeSignature where
   show (TimeSignature n d) = "TS " ++ show n ++ "//" ++ show d
 
--- | Create a TimeSignature from two integers.
 infixr 7 //
 
+-- | Create a TimeSignature from two integers.
 (//) :: Integer -> Integer -> TimeSignature
 n // d = TimeSignature n d
 
@@ -136,9 +126,8 @@ durToTimeSig d preferredDenominator
 
 -- | Convert a Duration to a TimeSignature with an optional preferred denominator.
 --
--- >>> fromDur' (3%4) (Just 8)
---  6//8
-
+-- >>> fromDur' (3%/4) (Just 8)
+-- TS 6//8
 fromDur' :: Duration -> Maybe Integer -> TimeSignature
 fromDur' d maybePreferredDenominator =
   case maybePreferredDenominator of
@@ -146,7 +135,6 @@ fromDur' d maybePreferredDenominator =
     Nothing                   -> fromDur d denom
   where
     denom = denominator $ unDuration d
-
 
 -- | Convert a Duration to a TimeSignature returns Maybe TimeSignature.
 --
@@ -217,39 +205,18 @@ isPowOfTwo n = n > 0 && n Data.Bits..&. (n - 1) == 0
 -- | Check if the denominator of a TimeSignature is a power of two.
 tsLowerPowerOfTwo :: TimeSignature -> Bool
 tsLowerPowerOfTwo ts = isPowOfTwo $ ts ^. lower
- -- QuickCheck
 
-----------------------------------------------------------------------------
--- # SECTION Examples
-----------------------------------------------------------------------------
-{-
--- | Create a TimeSignature.
-tsA :: TimeSignature
-tsA = 4 // 4
 
--- | Apply a function (+ dur 1/8) to tsA.
-tsB :: TimeSignature
-tsB = applyFunctionToTS (+ (dur 1%/)) tsA
 
--- | Apply a function (* 2) to tsA with a preferred denominator of 8.
-tsC :: TimeSignature
-tsC = applyFunctionToTS' (* 2) (Just 8) tsA
-
--- | Convert a Duration (4%8) to a TimeSignature with a preferred denominator of 8.
-tsD :: TimeSignature
-tsD = fromDur (dur 4/8) 8
-
--- | Convert a Duration (1%2) to a TimeSignature without specifying a denominator.
-tsE :: TimeSignature
-tsE = fromDur' (dur 1/2) Nothing
- -}
+--------------------------------------
+-- # SECTION QuickCheck
+--------------------------------------
 
 instance Arbitrary TimeSignature where
-    arbitrary = do
-        (Positive n) <- arbitrary
-        d <- elements [2 ^ x | x <- ([0 .. 7] :: [Integer]) ]
-        return (n // d)
-
+  arbitrary = do
+    (Positive n) <- arbitrary
+    d <- elements [2 ^ x | x <- ([0 .. 7] :: [Integer])]
+    return (n // d)
 
 instance Arbitrary Duration where
   arbitrary :: Gen Duration
@@ -259,14 +226,15 @@ instance Arbitrary Duration where
     let d = 2 ^ denominatorPower
     return $ Duration (n % d)
 
--- Conversion from TimeSignature to Duration and back should be an identity:
+-- | Conversion from TimeSignature to Duration and back should be an identity:
 prop_toDur_fromDur_identity :: TimeSignature -> Bool
 prop_toDur_fromDur_identity ts =
   let d = toDur ts
       ts' = fromDur d (ts ^. lower)
    in ts == ts'
 
---  fromDur' without a preferred denominator, it should be the same as using fromDur with the denominator of the given duration:
+-- | fromDur' without a preferred denominator, it should be the 
+-- same as using fromDur with the denominator of the given duration:
 prop_fromDur_fromDur' :: Duration -> Bool
 prop_fromDur_fromDur' d =
   fromDur' d Nothing == fromDur d (denominator $ unDuration d)
