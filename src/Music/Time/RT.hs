@@ -99,7 +99,7 @@ instance Show Proportions where
   show (Proportions xs) = " " ++ show xs
 
 data Capsule = Capsule
-  { _ts :: TS
+  { _ts :: TimeSignature 
   , _proportions :: Proportions
   } deriving (Eq, Ord)
 makeLenses ''Capsule
@@ -108,7 +108,7 @@ instance Show Capsule where
   show (Capsule tsg props) = show tsg ++ " " ++ show props
 
 data ScoreMeasure = ScoreMeasure
-  { _scoreMeasureTs :: TS
+  { _scoreMeasureTs :: TimeSignature
   , _scoreMeasureRhythms :: [Proportions]
   } deriving (Eq, Ord, Show)
 makeLenses ''ScoreMeasure
@@ -118,7 +118,7 @@ type ScoreVoice = [Capsule]
 type ScoreMatrix = [ScoreMeasure]
 
 newtype MatrixScore =
-  MatrixScore [[(TS, Proportions)]]
+  MatrixScore [[(TimeSignature, Proportions)]]
   deriving (Eq, Ord, Show)
 
 -- newtype Matrix = Matrix [[[Component]]]
@@ -286,7 +286,7 @@ addScalar props scalar = props & components %~ (scalar:)
 updateRhythm :: Capsule -> Proportions -> Capsule
 updateRhythm capsule newRhythm = capsule & proportions .~ newRhythm
 
-getTimeSignature :: ScoreMeasure -> TS
+getTimeSignature :: ScoreMeasure -> TimeSignature
 getTimeSignature scoreMeasure = scoreMeasure ^. scoreMeasureTs
 
 changeRhythms :: ScoreMeasure -> [Proportions] -> ScoreMeasure
@@ -296,7 +296,7 @@ firstComponent :: Capsule -> Maybe Component
 firstComponent capsule = capsule ^? proportions . components . ix 0
 
 
-getCapsule :: MatrixScore -> Int -> Int -> Maybe (TS, Proportions)
+getCapsule :: MatrixScore -> Int -> Int -> Maybe (TimeSignature, Proportions)
 getCapsule (MatrixScore m) rowIndex colIndex = m ^? ix rowIndex . ix colIndex
 
 
@@ -400,13 +400,13 @@ matrix3Transpose = MatrixP (transpose (unMatrixP matrix3))
 
 
 
-ts1 :: TS
-ts1 = TS 4 4
+ts1 :: TimeSignature
+ts1 = TimeSignature 4 4
 
-ts2 :: TS
+ts2 :: TimeSignature
 ts2 = 6 // 8
 
-ts3 :: TS
+ts3 :: TimeSignature
 ts3 = 3 // 4
 
 prop1 :: Proportions

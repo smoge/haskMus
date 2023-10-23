@@ -7,141 +7,153 @@ import           Control.Lens
 import           Data.Bits    ((.&.))
 import           Data.Ratio
 
-type Dur = Rational -- ^ Duration
+type Duration = Rational
 
--- | TimeSignature
-data TS = TS
-    { _num :: Integer -- ^ Numerator
-    , _den :: Integer -- ^ Denominator
+-- | Represents a time signature with an upper and lower number.
+data TimeSignature = TimeSignature
+    { _upper :: Integer -- ^ TS Upper Number
+    , _lower :: Integer -- ^ TS Lower Number
     } deriving (Eq, Ord)
 
-makeLenses ''TS
+makeLenses ''TimeSignature
 
-instance Show TS where
-    show (TS n d) = " " ++ show n ++ "//" ++ show d
+instance Show TimeSignature where
+    show (TimeSignature n d) = " " ++ show n ++ "//" ++ show d
 
+-- | Create a TimeSignature from two integers.
 infixr 7 //
+(//) :: Integer -> Integer -> TimeSignature
+n // d = TimeSignature n d
 
--- | Time Signature
-(//) :: Integer -> Integer -> TS
-n // d = TS n d
+-- | Convert a TimeSignature to a Duration.
+timeSigToDur :: TimeSignature -> Duration
+timeSigToDur (TimeSignature n d) = n % d
 
--- | Convert TimeSignature to duration
-timeSigToDur :: TS -> Dur
-timeSigToDur (TS n d) = n % d
+-- | Convert a TimeSignature to a Duration.
+--
+-- >>> toDur $ TimeSignature 4 8
+-- 1 % 2
+toDur :: TimeSignature -> Duration
+toDur (TimeSignature n d) = n % d
 
--- | Convert TimeSignature to duration
-toDur :: TS -> Dur
-toDur (TS n d) = n % d
-
--- | Convert duration to TimeSignature
-fromDur :: Dur -> Integer -> TS
+-- | Convert a Duration to a TimeSignature with a preferred denominator.
+--
+-- >>> fromDur (1%2) 8
+--  4//8
+fromDur :: Duration -> Integer -> TimeSignature
 fromDur dur preferredDenominator
-    | numeratorRatio == 0 = error "Cannot convert zero duration to time signature"
-    | otherwise = durToTimeSig dur targetDenominator
+    | numeratorRatio == 0 = error "Cannot convert zero Duration to TimeSignature"
+    | otherwise = fromDur dur targetDenominator
     where
         numeratorRatio = numerator dur
         targetDenominator = max (denominator dur) preferredDenominator
 
--- | Apply a function to a TimeSignature
-applyFunctionToTS :: (Dur -> Dur) -> TS -> TS
-applyFunctionToTS f ts =
-    let dur = timeSigToDur ts
-        targetDenominator = findBestDenominator f dur
-     in fromDur (f dur) targetDenominator
-
--- | Apply a function to a TimeSignature with a preferred denominator
-applyFunctionToTS' :: (Dur -> Dur) -> Maybe Integer -> TS -> TS
-applyFunctionToTS' f maybePreferredDenominator ts =
-    case maybePreferredDenominator of
-        Just preferredDenominator -> fromDur (f $ toDur ts) preferredDenominator
-        Nothing -> fromDur (f $ toDur ts)  (ts ^. den)
-
--- | Convert duration to TimeSignature with a preferred denominator
-fromDur' :: Dur -> Maybe Integer -> TS
+-- | Convert a Duration to a TimeSignature with an optional preferred denominator.
+--
+-- >>> fromDur' (3%4) (Just 8)
+--  6//8
+fromDur' :: Duration -> Maybe Integer -> TimeSignature
 fromDur' dur maybePreferredDenominator =
     case maybePreferredDenominator of
         Just preferredDenominator -> fromDur dur preferredDenominator
         Nothing -> fromDur dur (denominator dur)
 
--- | Convert duration to TimeSignature with a preferred denominator
-durToTimeSig :: Dur -> Integer -> TS
-durToTimeSig dur preferredDenominator
-    | denominatorRatio == preferredDenominator =
-        TS numeratorRatio denominatorRatio
-    | otherwise = TS (numeratorRatio * multiplier) preferredDenominator
+
+-- | Convert a Duration to a TimeSignature returns Maybe TimeSignature.
+--
+-- >>> fromDur'' (0%2) 8
+-- Nothing
+-- >>> fromDur'' (1%4) 8 
+fromDur'' :: Duration -> Integer -> Maybe TimeSignature
+fromDur'' dur preferredDenominator
+    | numeratorRatio == 0 = Nothing
+    | otherwise = Just $ fromDur dur targetDenominator
     where
         numeratorRatio = numerator dur
-        denominatorRatio = denominator dur
-        multiplier = preferredDenominator `div` denominatorRatio
+        targetDenominator = max (denominator dur) preferredDenominator
 
--- | Find the best denominator for a given function and duration
-findBestDenominator :: (Dur -> Dur) -> Dur -> Integer
+
+
+-- | Convert a Duration to a TimeSignature returns Maybe TimeSignature.
+--
+-- >>> fromDur'' (0%1) 8
+
+-- >>> fromDur'' (1%4) 8 
+-- | Apply a function to a TimeSignature.
+--
+-- >>> applyFunctionToTS (+ (1%8)) (4//8)
+--  5//8
+applyFunctionToTS :: (Duration -> Duration) -> TimeSignature -> TimeSignature
+applyFunctionToTS f ts =
+    let dur = timeSigToDur ts
+        targetDenominator = findBestDenominator f dur
+    in fromDur (f dur) targetDenominator
+
+-- | Apply a function to a TimeSignature with a preferred denominator.
+--
+-- >>> applyFunctionToTS' (+ (1%8)) (Just 16) (4//8)
+--  10//16
+applyFunctionToTS' :: (Duration -> Duration) -> Maybe Integer -> TimeSignature -> TimeSignature
+applyFunctionToTS' f maybePreferredDenominator ts =
+    case maybePreferredDenominator of
+        Just preferredDenominator -> fromDur (f $ toDur ts) preferredDenominator
+        Nothing -> fromDur (f $ toDur ts)  (ts ^. lower)
+
+
+-- | Find the best denominator for a given function and duration.
+--
+-- >>> findBestDenominator (+ (1%8)) (4/8)
+-- 8
+findBestDenominator :: (Duration -> Duration) -> Duration -> Integer
 findBestDenominator f dur =
     let currentDenominator = denominator dur
         newDur = f dur
         targetDenominator = denominator newDur
-     in lcm currentDenominator targetDenominator
+    in lcm currentDenominator targetDenominator
 
-isValid :: TS -> Bool
-isValid (TS n d) = n > 0 && d > 0
 
--- | Check if an integer is a power of two
+-- | Check if a TimeSignature is valid.
+--
+-- >>> isValid (4//4)
+-- True
+-- >>> isValid (TimeSignature (-4) 4)
+-- False
+-- >>> isValid (TimeSignature 4 0)
+-- False
+isValid :: TimeSignature -> Bool
+isValid (TimeSignature n d) = n > 0 && d > 0 && isPowOfTwo d
+
+
+-- | Check if an integer is a power of two.
 isPowOfTwo :: Integer -> Bool
 isPowOfTwo n = n > 0 && n Data.Bits..&. (n - 1) == 0
 
--- | Check if the denominator of a TimeSignature is a power of two
-isTSDenPowOfTwo :: TS -> Bool
-isTSDenPowOfTwo (TS _ d) = isPowOfTwo d
 
--- | Check if the denominator of a TimeSignature is a power of two
-checkPowerOfTwo :: TS -> Bool
-checkPowerOfTwo ts = isPowOfTwo $ ts ^. den
+-- | Check if the denominator of a TimeSignature is a power of two.
+tsLowerPowerOfTwo :: TimeSignature -> Bool
+tsLowerPowerOfTwo ts = isPowOfTwo $ ts ^. lower
 
 
-{- 
->>> applyFunctionToTS  (+ (1%8)) (4//8)
- 5//8
+----------------------------------------------------------------------------
+-- # SECTION Examples
+----------------------------------------------------------------------------
 
->>> applyFunctionToTS  (+ (3%8)) (4//8)
- 7//8
+-- | Create a TimeSignature.
+tsA :: TimeSignature
+tsA = 4 // 4
 
->>> applyFunctionToTS  (* (5%8)) (3//4)
- 15//32
+-- | Apply a function (+ 1%8) to tsA.
+tsB :: TimeSignature
+tsB = applyFunctionToTS (+ (1%8)) tsA
 
->>> applyFunctionToTS  (+ (3%8)) (4//4)
- 11//8
+-- | Apply a function (* 2) to tsA with a preferred denominator of 8.
+tsC :: TimeSignature
+tsC = applyFunctionToTS' (* 2) (Just 8) tsA
 
->>> applyFunctionToTS' (+ (1 % 8)) (Just 4) (4//4)
- 9//8
+-- | Convert a Duration (4%8) to a TimeSignature with a preferred denominator of 8.
+tsD :: TimeSignature
+tsD = fromDur (4%8) 8
 
->>> applyFunctionToTS' (* 2) Nothing (5//8)
- 10//8
-
->>> applyFunctionToTS' (+ (1 % 4)) (Nothing) (3//4)
- 4//4
-
->>> fromDur (4%8) 8
- 4//8
-
->>> fromDur (5%8) 4
- 5//8
-
->>> fromDur (1%2) 16
- 8//16
-
->>> fromDur' (4%8) (Just 8)
- 4//8
-
->>> fromDur' (5%8) Nothing
- 5//8
-
->>> fromDur' (1%2) (Just 4) 
- 2//4
-
->>>  (4//4) & num .~ 7 & den .~ 8
- 7//8
-
-
- -}
-
+-- | Convert a Duration (1%2) to a TimeSignature without specifying a denominator.
+tsE :: TimeSignature
+tsE = fromDur' (1%2) Nothing
