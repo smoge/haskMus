@@ -140,13 +140,6 @@ findBestDenominator f d =
       targetDenominator = denominator $ unDuration newDur
    in lcm currentDenominator targetDenominator
 
-findBestDenominator' :: (Rational -> Rational) -> Rational -> Integer
-findBestDenominator' f rat =
-  let currentDenominator = denominator rat
-      newDur = f rat
-      targetDenominator = denominator newDur
-   in lcm currentDenominator targetDenominator
-
 -- | Check if a TimeSignature is valid.
 --
 -- >>> isValid (4//4)
@@ -197,11 +190,18 @@ tsE = fromDur' (dur 1/2) Nothing
 --         up <- getPositive <$> arbitrary
 --         lo <- elements [1, 2, 4, 8, 16, 32, 64, 128]
 --         return $ TimeSignature up lo
+-- instance Arbitrary TimeSignature where
+--   arbitrary = do
+--     (Positive n) <- arbitrary
+--     d <- arbitrary `suchThat` isPowOfTwo
+--     return (n // d)
+
 instance Arbitrary TimeSignature where
-  arbitrary = do
-    (Positive n) <- arbitrary
-    d <- arbitrary `suchThat` isPowOfTwo
-    return (n // d)
+    arbitrary = do
+        (Positive n) <- arbitrary
+        d <- elements [2 ^ x | x <- ([0 .. 7] :: [Integer]) ]
+        return (n // d)
+
 
 instance Arbitrary Duration where
   arbitrary :: Gen Duration
