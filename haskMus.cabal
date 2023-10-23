@@ -28,13 +28,13 @@ library
     Music.Time.RT
     Music.Time.TS
 
-  build-depends:       base >= 4.17.2.0 && < 4.19.0.0
-                     , containers >= 0.6.7 && < 0.8
+  build-depends:       base >= 4.17.2 && < 4.19
+                     , containers >= 0.6.7 && < 0.7
                      , text >= 2.0.2 && < 2.2
                      , lens >= 5.2.3 && < 5.4
                      , hspec  >= 2.10.0 && < 2.13
-                     , doctest >= 0.20.0 && < 0.24
-                     , QuickCheck >= 2.14.3 && < 2.16
+                     , doctest >= 0.20.1 && < 0.22
+                     , QuickCheck >= 2.14.3 && < 2.15
                      , pretty-simple >= 4.1.2 && < 4.2
                      --, parsec
   default-language:    Haskell2010
@@ -76,15 +76,16 @@ test-suite haskMus-test
                      , PitchProperties
                      , RtmProperties
                      , TSSpec
-  build-depends:       base >= 4.17.2.0 && < 4.19.0.0
+  build-depends:       base >= 4.17.2 && < 4.19
                      , haskMus 
-                     , hspec >= 2.10.0 && < 2.12
-                     , lens >= 5.2.3 && < 5.3
                      , HUnit >= 1.6.2 && < 1.7
                      , test-framework >= 0.8.2 && < 0.9
                      , test-framework-quickcheck2 >= 0.3.0.5 && < 0.4
+                     , lens >= 5.2.3 && < 5.4
+                     , hspec  >= 2.10.0 && < 2.13
+                     , doctest >= 0.20.1 && < 0.22
                      , QuickCheck >= 2.14.3 && < 2.15
-                     , pretty-simple >= 4.1.2 && < 4.2
+
   default-language:    Haskell2010
   ghc-options:         -Wall
                        -Wcompat

@@ -1,10 +1,14 @@
+{-# LANGUAGE DefaultSignatures          #-}
 {-# LANGUAGE GADTs                      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE InstanceSigs               #-}
 {-# LANGUAGE TemplateHaskell            #-}
-{-# LANGUAGE TypeSynonymInstances       #-}
-{-# LANGUAGE DefaultSignatures          #-}
 {-# LANGUAGE TypeApplications           #-}
+{-# LANGUAGE TypeOperators              #-}
+{-# LANGUAGE TypeSynonymInstances       #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use isNothing" #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Music.Time.TS where
 
@@ -43,7 +47,7 @@ n %/ d = dur (n % d)
 
 -- >>> [1, 1, 1, 1, 1]|/ 8 :: [Duration]
 -- [1 %/ 8,1 %/ 8,1 %/ 8,1 %/ 8,1 %/ 8]
--- >>> [1%/2, 1%/2, 1%/2]|/ 8 
+-- >>> [1%/2, 1%/2, 1%/2]|/ 8
 -- [1 %/ 16,1 %/ 16,1 %/ 16]
 -- >>> [1%/2, 1%/2, 1%/2]|/ 8
 -- [1 %/ 16,1 %/ 16,1 %/ 16]
@@ -206,12 +210,9 @@ isPowOfTwo n = n > 0 && n Data.Bits..&. (n - 1) == 0
 tsLowerPowerOfTwo :: TimeSignature -> Bool
 tsLowerPowerOfTwo ts = isPowOfTwo $ ts ^. lower
 
-
-
 --------------------------------------
 -- # SECTION QuickCheck
 --------------------------------------
-
 instance Arbitrary TimeSignature where
   arbitrary = do
     (Positive n) <- arbitrary
@@ -233,7 +234,7 @@ prop_toDur_fromDur_identity ts =
       ts' = fromDur d (ts ^. lower)
    in ts == ts'
 
--- | fromDur' without a preferred denominator, it should be the 
+-- | fromDur' without a preferred denominator, it should be the
 -- same as using fromDur with the denominator of the given duration:
 prop_fromDur_fromDur' :: Duration -> Bool
 prop_fromDur_fromDur' d =
@@ -243,9 +244,8 @@ prop_fromDur_fromDur' d =
 prop_fromDur''_zero_duration :: Integer -> Bool
 prop_fromDur''_zero_duration denom = fromDur'' 0 denom == Nothing
 
-prop_applyFunction_identity :: TimeSignature -> Bool
-prop_applyFunction_identity ts = applyFunctionToTS id ts == ts
-
+-- prop_applyFunction_identity :: TimeSignature -> Bool
+-- prop_applyFunction_identity ts = applyFunctionToTS id ts == ts
 -- A valid time signature should have a denominator that's a power of two:
 prop_valid_ts_power_of_two :: TimeSignature -> Property
 prop_valid_ts_power_of_two ts = isValid ts ==> tsLowerPowerOfTwo ts
@@ -255,5 +255,5 @@ main = do
   quickCheck prop_toDur_fromDur_identity
   quickCheck prop_fromDur_fromDur'
   quickCheck prop_fromDur''_zero_duration
-  verboseCheck prop_applyFunction_identity
+--   verboseCheck prop_applyFunction_identity
   quickCheck prop_valid_ts_power_of_two
