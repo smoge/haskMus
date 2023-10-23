@@ -92,11 +92,15 @@ durToTimeSig d preferredDenominator
 --
 -- >>> fromDur' (3%4) (Just 8)
 --  6//8
+
 fromDur' :: Duration -> Maybe Integer -> TimeSignature
 fromDur' d maybePreferredDenominator =
   case maybePreferredDenominator of
     Just preferredDenominator -> fromDur d preferredDenominator
-    Nothing                   -> fromDur d (denominator $ unDuration d)
+    Nothing                   -> fromDur d denom
+  where
+    denom = denominator $ unDuration d
+
 
 -- | Convert a Duration to a TimeSignature returns Maybe TimeSignature.
 --
