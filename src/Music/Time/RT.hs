@@ -1,7 +1,6 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE GADTs     #-}
+{-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE DuplicateRecordFields #-}
-
+{-# LANGUAGE GADTs                 #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Music.Time.RT where
@@ -77,34 +76,31 @@ combineGaps []               = []
 combineGaps (Gap n:Gap m:xs) = combineGaps (Gap (n + m) : xs)
 combineGaps (x:xs)           = x : combineGaps xs
 
-
-
-
 -- data Capsule = [Component] deriving (Eq, Ord, Show)
-
 -- data Measure = Measure
 --   { ts :: TS -- TimeSignature
 --   , rt :: Capsule -- Vector / Rhythm Tree
 --   } deriving (Eq, Ord, Show)
-
--- data Column = Column 
--- { 
+-- data Column = Column
+-- {
 --   tsColumn :: TS,
 --   capsules :: [Capsule]  -- One Capsule for each voice in the column
 -- } deriving (Eq, Ord, Show)
-
 -- type Voice = [Measure]
-
 -- type Matrix = [Column]
-
 data TS = TS
   { num :: Integer
   , den :: Integer
   } deriving (Eq, Ord)
 
 instance Show TS where
-  show (TS n d) = "TimeSig " ++ show n ++ "/" ++ show d
-  
+  show (TS n d) = "TS " ++ show n ++ "//" ++ show d
+
+infixr 7 //
+
+(//) :: Integer -> Integer -> TS
+n // d = TS n d
+
 isValid :: TS -> Bool
 isValid (TS n d) = n > 0 && d > 0
 
@@ -117,27 +113,29 @@ isTSDenPowOfTwo (TS _ d) = isPowOfTwo d
 toDur :: TS -> Dur
 toDur (TS n d) = n % d
 
-
-newtype Proportions  = Proportions [Component] deriving (Eq, Ord, Show)
+newtype Proportions =
+  Proportions [Component]
+  deriving (Eq, Ord, Show)
 
 data Capsule = Capsule
-  { ts :: TS -- Time Signature
-  , rhythm :: Proportions -- Rhythm Tree 
+  { ts     :: TS -- Time Signature
+  , rhythm :: Proportions -- Rhythm Tree
   } deriving (Eq, Ord, Show)
 
-data ScoreMeasure = ScoreMeasure { 
-  ts :: TS,
-  rhythm :: [Proportions]  -- One RhythmSegment for each voice in the column
-} deriving (Eq, Ord, Show)
+data ScoreMeasure = ScoreMeasure
+  { ts     :: TS
+  , rhythm :: [Proportions] -- One RhythmSegment for each voice in the column
+  } deriving (Eq, Ord, Show)
 
 type ScoreVoice = [Capsule]
 
 type ScoreMatrix = [ScoreMeasure]
 
-newtype Matrix = Matrix [[(TS, Proportions)]] deriving (Eq, Ord, Show)
+newtype Matrix =
+  Matrix [[(TS, Proportions)]]
+  deriving (Eq, Ord, Show)
 
 -- VerticalSlice ?
-
 -- "
 --     | Measure 1 | Measure 2 | Measure 3 | ...
 -- ----------------------------------------------
@@ -147,21 +145,23 @@ newtype Matrix = Matrix [[(TS, Proportions)]] deriving (Eq, Ord, Show)
 -- ----------------------------------------------
 -- Voice 3 |   M3,1   |   M3,2   |   M3,3   | ...
 -- ----------------------------------------------
---    .       .          .          . 
+--    .       .          .          .
 --    .       .          .          .
 -- "
+{-  -- TESTS
+
 
 ts1 :: TS
 ts1 = TS 4 4
 
 ts2 :: TS
-ts2 = TS 6 8
+ts2 = 6 // 8
 
 ts3 :: TS
-ts3 = TS 3 4
+ts3 = 3 // 4
 
 prop1 :: Proportions
-prop1 = Proportions [Scalar 2, Gap 1, Scalar 1]  
+prop1 = Proportions [Scalar 2, Gap 1, Scalar 1]
 
 prop2 :: Proportions
 prop2 = Proportions [Scalar 1, Scalar 2, Scalar 1]
@@ -206,23 +206,16 @@ scoreVoice2 = [capsule2, capsule3]
 scoreMatrix1 :: ScoreMatrix
 scoreMatrix1 = [scoreMeasure1, scoreMeasure2, scoreMeasure3]
 
--- pPrint scoreMatrix1
 
 matrix1 :: Matrix
 matrix1 = Matrix [[(ts1, prop1), (ts2, prop2)], [(ts2, prop3), (ts3, prop4)]]
 
--- pPrint matrix1
-
-{- 
 
 pPrint scoreMatrix1
 
 pPrint matrix1
 
  -}
-
-
-
 -- | TimeSignature examples
 -- >>> TS 4 4
 -- TS {num = 4, den = 4}
@@ -409,25 +402,4 @@ pPrint ranks
     )
 ]
 
- -}
-
- {-
-simpleVector :: Component
-simpleVector = Vector 3 [Scalar 2, Gap 4, Scalar 6]
-
-nestedVector :: Component
-nestedVector = Vector 7 [Scalar 2, Vector 3 [Scalar 4, Gap 1], Scalar 6]
-
-
-example2 :: [Int]
-example2 = extractRanks [simpleVector]  -- Expected output: [0, 0, 0]
-
--- Extracting ranks from the nested vector. We should get:
--- - Scalar 2 at top level => 0
--- - Vector 3 itself at top level, but it has nested components
---   - Scalar 4 at depth 1 => 1
---   - Gap 1 at depth 1 => 1
--- - Scalar 6 at top level => 0
-example3 :: [Int]
-example3 = extractRanks [nestedVector]  -- Expected output: [0, 1, 1, 0]
  -}
