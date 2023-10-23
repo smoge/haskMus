@@ -25,8 +25,10 @@ library
     Music.Pitch.Accidental
     Music.Pitch.Pitch
     Music.Time.Rtm
-  build-depends:       base >= 4.7 && < 4.19
-                    -- base >= 4.7 && < 5
+    Music.Time.RT
+    Music.Time.TS
+
+  build-depends:       base >= 4.17.2.0 && < 4.19.0.0
                      , containers >= 0.6.7 && < 0.8
                      , text >= 2.0.2 && < 2.2
                      , lens >= 5.2.3 && < 5.4
@@ -73,7 +75,7 @@ test-suite haskMus-test
                      , PitchSpec
                      , PitchProperties
                      , RtmProperties
-  build-depends:       base >= 4.7 && < 4.19
+  build-depends:       base >= 4.17.2.0 && < 4.19.0.0
                      , haskMus
                      , hspec >= 2.10.0 && < 2.12
                      , lens >= 5.2.3 && < 5.3
