@@ -74,7 +74,7 @@ test-suite haskMus-test
   other-modules:       AccidentalProperties
                      , PitchSpec
                      , PitchProperties
-                     , RtmProperties
+                    --  , RtmProperties
                      , TSSpec
   build-depends:       base >= 4.17.2 && < 4.19
                      , haskMus 

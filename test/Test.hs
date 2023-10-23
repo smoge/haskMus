@@ -8,6 +8,8 @@ import PitchProperties (runTests)
 import TSSpec (specTS)
 import PitchSpec (spec)
 import Test.Hspec (hspec)
+import Test.Framework.Providers.QuickCheck2
+import Test.Framework 
 -- import RtmProperties (runTests, prop_toFromRtmArray)
 
 
