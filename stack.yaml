@@ -1,6 +1,6 @@
 
-#resolver: nightly-2023-10-23
-resolver: lts-21.17
+resolver: nightly-2023-10-23
+#resolver: lts-21.17
 
 packages:
   - "."

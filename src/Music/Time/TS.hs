@@ -5,7 +5,8 @@
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeApplications           #-}
 {-# LANGUAGE TypeOperators              #-}
-{-# LANGUAGE TypeSynonymInstances       #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use isNothing" #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
@@ -22,10 +23,16 @@ import           Test.QuickCheck (Arbitrary (arbitrary), Gen,
 
 newtype Duration = Duration
   { unDuration :: Rational
-  } deriving (Eq, Ord, Num, Fractional)
+  } deriving (Eq, Ord, Num)
 
 instance Show Duration where
   show (Duration r) = show (numerator r) ++ " %/ " ++ show (denominator r)
+
+instance Fractional Duration where
+    (Duration a) / (Duration b)
+        | b == 0    = error "Division by zero in Duration"
+        | otherwise = Duration (a / b)
+    fromRational = Duration
 
 class HasDuration a where
   toDuration :: a -> Duration
@@ -37,8 +44,27 @@ instance HasDuration Duration where
   toDuration = id
   fromDuration = id
 
+instance HasDuration Rational where
+  toDuration = dur
+  fromDuration (Duration r) = r
+
+
 dur :: Rational -> Duration
 dur = Duration
+
+
+
+-- Function to multiply a duration list by a scalar.
+multiplyDurations :: (HasDuration a) => [a] -> Rational -> [Duration]
+multiplyDurations durations scalar =
+    map (\d -> toDuration d `multiplyDuration` scalar) durations
+  where
+    multiplyDuration (Duration r1) r2 = Duration (r1 * r2)
+
+{- 
+>>> multiplyDurations [1 %/ 2, 1 %/ 3] (2 % 1)
+[1 %/ 1,2 %/ 3]
+ -}
 
 infix 7 %/
 
@@ -255,5 +281,4 @@ main = do
   quickCheck prop_toDur_fromDur_identity
   quickCheck prop_fromDur_fromDur'
   quickCheck prop_fromDur''_zero_duration
---   verboseCheck prop_applyFunction_identity
   quickCheck prop_valid_ts_power_of_two
