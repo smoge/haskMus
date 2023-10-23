@@ -6,7 +6,7 @@ module RtmProperties where
 
 import Music.Time.Rtm
 import Test.QuickCheck
-import Text.Pretty.Simple 
+-- import Text.Pretty.Simple 
 
 prop_toFromRtmArray :: RtmProportions -> Bool
 prop_toFromRtmArray rtm = rtm == (fromRtmArray . toRtmArray) rtm
@@ -22,9 +22,9 @@ main :: IO ()
 main = do
   verboseCheck prop_toFromRtmArray
 
-return []
+-- return []
 
-runTests :: IO Bool
-runTests = $verboseCheckAll
+-- runTests :: IO Bool
+-- runTests = $verboseCheckAll
 --runTests = $quickCheckAll
 
