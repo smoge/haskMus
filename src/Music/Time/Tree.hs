@@ -83,6 +83,110 @@ flattenTree = Tree.flatten
 printTree :: Component -> IO ()
 printTree = putStrLn . drawTree . fmap show
 
+filterOutGaps :: Component -> Component
+filterOutGaps (Tree.Node label subs) =
+    let filteredChildren = map filterOutGaps (filter isNotGap subs)
+    in Tree.Node label filteredChildren
+  where
+    isNotGap (Tree.Node (Gap _) _) = False
+    isNotGap _                     = True
+
+maxScalar :: Component -> Int
+maxScalar = maximum . map scalarValue . Tree.flatten
+  where
+    scalarValue (Scalar n) = n
+    scalarValue _          = minBound :: Int
+
+replaceScalar :: Int -> Int -> Component -> Component
+replaceScalar target replacement = fmap replaceWhereScalar
+  where
+    replaceWhereScalar (Scalar n)
+      | n == target = Scalar replacement
+      | otherwise   = Scalar n
+    replaceWhereScalar label = label
+
+--  printTree $ replaceScalar 1 10 exampleComponent1
+
+mapMaybe :: (a -> Maybe b) -> [a] -> [b]
+mapMaybe _ [] = []
+mapMaybe f (x:xs) =
+    case f x of
+         Just y  -> y : mapMaybe f xs
+         Nothing -> mapMaybe f xs
+-- import Data.Maybe (mapMaybe)
+
+
+findNodeByValue :: Int -> Component -> Maybe Component
+findNodeByValue val (node@(Tree.Node (Scalar n) _) ) | n == val = Just node
+findNodeByValue val (node@(Tree.Node (Gap g) _) )    | g == (-val) = Just node
+findNodeByValue val (Tree.Node _ subs) = 
+    case mapMaybe (findNodeByValue val) subs of
+        (found:_) -> Just found
+        []       -> Nothing
+
+-- printTree $ replaceScalar 1 10 exampleComponent1
+
+--  findNodeByValue 3 exampleComponent1
+
+countVectors :: Component -> Int
+countVectors (Tree.Node (Vector _) subs) = 1 + sum (map countVectors subs)
+countVectors (Tree.Node _ subs)          = sum (map countVectors subs)
+
+--  countVectors exampleComponent1
+
+transformGaps :: (Int -> Int) -> Component -> Component
+transformGaps f = fmap transformWhereGap
+  where
+    transformWhereGap (Gap g) = Gap (f g)
+    transformWhereGap label   = label
+
+--  printTree $ transformGaps (`div` 2) exampleComponent1
+{- 
+Vector 3
+|
++- Scalar 1
+|
++- Gap 1
+|
+`- Vector 2
+   |
+   +- Scalar 3
+   |
+   `- Gap 2 -}
+
+countLeaves :: Component -> Int
+countLeaves (Tree.Node _ []) = 1
+countLeaves (Tree.Node _ subs) = sum (map countLeaves subs)
+
+-- countLeaves exampleComponent1
+
+allScalars :: Component -> [Int]
+allScalars = mapMaybe scalarValue . Tree.flatten
+  where
+    scalarValue (Scalar n) = Just n
+    scalarValue _          = Nothing
+
+-- allScalars exampleComponent1
+
+replaceScalar2 :: Int -> Int -> Component -> Component
+replaceScalar2 old new t@(Tree.Node (Scalar n) _) | n == old = Tree.Node (Scalar new) []
+replaceScalar2 old new (Tree.Node label subs) = Tree.Node label (map (replaceScalar2 old new) subs)
+
+-- -- printTree $ replaceScalar2 3 9 exampleComponent1
+
+
+-- levels2 :: Component -> [[ComponentLabel]]
+-- levels2 = fmap (fmap rootLabel) . Music.Time.Tree.levels
+
+levels :: Component -> [[ComponentLabel]]
+levels tree = go [tree]
+  where
+    go [] = []
+    go nodes = map Tree.rootLabel nodes : go (concatMap Tree.subForest nodes)
+
+
+-- Music.Time.Tree.levels exampleComponent1
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 exampleComponent1 :: Component
