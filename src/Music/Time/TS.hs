@@ -79,8 +79,8 @@ durToTimeSig dur preferredDenominator
 findBestDenominator :: (Dur -> Dur) -> Dur -> Integer
 findBestDenominator f dur =
     let currentDenominator = denominator dur
-            newDur = f dur
-            targetDenominator = denominator newDur
+        newDur = f dur
+        targetDenominator = denominator newDur
      in lcm currentDenominator targetDenominator
 
 
