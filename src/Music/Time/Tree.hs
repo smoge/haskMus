@@ -4,6 +4,8 @@ import           Data.Tree
 import qualified Data.Tree as Tree
 import Data.Foldable (find)
 
+import Data.List (nub)
+
 -- | ComponentLabel represents individual nodes in our Component tree.
 data ComponentLabel
   = Scalar Int
@@ -116,12 +118,64 @@ mapMaybe f (x:xs) =
          Nothing -> mapMaybe f xs
 -- import Data.Maybe (mapMaybe)
 
+filterComponents :: (Component -> Bool) -> Component -> Component
+filterComponents predicate = go
+  where
+    go node@(Tree.Node label children)
+      | predicate node = Tree.Node label (map go children)
+      | otherwise = Tree.Node (Vector 0) []  -- Replace non-matching nodes with an empty vector
 
+{- 
+
+
+ghci> let hasValue2 (Tree.Node (Scalar n) _) = n == 2
+ghci> let filtered = filterComponents hasValue2 exampleComponent1
+ghci> printTree filtered
+Vector 3
+|
++- Scalar 2
+|
++- Gap 2
+|
+`- Vector 2
+   |
+   +- Gap 4
+   |
+   `- Gap 3
+
+
+
+ -}
 -- findNodeByValue' :: Int -> Component -> Maybe Component
 -- findNodeByValue' val = find (\node -> case node of
 --                                       Tree.Node (Scalar n) _ | n == val -> True
 --                                       Tree.Node (Gap g) _    | g == (-val) -> True
 --                                       _ -> False)
+
+multiplyScalars :: Int -> Component -> Component
+multiplyScalars factor = fmap multiplyWhereScalar
+  where
+    multiplyWhereScalar (Scalar n) = Scalar (n * factor)
+    multiplyWhereScalar label = label
+
+{-
+
+ghci> let multiplied = multiplyScalars 2 exampleComponent1
+ghci> printTree multiplied
+Vector 3
+|
++- Scalar 2
+|
++- Gap 2
+|
+`- Vector 2
+   |
+   +- Scalar 6
+   |
+   `- Gap 4
+
+
+  -}
 
 findNodeByValue :: Int -> Component -> Maybe Component
 findNodeByValue val (node@(Tree.Node (Scalar n) _) ) | n == val = Just node
@@ -186,8 +240,76 @@ allScalars = mapMaybe scalarValue . Tree.flatten
 
 -- allScalars exampleComponent1
 
+-- Mapping Components to a New Type:
+mapToNewType :: (ComponentLabel -> newLabel) -> Component -> Tree newLabel
+mapToNewType f = fmap f
+
+{- 
+
+ghci> let mapScalarToString (Scalar n) = "Value: " ++ show n
+ghci> let mappedTree = mapToNewType mapScalarToString exampleComponent1
+ghci> printTree mappedTree
+Vector 3
+|
++- Value: 1
+|
++- Gap 2
+|
+`- Vector 2
+   |
+   +- Value: 3
+   |
+   `- Gap 4
+
+ -}
+
+replaceSubtree :: Component -> Component -> Component -> Component
+replaceSubtree target replacement tree = go tree
+  where
+    go (Node label children)
+      | tree == target = replacement
+      | otherwise = Node label (map go children)
+
+{- 
+
+ghci> let replacementTree = Vector 2 [Scalar 10, Gap 20]
+ghci> let updatedTree = replaceSubtree (Vector 2 [Scalar 3, Gap 4]) replacementTree exampleComponent1
+ghci> printTree updatedTree
+Vector 3
+|
++- Scalar 1
+|
+`- Vector 2
+   |
+   +- Scalar 10
+   |
+   `- Gap 20
 
 
+ -}
+
+
+
+
+breadthFirstTraversal :: Component -> [Component]
+breadthFirstTraversal root = bfs [root]
+  where
+    bfs [] = []
+    bfs xs = xs ++ bfs (nub $ concatMap Tree.subForest xs)
+
+
+{- 
+ghci> let breadthFirst = breadthFirstTraversal exampleComponent1
+ghci> mapM_ printTree breadthFirst
+Vector 3
+Scalar 1
+Gap 2
+Vector 2
+Scalar 3
+Gap 4
+
+
+ -}
 replaceScalar2 :: Int -> Int -> Component -> Component
 replaceScalar2 old new t@(Tree.Node (Scalar n) _) | n == old = Tree.Node (Scalar new) []
 replaceScalar2 old new (Tree.Node label subs) = Tree.Node label (map (replaceScalar2 old new) subs)
