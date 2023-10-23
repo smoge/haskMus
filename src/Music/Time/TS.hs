@@ -13,21 +13,18 @@ type Duration = Rational
 data TimeSignature = TimeSignature
     { _upper :: Integer -- ^ TS Upper Number
     , _lower :: Integer -- ^ TS Lower Number
-    } deriving (Eq, Ord)
+    } deriving (Eq, Ord, Show)
 
 makeLenses ''TimeSignature
 
-instance Show TimeSignature where
-    show (TimeSignature n d) = " " ++ show n ++ "//" ++ show d
+-- instance Show TimeSignature where
+--     show (TimeSignature n d) = " " ++ show n ++ "//" ++ show d
 
 -- | Create a TimeSignature from two integers.
 infixr 7 //
 (//) :: Integer -> Integer -> TimeSignature
 n // d = TimeSignature n d
 
--- | Convert a TimeSignature to a Duration.
-timeSigToDur :: TimeSignature -> Duration
-timeSigToDur (TimeSignature n d) = n % d
 
 -- | Convert a TimeSignature to a Duration.
 --
@@ -43,10 +40,26 @@ toDur (TimeSignature n d) = n % d
 fromDur :: Duration -> Integer -> TimeSignature
 fromDur dur preferredDenominator
     | numeratorRatio == 0 = error "Cannot convert zero Duration to TimeSignature"
-    | otherwise = fromDur dur targetDenominator
+    | otherwise = durToTimeSig dur targetDenominator
     where
         numeratorRatio = numerator dur
         targetDenominator = max (denominator dur) preferredDenominator
+
+-- | Convert a TimeSignature to a Duration.
+timeSigToDur :: TimeSignature -> Duration
+timeSigToDur (TimeSignature n d) = n % d
+
+
+-- | Convert duration to TimeSignature with a preferred denominator
+durToTimeSig :: Duration -> Integer -> TimeSignature
+durToTimeSig dur preferredDenominator
+    | denominatorRatio == preferredDenominator =
+      TimeSignature numeratorRatio denominatorRatio
+    | otherwise = TimeSignature (numeratorRatio * multiplier) preferredDenominator
+    where
+        numeratorRatio = numerator dur
+        denominatorRatio = denominator dur
+        multiplier = preferredDenominator `div` denominatorRatio
 
 -- | Convert a Duration to a TimeSignature with an optional preferred denominator.
 --
@@ -137,7 +150,7 @@ tsLowerPowerOfTwo ts = isPowOfTwo $ ts ^. lower
 ----------------------------------------------------------------------------
 -- # SECTION Examples
 ----------------------------------------------------------------------------
-
+{- 
 -- | Create a TimeSignature.
 tsA :: TimeSignature
 tsA = 4 // 4
@@ -157,3 +170,4 @@ tsD = fromDur (4%8) 8
 -- | Convert a Duration (1%2) to a TimeSignature without specifying a denominator.
 tsE :: TimeSignature
 tsE = fromDur' (1%2) Nothing
+ -}
