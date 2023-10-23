@@ -2,6 +2,7 @@ module Music.Time.Tree where
 
 import           Data.Tree
 import qualified Data.Tree as Tree
+import Data.Foldable (find)
 
 -- | ComponentLabel represents individual nodes in our Component tree.
 data ComponentLabel
@@ -116,6 +117,12 @@ mapMaybe f (x:xs) =
 -- import Data.Maybe (mapMaybe)
 
 
+-- findNodeByValue' :: Int -> Component -> Maybe Component
+-- findNodeByValue' val = find (\node -> case node of
+--                                       Tree.Node (Scalar n) _ | n == val -> True
+--                                       Tree.Node (Gap g) _    | g == (-val) -> True
+--                                       _ -> False)
+
 findNodeByValue :: Int -> Component -> Maybe Component
 findNodeByValue val (node@(Tree.Node (Scalar n) _) ) | n == val = Just node
 findNodeByValue val (node@(Tree.Node (Gap g) _) )    | g == (-val) = Just node
@@ -125,6 +132,17 @@ findNodeByValue val (Tree.Node _ subs) =
         []       -> Nothing
 
 -- printTree $ replaceScalar 1 10 exampleComponent1
+
+
+reverseScalars :: Component -> Component
+reverseScalars = fmap reverseWhereScalar
+  where
+    reverseWhereScalar (Scalar n) = Scalar n
+    reverseWhereScalar label = label
+
+
+-- printTree (reverseScalars exampleComponent1)
+
 
 --  findNodeByValue 3 exampleComponent1
 
@@ -167,6 +185,8 @@ allScalars = mapMaybe scalarValue . Tree.flatten
     scalarValue _          = Nothing
 
 -- allScalars exampleComponent1
+
+
 
 replaceScalar2 :: Int -> Int -> Component -> Component
 replaceScalar2 old new t@(Tree.Node (Scalar n) _) | n == old = Tree.Node (Scalar new) []
