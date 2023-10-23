@@ -1,6 +1,8 @@
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE GADTs                 #-}
+{-# LANGUAGE TemplateHaskell #-}
+
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Music.Time.RT where
@@ -10,6 +12,8 @@ import           Data.Bits          ((.&.))
 import           Data.Ratio
 import           Test.QuickCheck
 import           Text.Pretty.Simple
+import Control.Lens
+import Data.List (transpose)
 
 type Dur = Rational -- ^ Duration
 
@@ -17,7 +21,14 @@ data Component
   = Scalar Int
   | Gap Int
   | Vector Int [Component]
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+
+instance Show Component where
+  show (Scalar n) = " " ++ show n
+  show (Gap n) = " -" ++ show n
+  show (Vector n xs) = " vector " ++ show n  ++ show xs
+
+
 
 -- | This function checks if the Component is valid.
 --
@@ -76,33 +87,36 @@ combineGaps []               = []
 combineGaps (Gap n:Gap m:xs) = combineGaps (Gap (n + m) : xs)
 combineGaps (x:xs)           = x : combineGaps xs
 
--- data Capsule = [Component] deriving (Eq, Ord, Show)
--- data Measure = Measure
---   { ts :: TS -- TimeSignature
---   , rt :: Capsule -- Vector / Rhythm Tree
---   } deriving (Eq, Ord, Show)
--- data Column = Column
--- {
---   tsColumn :: TS,
---   capsules :: [Capsule]  -- One Capsule for each voice in the column
--- } deriving (Eq, Ord, Show)
--- type Voice = [Measure]
--- type Matrix = [Column]
+
+-- | TimeSignature
 data TS = TS
-  { num :: Integer
-  , den :: Integer
+  { _num :: Integer
+  , _den :: Integer
   } deriving (Eq, Ord)
+makeLenses ''TS
+
+-- instance Show TS where
+--   show (TS n d) = " " ++ show n ++ "//" ++ show d
 
 instance Show TS where
-  show (TS n d) = "TS " ++ show n ++ "//" ++ show d
+  show (TS n d) = " time " ++ show n ++ "/" ++ show d
 
 infixr 7 //
 
+-- | Time Signature 
 (//) :: Integer -> Integer -> TS
 n // d = TS n d
 
-isValid :: TS -> Bool
-isValid (TS n d) = n > 0 && d > 0
+
+{- 
+>>> ts1 = 4 // 4
+>>> ts2 = ts1 & num .~ 7 & den .~ 8
+>>> ts2
+TS 7//8
+
+ -}
+isValidTS :: TS -> Bool
+isValidTS (TS n d) = n > 0 && d > 0
 
 isPowOfTwo :: Integer -> Bool
 isPowOfTwo n = n > 0 && n Data.Bits..&. (n - 1) == 0
@@ -110,30 +124,96 @@ isPowOfTwo n = n > 0 && n Data.Bits..&. (n - 1) == 0
 isTSDenPowOfTwo :: TS -> Bool
 isTSDenPowOfTwo (TS _ d) = isPowOfTwo d
 
-toDur :: TS -> Dur
-toDur (TS n d) = n % d
+timeSigToDur :: TS -> Dur
+timeSigToDur (TS n d) = n % d
 
-newtype Proportions =
-  Proportions [Component]
-  deriving (Eq, Ord, Show)
+checkPowerOfTwo :: TS -> Bool
+checkPowerOfTwo ts = isPowOfTwo $ ts ^. den
+
+
+newtype Proportions = Proportions
+  { _components :: [Component]
+  } deriving (Eq, Ord)
+makeLenses ''Proportions
+
+instance Show Proportions where
+  show (Proportions xs) = " " ++ show xs
 
 data Capsule = Capsule
-  { ts     :: TS -- Time Signature
-  , rhythm :: Proportions -- Rhythm Tree
-  } deriving (Eq, Ord, Show)
+  { _ts :: TS
+  , _proportions :: Proportions
+  } deriving (Eq, Ord)
+makeLenses ''Capsule
+
+instance Show Capsule where
+  show (Capsule tsg props) = show tsg ++ " " ++ show props
 
 data ScoreMeasure = ScoreMeasure
-  { ts     :: TS
-  , rhythm :: [Proportions] -- One RhythmSegment for each voice in the column
+  { _scoreMeasureTs :: TS
+  , _scoreMeasureRhythms :: [Proportions]
   } deriving (Eq, Ord, Show)
+makeLenses ''ScoreMeasure
 
 type ScoreVoice = [Capsule]
 
 type ScoreMatrix = [ScoreMeasure]
 
-newtype Matrix =
-  Matrix [[(TS, Proportions)]]
+newtype MatrixScore =
+  MatrixScore [[(TS, Proportions)]]
   deriving (Eq, Ord, Show)
+
+-- newtype Matrix = Matrix [[[Component]]]
+--   deriving (Eq, Ord, Show)
+
+newtype Matrix a = Matrix [[[a]]]
+  deriving (Eq, Ord, Show)
+
+matrix :: [[[a]]] -> Matrix a
+matrix = Matrix
+
+-- unwraps the 2d list from a matrix
+unMatrix :: Matrix a -> [[[a]]]
+unMatrix (Matrix m) = m
+
+
+
+-- lifts a 2D list operation to be a Matrix operation
+liftMatrixOp :: ([[a]] -> [[a]]) -> Matrix a -> Matrix a
+liftMatrixOp f (Matrix xs) = Matrix $ map f xs
+
+
+-- Testing Lenses 
+
+
+addScalar :: Proportions -> Component -> Proportions
+addScalar props scalar = props & components %~ (scalar:)
+
+updateRhythm :: Capsule -> Proportions -> Capsule
+updateRhythm capsule newRhythm = capsule & proportions .~ newRhythm
+
+getTimeSignature :: ScoreMeasure -> TS
+getTimeSignature scoreMeasure = scoreMeasure ^. scoreMeasureTs
+
+changeRhythms :: ScoreMeasure -> [Proportions] -> ScoreMeasure
+changeRhythms scoreMeasure newRhythms = scoreMeasure & scoreMeasureRhythms .~ newRhythms
+
+firstComponent :: Capsule -> Maybe Component
+firstComponent capsule = capsule ^? proportions . components . ix 0
+
+
+getCapsule :: MatrixScore -> Int -> Int -> Maybe (TS, Proportions)
+getCapsule (MatrixScore m) rowIndex colIndex = m ^? ix rowIndex . ix colIndex
+
+
+-- getCapsule matrix1 1 1
+-- Just (TS 3//4,Proportions {_components = [Vector 3 [Scalar 1,Gap 2,Vector 2 [Scalar 1,Gap 1]],Scalar 3]})
+
+
+-- Access the Proportions inside a Matrix
+getProportions :: MatrixScore-> Int -> Int -> Maybe Proportions
+getProportions (MatrixScore m) rowIndex colIndex = m ^? ix rowIndex . ix colIndex . _2
+
+-- getProportions matrix1 1 1
 
 -- VerticalSlice ?
 -- "
@@ -148,7 +228,81 @@ newtype Matrix =
 --    .       .          .          .
 --    .       .          .          .
 -- "
-{-  -- TESTS
+
+
+
+-- Example 1: Simple 2x2 matrix
+matrix1b :: Matrix Component
+matrix1b =
+  Matrix
+    [ [ [Scalar 1, Gap 2]
+      , [Vector 3 [Scalar 4, Gap 5], Scalar 6]
+      ]
+    , [ [Scalar 7, Scalar 8]
+      , [Scalar 9, Scalar 10]
+      ]
+    ]
+
+-- Example 2: 3x3 matrix with nested vectors
+matrix2 :: Matrix Component
+matrix2 =
+  Matrix
+    [ [ [Scalar 1, Scalar 2, Scalar 3]
+      , [Scalar 4, Scalar 5, Scalar 6]
+      , [Scalar 7, Scalar 8, Scalar 9]
+      ]
+    , [ [Vector 2 [Scalar 10, Scalar 11], Scalar 12]
+      , [Scalar 13, Scalar 14, Vector 3 [Scalar 15, Scalar 16, Scalar 17]]
+      , [Vector 4 [Scalar 18, Vector 2 [Scalar 19, Scalar 20]], Scalar 21]
+      ]
+    ]
+
+-- Example 3: Irregular matrix with varying row lengths
+matrix3 :: Matrix Component
+matrix3 =
+  Matrix
+    [ [ [Scalar 1, Scalar 2]
+      , [Scalar 3]
+      , [Vector 2 [Scalar 4, Scalar 5]]
+      ]
+    , [ [Scalar 6, Scalar 7, Scalar 8, Scalar 9]
+      , [Vector 3 [Scalar 10, Scalar 11, Scalar 12]]
+      ]
+    ]
+
+-- Example 5: A single row matrix
+matrix5 :: Matrix Component
+matrix5 =
+  Matrix
+    [ [ [Scalar 1, Scalar 2, Scalar 3]
+      ]
+    ]
+
+-- Example 6: A single column matrix
+matrix6 :: Matrix Component
+matrix6 =
+  Matrix
+    [ [ [Scalar 1]
+      ]
+    , [ [Scalar 2]
+      ]
+    , [ [Scalar 3]
+      ]
+    ]
+
+{- -- Example 7: Transpose of matrix1
+matrix1Transpose :: MatrixP
+matrix1Transpose = MatrixP (transpose (unMatrixP matrix1b))
+
+-- Example 8: Transpose of matrix2
+matrix2Transpose :: MatrixP
+matrix2Transpose = MatrixP (transpose (unMatrixP matrix2))
+
+-- Example 9: Transpose of matrix3
+matrix3Transpose :: MatrixP
+matrix3Transpose = MatrixP (transpose (unMatrixP matrix3))
+ -}
+
 
 
 ts1 :: TS
@@ -207,15 +361,16 @@ scoreMatrix1 :: ScoreMatrix
 scoreMatrix1 = [scoreMeasure1, scoreMeasure2, scoreMeasure3]
 
 
-matrix1 :: Matrix
-matrix1 = Matrix [[(ts1, prop1), (ts2, prop2)], [(ts2, prop3), (ts3, prop4)]]
+matrix1 :: MatrixScore
+matrix1 = MatrixScore [[(ts1, prop1), (ts2, prop2)], [(ts2, prop3), (ts3, prop4)]]
 
 
-pPrint scoreMatrix1
+-- pPrint scoreMatrix1
 
-pPrint matrix1
+-- pPrint matrix1
 
- -}
+
+
 -- | TimeSignature examples
 -- >>> TS 4 4
 -- TS {num = 4, den = 4}
