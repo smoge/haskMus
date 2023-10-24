@@ -8,6 +8,7 @@
 {-# HLINT ignore "Eta reduce" #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 {-# LANGUAGE KindSignatures #-}
+ {-# LANGUAGE UnicodeSyntax #-}
 
 module Music.Pitch.Accidental
   ( Accidental (..),
@@ -31,7 +32,9 @@ import Data.String
 import qualified Data.Text as T
 import Test.QuickCheck
 
--- // SECTION - ACCIDENTAL
+-- // SECTION `a- ACCIDENTAL
+
+
 
 data Accidental
   = DoubleFlat
