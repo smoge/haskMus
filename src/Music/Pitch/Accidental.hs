@@ -32,7 +32,7 @@ import           Data.Proxy
 import           Data.Ratio
 import           Data.String
 import qualified Data.Text       as T
-import           GHC.TypeLits
+import           GHC.TypeLits hiding (Natural)
 import           Test.QuickCheck
 import           Text.Printf
 
