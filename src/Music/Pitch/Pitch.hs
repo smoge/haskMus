@@ -58,7 +58,14 @@ instance NoteClass D where
   sayNote = "d"
 instance NoteClass E where
   sayNote = "e"
-
+instance NoteClass F where
+  sayNote = "f"
+instance NoteClass G where
+  sayNote = "g"
+instance NoteClass A where
+  sayNote = "a"
+instance NoteClass B where
+  sayNote = "b"
 
 -- note1 :: NoteName
 -- note1 =  "c"
