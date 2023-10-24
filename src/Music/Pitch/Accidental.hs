@@ -1,18 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE ExistentialQuantification  #-}
+{-# LANGUAGE GADTs  #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE TypeOperators #-}
+
 {-# LANGUAGE TypeApplications #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Redundant bracket" #-}
-{-# HLINT ignore "Eta reduce" #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE KindSignatures #-}
  {-# LANGUAGE UnicodeSyntax #-}
 
 module Music.Pitch.Accidental
   ( Accidental (..),
-    toAccidental,
     accidentalToSemitones,
     semitonesToAccidental,
     modifyAccidental,
@@ -21,7 +19,6 @@ module Music.Pitch.Accidental
     addAccidental,
     allAccidentals,
     allSemitones,
-    invertAccidental'',
     AccidentalString (..),
   )
 where
@@ -31,8 +28,8 @@ import Data.Ratio
 import Data.String
 import qualified Data.Text as T
 import Test.QuickCheck
-
--- // SECTION `a- ACCIDENTAL
+import qualified Data.Map  as Map
+-- // SECTION   ACCIDENTAL
 
 
 
@@ -92,8 +89,8 @@ instance AccClass DoubleSharp where
 acidente1 :: Accidental
 acidente1 = "ff"
 
-ex1 :: (String, String, String)
-ex1 = (sayAccidental @Flat, sayAccidental @QuarterSharp, sayAccidental  @DoubleSharp)
+-- ex1 :: (String, String, String)
+-- ex1 = (sayAccidental @Flat, sayAccidental @QuarterSharp, sayAccidental  @DoubleSharp)
 
 type AccSelection = [String]
 
@@ -108,19 +105,19 @@ type AccSelection = [String]
 -- Natural
 -- QuarterSharp
 -- QuarterFlat
-instance Num Accidental where
-  (+) a b = toAccidental $ accidentalToSemitones a + accidentalToSemitones b
-  (-) a b = toAccidental $ accidentalToSemitones a - accidentalToSemitones b
-  (*) a b = toAccidental $ accidentalToSemitones a * accidentalToSemitones b
-  abs a = toAccidental $ abs (accidentalToSemitones a)
-  signum a =
-    case compare (accidentalToSemitones a) 0 of
-      EQ -> Natural
-      GT -> Sharp
-      LT -> Flat
-  fromInteger n = toAccidental (fromInteger n)
-  negate (Custom r) = (Custom (-r))
-  negate a = toAccidental $ negate (accidentalToSemitones a)
+-- instance Num Accidental where
+--   (+) a b = toAccidental $ accidentalToSemitones a + accidentalToSemitones b
+--   (-) a b = toAccidental $ accidentalToSemitones a - accidentalToSemitones b
+--   (*) a b = toAccidental $ accidentalToSemitones a * accidentalToSemitones b
+--   abs a = toAccidental $ abs (accidentalToSemitones a)
+--   signum a =
+--     case compare (accidentalToSemitones a) 0 of
+--       EQ -> Natural
+--       GT -> Sharp
+--       LT -> Flat
+--   fromInteger n = toAccidental (fromInteger n)
+--   negate (Custom r) = (Custom (-r))
+--   negate a = toAccidental $ negate (accidentalToSemitones a)
 
 instance Enum Accidental where
   toEnum n = case n of
@@ -152,18 +149,18 @@ instance Bounded Accidental where
   maxBound = DoubleSharp
 
 -- //ANCHOR toAccidental
-toAccidental :: Rational -> Accidental
-toAccidental r
-  | r == (-2) = DoubleFlat
-  | r == (-3) % 2 = ThreeQuartersFlat
-  | r == (-1) = Flat
-  | r == (-1) % 2 = QuarterFlat
-  | r == 0 = Natural
-  | r == 1 % 2 = QuarterSharp
-  | r == 1 = Sharp
-  | r == 3 % 2 = ThreeQuartersSharp
-  | r == 2 = DoubleSharp
-  | otherwise = (Custom r)
+-- toAccidental :: Rational -> Accidental
+-- toAccidental r
+--   | r == (-2) = DoubleFlat
+--   | r == (-3) % 2 = ThreeQuartersFlat
+--   | r == (-1) = Flat
+--   | r == (-1) % 2 = QuarterFlat
+--   | r == 0 = Natural
+--   | r == 1 % 2 = QuarterSharp
+--   | r == 1 = Sharp
+--   | r == 3 % 2 = ThreeQuartersSharp
+--   | r == 2 = DoubleSharp
+--   | otherwise = (Custom r)
 
 -- //ANCHOR accidentalToSemitones
 
@@ -343,8 +340,8 @@ addAccidental acc delta
     currentSemitone = accidentalToSemitones acc
     newSemitone = currentSemitone + delta
 
-invertAccidental'' :: Accidental -> Accidental
-invertAccidental'' acc = negate (acc)
+-- invertAccidental'' :: Accidental -> Accidental
+-- invertAccidental'' = negate
 
 allAccidentals :: [Accidental]
 allAccidentals =

@@ -26,6 +26,7 @@ import Data.Map as Map
 -- .// SECTION PITCH / PITCHCLASS
 -- :set -XDataKinds
 
+
 data NoteName = C | D | E | F | G | A | B
   deriving (Eq, Ord, Show, Enum, Bounded)
 
@@ -59,14 +60,12 @@ instance NoteClass E where
   sayNote = "e"
 
 
-note1 :: NoteName
-note1 =  "c"
+-- note1 :: NoteName
+-- note1 =  "c"
 
-ex1 :: (String, String, String)
-ex1 = (sayNote @C, sayNote @D, sayNote  @E)
+-- ex1 :: (String, String, String)
+-- ex1 = (sayNote @C, sayNote @D, sayNote  @E)
 
-type a :+ b = Cons a b
-infixr 6 :+
 
 -- list = C :+ D 
 
