@@ -1,11 +1,15 @@
 {-# LANGUAGE AllowAmbiguousTypes       #-}
 {-# LANGUAGE DataKinds                 #-}
 {-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE FlexibleContexts          #-}
+{-# LANGUAGE FlexibleInstances         #-}
 {-# LANGUAGE GADTs                     #-}
 {-# LANGUAGE InstanceSigs              #-}
 {-# LANGUAGE KindSignatures            #-}
 {-# LANGUAGE OverloadedStrings         #-}
+{-# LANGUAGE PolyKinds                 #-}
 {-# LANGUAGE TypeApplications          #-}
+{-# LANGUAGE UndecidableInstances      #-}
 {-# LANGUAGE UnicodeSyntax             #-}
 
 module Music.Pitch.Accidental
@@ -21,12 +25,16 @@ module Music.Pitch.Accidental
   , AccidentalString(..)
   ) where
 
+import           Data.Kind
 import           Data.List       (isPrefixOf)
-import qualified Data.Map        as Map
+import Data.Proxy
+import qualified Data.Map.Strict as Map
 import           Data.Ratio
 import           Data.String
 import qualified Data.Text       as T
+import           GHC.TypeLits
 import           Test.QuickCheck
+import           Text.Printf
 
 -- // SECTION   ACCIDENTAL
 data Accidental
@@ -42,8 +50,7 @@ data Accidental
   | Custom Rational
   deriving (Eq, Ord, Show)
 
-class AccClass (notename :: Accidental) where
-  sayAccidental :: String
+
 
 class IsAccidental a where
   toAccidental :: a -> Accidental
@@ -60,6 +67,11 @@ newtype AccidentalSelection selection = AccidentalSelection
   { getAccidentalSelection :: Map.Map String SomeAccidental
   }
 
+class AccClass (notename :: Accidental) where
+  sayAccidental :: String
+  unicodeAcc :: String
+
+
 instance Show SomeAccidental where
   show = show . toAccidental
 
@@ -74,6 +86,10 @@ instance AccClass Natural where
 
 instance AccClass QuarterFlat where
   sayAccidental = "qf"
+
+instance AccClass QuarterSharp where
+  sayAccidental = "n"
+  unicodeAcc = ""
 
 instance AccClass QuarterSharp where
   sayAccidental = "qs"

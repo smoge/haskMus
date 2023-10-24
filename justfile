@@ -18,3 +18,7 @@ make_ci:
 # Make cabal package version bounds
 cabal_bounds:
     cabal gen-bounds
+
+# Clean the project
+clean:
+    stack clean
