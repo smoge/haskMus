@@ -2,10 +2,16 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -Wno-unused-imports #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeApplications #-}
+
+{-# LANGUAGE ConstraintKinds #-}
 
 module Music.Pitch.Pitch where
 
@@ -14,13 +20,63 @@ import Data.Ratio ((%))
 import Data.String
 import qualified Data.Text as T
 import Music.Pitch.Accidental
-import Test.QuickCheck
+import Test.QuickCheck ( Arbitrary(arbitrary), Gen, elements )
+import Data.Map as Map
 
 -- .// SECTION PITCH / PITCHCLASS
+-- :set -XDataKinds
 
 data NoteName = C | D | E | F | G | A | B
   deriving (Eq, Ord, Show, Enum, Bounded)
 
+
+class NoteClass (notename :: NoteName ) where
+  sayNote :: String
+
+class IsNoteName a where
+  toNoteName :: a -> NoteName
+
+data SomeNote = forall notename. IsNoteName notename => SomeNote notename
+
+instance IsNoteName SomeNote where
+  toNoteName :: SomeNote -> NoteName
+  toNoteName (SomeNote nn) = toNoteName nn
+
+
+
+newtype NotesSelection = NotesSelection
+  { getNotesSelection :: Map.Map String SomeNote }
+
+
+instance Show SomeNote where
+  show = show . toNoteName
+
+instance NoteClass C where
+  sayNote = "c"
+instance NoteClass D where
+  sayNote = "d"
+instance NoteClass E where
+  sayNote = "e"
+
+
+note1 :: NoteName
+note1 =  "c"
+
+ex1 :: (String, String, String)
+ex1 = (sayNote @C, sayNote @D, sayNote  @E)
+
+type a :+ b = Cons a b
+infixr 6 :+
+
+-- list = C :+ D 
+
+{-ghci> :kind C
+C :: NoteName
+
+ghci>' :kind! C'
+C :: NoteName
+= C
+  -}
 instance IsString NoteName where
   fromString :: String -> NoteName
   fromString "c" = C
