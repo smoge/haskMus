@@ -7,7 +7,14 @@
 module Music.Time.Rtm where
 
 import           Data.List          (foldl')
-import           Test.QuickCheck
+import Test.QuickCheck
+    ( Gen,
+      Arbitrary(arbitrary),
+      choose,
+      oneof,
+      resize,
+      sized,
+      vectorOf )
 import           Text.Pretty.Simple
 
 data RtmValue

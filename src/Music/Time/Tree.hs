@@ -337,8 +337,8 @@ Gap 4
 
  -}
 replaceScalar2 :: Int -> Int -> Component -> Component
-replaceScalar2 old new t@(Tree.Node (Scalar n) _)
-  | n == old = Tree.Node (Scalar new) []
+replaceScalar2 old new (Tree.Node (Scalar n) subs)
+  | n == old = Tree.Node (Scalar new) subs
 replaceScalar2 old new (Tree.Node label subs) =
   Tree.Node label (map (replaceScalar2 old new) subs)
 
