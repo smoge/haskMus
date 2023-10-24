@@ -1,8 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeApplications #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Redundant bracket" #-}
 {-# HLINT ignore "Eta reduce" #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE KindSignatures #-}
 
 module Music.Pitch.Accidental
   ( Accidental (..),
@@ -40,6 +45,56 @@ data Accidental
   | DoubleSharp
   | Custom Rational
   deriving (Eq, Ord, Show)
+
+
+class AccClass (notename :: Accidental ) where
+  sayAccidental :: String
+
+class IsAccidental a where
+  toAccidental :: a -> Accidental
+
+data SomeAccidental = forall accidental. IsAccidental accidental => SomeAccidental accidental
+
+instance IsAccidental SomeAccidental where
+  toAccidental :: SomeAccidental -> Accidental
+  toAccidental (SomeAccidental acc) = toAccidental acc
+
+
+newtype AccidentalSelection selection = AccidentalSelection
+  { getAccidentalSelection :: Map.Map String SomeAccidental }
+
+instance Show SomeAccidental where
+  show = show . toAccidental
+
+instance AccClass DoubleFlat where
+  sayAccidental = "ff"
+instance AccClass Flat where
+  sayAccidental = "f"
+instance AccClass Natural where
+  sayAccidental = "n"
+instance AccClass QuarterFlat where
+  sayAccidental = "qf"
+instance AccClass QuarterSharp where
+  sayAccidental = "qs"
+instance AccClass Sharp where
+  sayAccidental = "s"
+instance AccClass ThreeQuartersSharp where
+  sayAccidental = "qss"
+instance AccClass ThreeQuartersFlat where
+  sayAccidental = "qsf"
+instance AccClass DoubleSharp where
+  sayAccidental = "ss"
+
+
+acidente1 :: Accidental
+acidente1 = "ff"
+
+ex1 :: (String, String, String)
+ex1 = (sayAccidental @Flat, sayAccidental @QuarterSharp, sayAccidental  @DoubleSharp)
+
+type AccSelection = [String]
+
+-- >>> read @Accidental "f"
 
 -- | Converts a string to an accidental
 -- >>>  "ff" ::  Accidental
