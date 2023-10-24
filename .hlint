@@ -1,0 +1,6 @@
+- arguments: [-XCPP -cross]
+
+- ignore: {name: Avoid lambda}
+- ignore: {name: Redundant lambda}
+- ignore: {name: Unused LANGUAGE pragma} 
+- ignore: {name: Eta reduce}
