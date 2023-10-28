@@ -3,11 +3,11 @@
 
 module Music.Time.Tree where
 
-import           Data.Foldable (find)
-import           Data.List     (nub)
+import           Data.Foldable                     (find)
+import           Data.GraphViz.Attributes.Complete (GraphSize (GSize))
+import           Data.List                         (nub)
 import           Data.Ratio
-import           Data.Tree
-import qualified Data.Tree     as Tree
+import qualified Data.Tree                         as T
 
 -- | ComponentLabel represents individual nodes in our Component tree.
 data ComponentLabel
@@ -16,19 +16,28 @@ data ComponentLabel
   | Vector Int
   deriving (Eq, Show, Ord)
 
-type Component = Tree.Tree ComponentLabel
+type Component = T.Tree ComponentLabel
 
+isValidComponent :: Component -> Bool
+isValidComponent (T.Node (Scalar n) []) = n > 0
+isValidComponent (T.Node (Gap n) [])    = n > 0
+isValidComponent (T.Node (Vector n) cs) = n > 0 && all isValidComponent cs
+isValidComponent _                      = False
+
+{-
+isValidComponent exampleComponent1
+ -}
 -- | Extracts the shape of a Component.
 shape :: Component -> [Int]
-shape (Tree.Node (Scalar _) _)        = [0]
-shape (Tree.Node (Gap _) _)           = [0]
-shape (Tree.Node (Vector v) children) = v : concatMap shape children
+shape (T.Node (Scalar _) _)        = [0]
+shape (T.Node (Gap _) _)           = [0]
+shape (T.Node (Vector v) children) = v : concatMap shape children
 
 -- | Extracts the values of a Component.
 values :: Component -> [Int]
-values (Tree.Node (Scalar value) _)      = [value]
-values (Tree.Node (Gap value) _)         = [-value]
-values (Tree.Node (Vector val) children) = val : concatMap values children
+values (T.Node (Scalar value) _)      = [value]
+values (T.Node (Gap value) _)         = [-value]
+values (T.Node (Vector val) children) = val : concatMap values children
 
 -------------------------------------------------------------------------------
 -- Reconstruction Functions
@@ -41,13 +50,13 @@ reconstructComponent shape values =
 
 reconstructComponentHelper :: [Int] -> [Int] -> (Component, [Int], [Int])
 reconstructComponentHelper (0:shapeRest) (v:valuesRest)
-  | v >= 0 = (Tree.Node (Scalar v) [], shapeRest, valuesRest)
-  | otherwise = (Tree.Node (Gap (-v)) [], shapeRest, valuesRest)
+  | v >= 0 = (T.Node (Scalar v) [], shapeRest, valuesRest)
+  | otherwise = (T.Node (Gap (-v)) [], shapeRest, valuesRest)
 reconstructComponentHelper (n:shapeRest) (v:valuesRest)
   | n > 0 =
     let (children, remainingShape, remainingValues) =
           extractComponents n shapeRest valuesRest
-     in (Tree.Node (Vector v) children, remainingShape, remainingValues)
+     in (T.Node (Vector v) children, remainingShape, remainingValues)
   | otherwise =
     error
       $ "Invalid shape or values: Shape="
@@ -74,11 +83,11 @@ doubleScalars = fmap doubleWhereScalar
     doubleWhereScalar label      = label
 
 depthOfTree :: Component -> Int
-depthOfTree (Tree.Node _ [])   = 1
-depthOfTree (Tree.Node _ subs) = 1 + maximum (map depthOfTree subs)
+depthOfTree (T.Node _ [])   = 1
+depthOfTree (T.Node _ subs) = 1 + maximum (map depthOfTree subs)
 
 sumOfScalars :: Component -> Int
-sumOfScalars = sum . map scalarValue . Tree.flatten
+sumOfScalars = sum . map scalarValue . T.flatten
   where
     scalarValue (Scalar n) = n
     scalarValue _          = 0
@@ -87,7 +96,7 @@ sumAtRank :: Int -> Component -> Int
 sumAtRank rank tree = sumAtRankHelper rank tree 0
 
 sumAtRankHelper :: Int -> Component -> Int -> Int
-sumAtRankHelper rank (Tree.Node label subs) acc =
+sumAtRankHelper rank (T.Node label subs) acc =
   let newAcc =
         if rank == 0
           then acc + scalarValue label
@@ -102,12 +111,12 @@ sumAtRankHelper rank (Tree.Node label subs) acc =
 
 {-
 tree :: Component
-tree = Tree.Node (Vector 5) [
-    Tree.Node (Scalar 3) [
-      Tree.Node (Gap 1) [],
-      Tree.Node (Scalar 2) []
+tree = T.Node (Vector 5) [
+    T.Node (Scalar 3) [
+      T.Node (Gap 1) [],
+      T.Node (Scalar 2) []
     ],
-    Tree.Node (Scalar 2) []
+    T.Node (Scalar 2) []
  ]
 
 ghci> printTree tree
@@ -135,21 +144,21 @@ partitionRational inteiro lista = map (* inteiro) normalizedList
     normalizedList = map ((* ratio) . toRational) lista
 
 flattenTree :: Component -> [ComponentLabel]
-flattenTree = Tree.flatten
+flattenTree = T.flatten
 
 printTree :: Component -> IO ()
-printTree = putStrLn . drawTree . fmap show
+printTree = putStrLn . T.drawTree . fmap show
 
 filterOutGaps :: Component -> Component
-filterOutGaps (Tree.Node label subs) =
+filterOutGaps (T.Node label subs) =
   let filteredChildren = map filterOutGaps (filter isNotGap subs)
-   in Tree.Node label filteredChildren
+   in T.Node label filteredChildren
   where
-    isNotGap (Tree.Node (Gap _) _) = False
-    isNotGap _                     = True
+    isNotGap (T.Node (Gap _) _) = False
+    isNotGap _                  = True
 
 maxScalar :: Component -> Int
-maxScalar = maximum . map scalarValue . Tree.flatten
+maxScalar = maximum . map scalarValue . T.flatten
   where
     scalarValue (Scalar n) = n
     scalarValue _          = minBound :: Int
@@ -174,14 +183,14 @@ mapMaybe f (x:xs) =
 filterComponents :: (Component -> Bool) -> Component -> Component
 filterComponents predicate = go
   where
-    go node@(Tree.Node label children)
-      | predicate node = Tree.Node label (map go children)
-      | otherwise = Tree.Node (Vector 0) [] -- Replace non-matching nodes with an empty vector
+    go node@(T.Node label children)
+      | predicate node = T.Node label (map go children)
+      | otherwise = T.Node (Vector 0) [] -- Replace non-matching nodes with an empty vector
 
 {-
 
 
-ghci> let hasValue2 (Tree.Node (Scalar n) _) = n == 2
+ghci> let hasValue2 (T.Node (Scalar n) _) = n == 2
 ghci> let filtered = filterComponents hasValue2 exampleComponent1
 ghci> printTree filtered
 Vector 3
@@ -201,8 +210,8 @@ Vector 3
  -}
 -- findNodeByValue' :: Int -> Component -> Maybe Component
 -- findNodeByValue' val = find (\node -> case node of
---                                       Tree.Node (Scalar n) _ | n == val -> True
---                                       Tree.Node (Gap g) _    | g == (-val) -> True
+--                                       T.Node (Scalar n) _ | n == val -> True
+--                                       T.Node (Gap g) _    | g == (-val) -> True
 --                                       _ -> False)
 multiplyScalars :: Int -> Component -> Component
 multiplyScalars factor = fmap multiplyWhereScalar
@@ -229,11 +238,11 @@ Vector 3
 
   -}
 findNodeByValue :: Int -> Component -> Maybe Component
-findNodeByValue val (node@(Tree.Node (Scalar n) _))
+findNodeByValue val (node@(T.Node (Scalar n) _))
   | n == val = Just node
-findNodeByValue val (node@(Tree.Node (Gap g) _))
+findNodeByValue val (node@(T.Node (Gap g) _))
   | g == (-val) = Just node
-findNodeByValue val (Tree.Node _ subs) =
+findNodeByValue val (T.Node _ subs) =
   case mapMaybe (findNodeByValue val) subs of
     (found:_) -> Just found
     []        -> Nothing
@@ -248,8 +257,8 @@ reverseScalars = fmap reverseWhereScalar
 -- printTree (reverseScalars exampleComponent1)
 --  findNodeByValue 3 exampleComponent1
 countVectors :: Component -> Int
-countVectors (Tree.Node (Vector _) subs) = 1 + sum (map countVectors subs)
-countVectors (Tree.Node _ subs)          = sum (map countVectors subs)
+countVectors (T.Node (Vector _) subs) = 1 + sum (map countVectors subs)
+countVectors (T.Node _ subs)          = sum (map countVectors subs)
 
 --  countVectors exampleComponent1
 transformGaps :: (Int -> Int) -> Component -> Component
@@ -272,19 +281,19 @@ Vector 3
    |
    `- Gap 2 -}
 countLeaves :: Component -> Int
-countLeaves (Tree.Node _ [])   = 1
-countLeaves (Tree.Node _ subs) = sum (map countLeaves subs)
+countLeaves (T.Node _ [])   = 1
+countLeaves (T.Node _ subs) = sum (map countLeaves subs)
 
 -- countLeaves exampleComponent1
 allScalars :: Component -> [Int]
-allScalars = mapMaybe scalarValue . Tree.flatten
+allScalars = mapMaybe scalarValue . T.flatten
   where
     scalarValue (Scalar n) = Just n
     scalarValue _          = Nothing
 
 -- allScalars exampleComponent1
 -- Mapping Components to a New Type:
-mapToNewType :: (ComponentLabel -> newLabel) -> Component -> Tree newLabel
+mapToNewType :: (ComponentLabel -> newLabel) -> Component -> T.Tree newLabel
 mapToNewType f = fmap f
 
 {-
@@ -308,9 +317,9 @@ Vector 3
 replaceSubtree :: Component -> Component -> Component -> Component
 replaceSubtree target replacement tree = go tree
   where
-    go (Node label children)
+    go (T.Node label children)
       | tree == target = replacement
-      | otherwise = Node label (map go children)
+      | otherwise = T.Node label (map go children)
 
 {-
 
@@ -333,7 +342,7 @@ breadthFirstTraversal :: Component -> [Component]
 breadthFirstTraversal root = bfs [root]
   where
     bfs [] = []
-    bfs xs = xs ++ bfs (nub $ concatMap Tree.subForest xs)
+    bfs xs = xs ++ bfs (nub $ concatMap T.subForest xs)
 
 {-
 ghci> let breadthFirst = breadthFirstTraversal exampleComponent1
@@ -348,30 +357,30 @@ Gap 4
 
  -}
 replaceScalar2 :: Int -> Int -> Component -> Component
-replaceScalar2 old new (Tree.Node (Scalar n) subs)
-  | n == old = Tree.Node (Scalar new) subs
-replaceScalar2 old new (Tree.Node label subs) =
-  Tree.Node label (map (replaceScalar2 old new) subs)
+replaceScalar2 old new (T.Node (Scalar n) subs)
+  | n == old = T.Node (Scalar new) subs
+replaceScalar2 old new (T.Node label subs) =
+  T.Node label (map (replaceScalar2 old new) subs)
 
 -- -- printTree $ replaceScalar2 3 9 exampleComponent1
 -- levels2 :: Component -> [[ComponentLabel]]
--- levels2 = fmap (fmap rootLabel) . Music.Time.Tree.levels
+-- levels2 = fmap (fmap rootLabel) . Music.Time.T.levels
 levels :: Component -> [[ComponentLabel]]
 levels tree = go [tree]
   where
     go []    = []
-    go nodes = map Tree.rootLabel nodes : go (concatMap Tree.subForest nodes)
+    go nodes = map T.rootLabel nodes : go (concatMap T.subForest nodes)
 
--- Music.Time.Tree.levels exampleComponent1
+-- Music.Time.T.levels exampleComponent1
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 exampleComponent1 :: Component
 exampleComponent1 =
-  Tree.Node
+  T.Node
     (Vector 3)
-    [ Tree.Node (Scalar 1) []
-    , Tree.Node (Gap 2) []
-    , Tree.Node (Vector 2) [Tree.Node (Scalar 3) [], Tree.Node (Gap 4) []]
+    [ T.Node (Scalar 1) []
+    , T.Node (Gap 2) []
+    , T.Node (Vector 2) [T.Node (Scalar 3) [], T.Node (Gap 4) []]
     ]
 
 shapeExample1 :: [Int]
