@@ -133,11 +133,10 @@ List [Number 1,List [Number 2,List [Number 3,Number (-4)]],Number 5,List [Number
 nestedListToComponent :: NestedList -> Component
 nestedListToComponent (Number n) = scalar n
 nestedListToComponent (List []) = vector 0 []
-nestedListToComponent (List (x:xs)) =
-  vector (getNumber x) (map nestedListToComponent xs)
-  where
-    getNumber (Number n) = n
-    getNumber _          = 0
+nestedListToComponent (List [Number n]) = scalar n
+nestedListToComponent (List (Number x:xs)) =
+  vector x (map nestedListToComponent xs)
+nestedListToComponent _ = error "Invalid nested list"
 
 example :: String
 example = "(1 1 (1 (1 1 1)) 1)"
