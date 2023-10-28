@@ -102,13 +102,24 @@ sumAtRankHelper rank (Tree.Node label subs) acc =
 
 {-
 tree :: Component
-tree = Tree.Node (Scalar 5) [
+tree = Tree.Node (Vector 5) [
     Tree.Node (Scalar 3) [
-      Tree.Node (Scalar 1) [],
+      Tree.Node (Gap 1) [],
       Tree.Node (Scalar 2) []
     ],
     Tree.Node (Scalar 2) []
  ]
+
+ghci> printTree tree
+Vector 5
+|
++- Scalar 3
+|  |
+|  +- Gap 1
+|  |
+|  `- Scalar 2
+|
+`- Scalar 2
 
 sumAtRank 1 tree
 
