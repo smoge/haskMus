@@ -140,18 +140,6 @@ testIsValidComponent =
     assertBool "Test for valid component" (isValidComponent validComp)
     assertBool "Test for invalid component" (not (isValidComponent invalidComp))
 
--- Grouping tests
-tests :: Test
-tests =
-  TestList
-    [testComponentToString, testParseComponentString, testIsValidComponent]
-
--- Running tests in main
-main3 :: IO Counts
-main3 = do
-  putStrLn "Running tests..."
-  runTestTT tests
-
 --
 -- QUICKCHECK
 -- Define Arbitrary instances for ComponentLabel and Component
@@ -187,13 +175,80 @@ prop_isValidComponent =
   forAll arbitraryComponent $ \component ->
     traceShowId (show component) `seq` isValidComponent component ==> True
 
+-- Round-Trip Test
+testRoundTrip :: Test
+testRoundTrip =
+  TestCase $ do
+    let original = createComponent
+    let serialized = componentToString original
+    let parsed =
+          fromRight (error "Parse failed") $ parseComponentString serialized
+    assertEqual "Round trip test failed" original parsed
+
+prop_roundTrip :: Property
+prop_roundTrip =
+  forAll arbitraryComponent $ \validComponent ->
+    let serialized = componentToString validComponent
+        parsed = parseComponentString serialized
+     in isRight parsed
+          && fromRight (error "Parse failed") parsed == validComponent
+
+-- QuickCheck Property for Random Component Parsing
+prop_parseComponent :: Property
+prop_parseComponent =
+  forAll arbitraryComponent $ \validComponent ->
+    let serialized = componentToString validComponent
+        parsed = parseComponentString serialized
+     in isRight parsed
+          && fromRight (error "Parse failed") parsed == validComponent
+
+-- QuickCheck Property to ensure Vector has children and leafs don't
+prop_structureValidity :: Property
+prop_structureValidity =
+  forAll arbitraryComponent $ \validComponent ->
+    case validComponent of
+      (T.Node (Vector _) cs) -> not (null cs)
+      (T.Node (Scalar _) cs) -> null cs
+      (T.Node (Gap _) cs)    -> null cs
+      _                      -> False
+
 isRight :: Either a b -> Bool
 isRight (Right _) = True
 isRight _         = False
 
-main :: IO ()
-main = do
-  verboseCheck prop_isValidComponent
+-- main :: IO ()
+-- main = do
+--   verboseCheck prop_isValidComponent
+-- -- Grouping tests
+-- tests :: Test
+-- tests =
+--   TestList
+--     [testComponentToString, testParseComponentString, testIsValidComponent]
+-- Running tests in main
+main3 :: IO Counts
+main3 = do
+  putStrLn "Running tests..."
+  runTestTT tests
+
+-- Grouping tests
+tests :: Test
+tests =
+  TestList
+    [ testComponentToString
+    , testParseComponentString
+    , testIsValidComponent
+    , testRoundTrip
+    ]
+
+-- Running tests in main
+main4 :: IO ()
+main4 = do
+  -- putStrLn "Running HUnit tests..."
+  -- _ <- runTestTT tests
+  putStrLn "\nRunning QuickCheck tests..."
+  verboseCheck prop_roundTrip
+  verboseCheck prop_parseComponent
+  verboseCheck prop_structureValidity
 {-
 t = Node
     { rootLabel = Vector 2
