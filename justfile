@@ -6,6 +6,10 @@ push:
 # Stack build file-watch
 build:
     stack build --fast --file-watch
+    
+# Stack build file-watch
+b:
+    stack build 
 
 # Stack test file-watch
 test: 

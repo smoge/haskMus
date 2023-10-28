@@ -32,10 +32,9 @@ import           Data.Proxy
 import           Data.Ratio
 import           Data.String
 import qualified Data.Text       as T
-import           GHC.TypeLits hiding (Natural)
+import           GHC.TypeLits    hiding (Natural)
 import           Test.QuickCheck
 import           Text.Printf
-
 
 -- // SECTION   ACCIDENTAL
 data Accidental
@@ -70,54 +69,42 @@ class AccClass (notename :: Accidental) where
   sayAccidental :: String
   -- unicodeAcc :: String
 
-instance Show SomeAccidental
- where
+instance Show SomeAccidental where
   show = show . toAccidental
 
-instance AccClass DoubleFlat
- where
+instance AccClass DoubleFlat where
   sayAccidental = "ff"
 
-instance AccClass Flat
- where
+instance AccClass Flat where
   sayAccidental = "f"
 
-instance AccClass Natural
- where
+instance AccClass Natural where
   sayAccidental = "n"
 
-instance AccClass QuarterFlat
- where
+instance AccClass QuarterFlat where
   sayAccidental = "qf"
 
-instance AccClass QuarterSharp
- where
+instance AccClass QuarterSharp where
   sayAccidental = "qs"
 
-instance AccClass Sharp
- where
+instance AccClass Sharp where
   sayAccidental = "s"
 
-instance AccClass ThreeQuartersSharp
- where
+instance AccClass ThreeQuartersSharp where
   sayAccidental = "qss"
 
-instance AccClass ThreeQuartersFlat
- where
+instance AccClass ThreeQuartersFlat where
   sayAccidental = "qsf"
 
-instance AccClass DoubleSharp
- where
+instance AccClass DoubleSharp where
   sayAccidental = "ss"
 
 acidente1 :: Accidental
 acidente1 = "ff"
 
-
 -- ex1 :: (String, String, String)
 -- ex1 = (sayAccidental @Flat, sayAccidental @QuarterSharp, sayAccidental  @DoubleSharp)
 type AccSelection = [String]
-
 
 -- >>> read @Accidental "f"
 -- | Converts a string to an accidental
@@ -169,11 +156,9 @@ instance Enum Accidental where
       Custom _ ->
         error "fromEnum: Custom accidental doesn't have a fixed enumeration"
 
-instance Bounded Accidental
- where
+instance Bounded Accidental where
   minBound = DoubleFlat
   maxBound = DoubleSharp
-
 
 -- //ANCHOR toAccidental
 -- toAccidental :: Rational -> Accidental
@@ -202,7 +187,6 @@ accidentalToSemitones ThreeQuartersSharp = 3 % 2
 accidentalToSemitones DoubleSharp        = 2
 accidentalToSemitones (Custom r)         = r
 
-
 -- | Converts a semitone offset to the corresponding accidental.
 semitonesToAccidental :: Rational -> Accidental
 semitonesToAccidental r
@@ -210,13 +194,12 @@ semitonesToAccidental r
   | r == (-3) % 2 = ThreeQuartersFlat
   | r == (-1) % 1 = Flat
   | r == (-1) % 2 = QuarterFlat
-  | r == 0 % 1    = Natural
-  | r == 1 % 2    = QuarterSharp
-  | r == 1 % 1    = Sharp
-  | r == 3 % 2    = ThreeQuartersSharp
-  | r == 2 % 1    = DoubleSharp
-  | otherwise     = (Custom r)
-
+  | r == 0 % 1 = Natural
+  | r == 1 % 2 = QuarterSharp
+  | r == 1 % 1 = Sharp
+  | r == 3 % 2 = ThreeQuartersSharp
+  | r == 2 % 1 = DoubleSharp
+  | otherwise = (Custom r)
 
 -- error "Invalid semitone offset."
 -- | Converts an accidental to its corresponding LilyPond representation.
@@ -234,37 +217,35 @@ accToLily ThreeQuartersSharp = T.pack "tqs"
 accToLily DoubleSharp        = T.pack "ss"
 accToLily (Custom r)         = T.pack $ show r
 
-
 -- //ANCHOR OverloadedStrings
-instance IsString Accidental
- where
-  fromString "ff"           = DoubleFlat
-  fromString "tqf"          = ThreeQuartersFlat
-  fromString "f"            = Flat
-  fromString "qf"           = QuarterFlat
-  fromString ""             = Natural
-  fromString "n"            = Natural
-  fromString "qs"           = QuarterSharp
-  fromString "s"            = Sharp
-  fromString "tqs"          = ThreeQuartersSharp
-  fromString "ss"           = DoubleSharp
-  fromString "sharp"        = Sharp
-  fromString "flat"         = Flat
-  fromString "natural"      = Natural
+instance IsString Accidental where
+  fromString "ff" = DoubleFlat
+  fromString "tqf" = ThreeQuartersFlat
+  fromString "f" = Flat
+  fromString "qf" = QuarterFlat
+  fromString "" = Natural
+  fromString "n" = Natural
+  fromString "qs" = QuarterSharp
+  fromString "s" = Sharp
+  fromString "tqs" = ThreeQuartersSharp
+  fromString "ss" = DoubleSharp
+  fromString "sharp" = Sharp
+  fromString "flat" = Flat
+  fromString "natural" = Natural
   fromString "quartersharp" = QuarterSharp
-  fromString "semisharp"    = QuarterSharp
-  fromString "quarterflat"  = QuarterFlat
-  fromString "semiflat"     = QuarterFlat
-  fromString "♭"            = Flat
-  fromString "♯"            = Sharp
-  fromString "♮"            = Natural
-  fromString "𝄫"           = DoubleFlat
-  fromString "𝄪"           = DoubleSharp
-  fromString "𝄳"           = QuarterFlat
-  fromString "𝄲"           = QuarterSharp
+  fromString "semisharp" = QuarterSharp
+  fromString "quarterflat" = QuarterFlat
+  fromString "semiflat" = QuarterFlat
+  fromString "♭" = Flat
+  fromString "♯" = Sharp
+  fromString "♮" = Natural
+  fromString "𝄫" = DoubleFlat
+  fromString "𝄪" = DoubleSharp
+  fromString "𝄳" = QuarterFlat
+  fromString "𝄲" = QuarterSharp
   fromString str
     | "custom " `isPrefixOf` str = Custom (read (drop 7 str) :: Rational)
-    | otherwise                  = error $ "Invalid Accidental string: " ++ str
+    | otherwise = error $ "Invalid Accidental string: " ++ str
 
 {-
 >>> accStr1 :: Accidental
@@ -321,11 +302,9 @@ modifyAccidental acc f =
           | r == 2 -> DoubleSharp
           | otherwise -> (Custom r)
 
-
 -- | Checks whether an accidental is equal to its corresponding semitone offset.
 checkAccidental :: Accidental -> Bool
 checkAccidental acc = semitonesToAccidental (accidentalToSemitones acc) == acc
-
 
 -- | Modifies an accidental by a given delta (Rational).
 --
@@ -350,20 +329,19 @@ addAccidental ::
   -> Accidental
   -- | The initial accidental
 addAccidental acc delta
-  | newSemitone == -2       = DoubleFlat
+  | newSemitone == -2 = DoubleFlat
   | newSemitone == (-3) % 2 = ThreeQuartersFlat
-  | newSemitone == -1       = Flat
+  | newSemitone == -1 = Flat
   | newSemitone == (-1) % 2 = QuarterFlat
-  | newSemitone == 0        = Natural
-  | newSemitone == 1 % 2    = QuarterSharp
-  | newSemitone == 1        = Sharp
-  | newSemitone == 3 % 2    = ThreeQuartersSharp
-  | newSemitone == 2        = DoubleSharp
-  | otherwise               = (Custom newSemitone)
+  | newSemitone == 0 = Natural
+  | newSemitone == 1 % 2 = QuarterSharp
+  | newSemitone == 1 = Sharp
+  | newSemitone == 3 % 2 = ThreeQuartersSharp
+  | newSemitone == 2 = DoubleSharp
+  | otherwise = (Custom newSemitone)
   where
     currentSemitone = accidentalToSemitones acc
-    newSemitone     = currentSemitone + delta
-
+    newSemitone = currentSemitone + delta
 
 -- invertAccidental'' :: Accidental -> Accidental
 -- invertAccidental'' = negate
@@ -383,7 +361,6 @@ allAccidentals =
 allSemitones :: [Rational]
 allSemitones = map accidentalToSemitones allAccidentals
 
-
 -- //ANCHOR  - QUICKCHECK
 instance Arbitrary Accidental where
   arbitrary =
@@ -392,12 +369,10 @@ instance Arbitrary Accidental where
       , (1, Custom <$> arbitrary) -- Picking a custom accidental
       ]
 
-
 -- Newtype wrapper for specific accidental strings
 newtype AccidentalString =
   AccidentalString String
   deriving (Show)
-
 
 -- Arbitrary instance for AccidentalString (QuickCheck)
 instance Arbitrary AccidentalString where
