@@ -1,6 +1,7 @@
 module Parsers.RtmParser where
 
 import           Control.Applicative
+import           Data.Either         (fromRight)
 import qualified Data.Tree           as T
 import           Text.Parsec         hiding ((<|>))
 import           Text.Parsec.String
@@ -110,8 +111,41 @@ value =
 -- Function to parse a LISP-style list
 parseLISP :: String -> Either ParseError NestedList
 parseLISP input = parse (value <* eof) "" input
--- main :: IO ()
--- main = do
---   let example = "(1 (2 (3 -4)) 5 (6 (7 (8 (-9 10)))))"
---   let parsed = parseLISP example
---   print parsed
+
+test1 :: IO ()
+test1 = do
+  let example = "(1 (2 (3 -4)) 5 (6 (7 (8 (-9 10)))))"
+  let parsed = parseLISP example
+  case parsed of
+    Right list -> do
+      putStrLn "Parsed successfully:"
+      print list
+    Left err -> do
+      putStrLn "Failed to parse:"
+      print err
+
+{-
+Parsed successfully:
+List [Number 1,List [Number 2,List [Number 3,Number (-4)]],Number 5,List [Number 6,List [Number 7,List [Number 8,List [Number (-9),Number 10]]]]]
+ -}
+nestedListToComponent :: NestedList -> Component
+nestedListToComponent (Number n) = scalar n
+nestedListToComponent (List []) = vector 0 []
+nestedListToComponent (List (x:xs)) =
+  vector (getNumber x) (map nestedListToComponent xs)
+  where
+    getNumber (Number n) = n
+    getNumber _          = 0
+
+example = "(1 1 (1 (1 1 1)) 1)"
+
+parsed = parseLISP example
+
+comp = nestedListToComponent $ fromRight (List []) parsed
+{-
+>>> isValidComponent comp
+True
+
+printTree comp
+
+-}
