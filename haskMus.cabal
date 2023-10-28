@@ -45,6 +45,7 @@ library
                      , vector-space >= 0.16 && < 0.17
                      , graphviz  >= 2999.20.1 && < 2999.21
                      , fgl  >= 5.8.0 && < 5.9
+                     , HUnit >= 1.6.2 && < 1.7
                      --, witch
                      , parsec >= 3.1.16 && < 3.2
   default-language:    Haskell2010

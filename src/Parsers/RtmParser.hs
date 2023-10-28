@@ -6,6 +6,7 @@ module Parsers.RtmParser where
 import           Control.Applicative
 import           Data.Either         (fromRight)
 import qualified Data.Tree           as T
+import           Test.HUnit
 import           Text.Parsec         hiding ((<|>))
 import           Text.Parsec.String
 
@@ -71,8 +72,8 @@ componentParser = try vectorParser <|> try scalarParser <|> gapParser
 parseComponentString :: String -> Either ParseError Component
 parseComponentString s = parse componentParser "" s
 
-main :: IO ()
-main = do
+main2 :: IO ()
+main2 = do
   let example = "(2 (1 1 1 3 -1 (4 (5 1 1 -2))))"
   let parsed = parseComponentString example
   case parsed of
@@ -82,7 +83,51 @@ main = do
     Left err -> do
       putStrLn "Failed to parse:"
       print err
+ -----
+ ---------
+
 {-
 >>> componentToString createComponent
 "(2 (3 -1 (4 (5 -2))))"
  -}
+-- TEST
+-- Testing the componentToString function
+testComponentToString :: Test
+testComponentToString =
+  TestCase $ do
+    assertEqual
+      "Test for createComponent"
+      "(2 (3 -1 (4 (5 -2))))"
+      (componentToString createComponent)
+
+-- Testing the parser
+testParseComponentString :: Test
+testParseComponentString =
+  TestCase $ do
+    let exampleStr = "(2 (3 -1 (4 (5 -2))))"
+    let parsed = parseComponentString exampleStr
+    assertEqual
+      "Test for parsing a component string"
+      (Right createComponent)
+      parsed
+
+-- Testing the validator
+testIsValidComponent :: Test
+testIsValidComponent =
+  TestCase $ do
+    let validComp = createComponent
+    let invalidComp = vector (-1) [scalar 3]
+    assertBool "Test for valid component" (isValidComponent validComp)
+    assertBool "Test for invalid component" (not (isValidComponent invalidComp))
+
+-- Grouping tests
+tests :: Test
+tests =
+  TestList
+    [testComponentToString, testParseComponentString, testIsValidComponent]
+
+-- Running tests in main
+main :: IO Counts
+main = do
+  putStrLn "Running tests..."
+  runTestTT tests
