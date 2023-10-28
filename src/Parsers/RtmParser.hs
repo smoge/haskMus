@@ -39,11 +39,15 @@ printTree = putStrLn . T.drawTree . fmap show
 printTree' :: Show a => T.Tree a -> IO ()
 printTree' = putStrLn . T.drawTree . fmap show
 
---test
-createComponent :: Component
-createComponent = vector 2 [scalar 3, gap 1, vector 4 [scalar 5, gap 2]]
-
--- Function to convert Component to a String representation
+-- shape :: Component -> [Int]
+-- shape (T.Node (Scalar _) _)        = [0]
+-- shape (T.Node (Gap _) _)           = [0]
+-- shape (T.Node (Vector v) children) = v : concatMap shape children
+-- -- | Extracts the values of a Component.
+-- values :: Component -> [Int]
+-- values (T.Node (Scalar value) _)      = [value]
+-- values (T.Node (Gap value) _)         = [-value]
+-- values (T.Node (Vector val) children) = val : concatMap values children
 componentToString :: Component -> String
 componentToString (T.Node (Scalar n) []) = show n
 componentToString (T.Node (Gap n) []) = "-" ++ show n
@@ -249,6 +253,7 @@ main4 = do
   verboseCheck prop_roundTrip
   verboseCheck prop_parseComponent
   verboseCheck prop_structureValidity
+
 {-
 t = Node
     { rootLabel = Vector 2
@@ -490,3 +495,45 @@ Vector 2
    |
    `- Gap 5
  -}
+{-
+buildComponent :: Int -> (ComponentLabel, [Int])
+buildComponent x =
+    if 2*x + 1 > 12
+    then (Scalar x, [])
+    else (Vector x, [2*x, 2*x+1])
+
+
+componentTree :: Tree ComponentLabel
+componentTree = unfoldTree buildComponent 1
+
+
+printTree componentTree
+
+ -}
+-- Building more complex components with depth-awareness and variety
+buildComplexComponent :: Int -> Int -> (ComponentLabel, [Int])
+buildComplexComponent depth x
+  | depth >= 4 = (Scalar x, []) -- Prevent creating an overly large tree by respecting depthThreshold
+  | x `mod` 5 == 0 = (Gap x, filter validChild [2 * x, x + 3])
+  | x `mod` 5 == 1 = (Vector x, filter validChild [2 * x, 2 * x + 1, x + 4])
+  | x `mod` 5 == 2 = (Scalar x, filter validChild [x + 3, 2 * x + 2])
+  | x `mod` 5 == 3 = (Vector x, filter validChild [x + 4])
+  | otherwise = (Gap x, [])
+  where
+    validChild child = child <= 25 && child `mod` 3 /= 0 -- Some arbitrary constraints for valid children
+
+componentTree :: Tree ComponentLabel
+componentTree = unfoldTree (buildComplexComponent' 1) 1
+  where
+    buildComplexComponent' depth x =
+      let (label_, children) = buildComplexComponent depth x
+       in (label_, map (\c -> c + depth) children) -- Adjust children values with depth for variety
+
+-- Test our tree
+main :: IO ()
+main = do
+  printTree componentTree
+  putStrLn
+    $ if isValidComponent componentTree
+        then "Tree is valid!"
+        else "Tree is not valid."
