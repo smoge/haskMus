@@ -36,120 +36,53 @@ printTree' = putStrLn . T.drawTree . fmap show
 createComponent :: Component
 createComponent = vector 2 [scalar 3, gap 1, vector 4 [scalar 5, gap 2]]
 
+-- Function to convert Component to a String representation
+componentToString :: Component -> String
+componentToString (T.Node (Scalar n) []) = show n
+componentToString (T.Node (Gap n) []) = "-" ++ show n
+componentToString (T.Node (Vector n) cs) =
+  "(" ++ show n ++ " (" ++ unwords (map componentToString cs) ++ "))"
+componentToString (T.Node (Scalar _) _) =
+  error "Scalar should not have children"
+componentToString (T.Node (Gap _) _) = error "Gap should not have children"
+
 isValidComponent :: Component -> Bool
 isValidComponent (T.Node (Scalar n) []) = n > 0
 isValidComponent (T.Node (Gap n) [])    = n > 0
 isValidComponent (T.Node (Vector n) cs) = n > 0 && all isValidComponent cs
 isValidComponent _                      = False
 
--- parse rtm
-componentLabel :: Parser ComponentLabel
-componentLabel = try vectorParser <|> scalarParser <|> gapParser
+componentParser :: Parser Component
+componentParser = try vectorParser <|> try scalarParser <|> gapParser
   where
-    scalarParser = Scalar . read <$> many1 digit
-    gapParser = Gap . abs <$> (char '-' *> (read <$> many1 digit))
-    vectorParser =
-      Vector . read
-        <$> (char '[' *> spaces *> many1 digit <* spaces <* char ',' <* spaces)
-
-component :: Parser Component
-component = scalarComponent <|> gapComponent <|> vectorComponent
-  where
-    scalarComponent = scalar . read <$> many1 digit
-    gapComponent = gap . abs . read <$> (char '-' *> many1 digit)
-    vectorComponent = do
-      _ <- char '['
+    scalarParser :: Parser Component
+    scalarParser = scalar . read <$> many1 digit
+    gapParser :: Parser Component
+    gapParser = gap . read <$> (char '-' *> many1 digit)
+    vectorParser :: Parser Component
+    vectorParser = do
+      _ <- char '('
       n <- read <$> many1 digit
-      _ <- char ','
-      _ <- spaces
-      _ <- char '['
-      cs <- sepBy component (spaces >> char ',' >> spaces)
-      _ <- char ']'
-      _ <- char ']'
-      return $ vector n cs
+      _ <- spaces >> char '('
+      comps <- sepBy componentParser spaces
+      _ <- char ')' >> char ')'
+      return $ vector n comps
 
-parseComponent :: String -> Either ParseError Component
-parseComponent input = parse (component <* eof) "" input
+parseComponentString :: String -> Either ParseError Component
+parseComponentString s = parse componentParser "" s
 
 main :: IO ()
 main = do
-  let example = "[2, [3,-1,[4, [5,-2]]]]"
-  let parsed = parseComponent example
+  let example = "(2 (1 1 1 3 -1 (4 (5 1 1 -2))))"
+  let parsed = parseComponentString example
   case parsed of
     Right comp -> do
       putStrLn "Parsed successfully:"
-      print comp
       printTree comp
     Left err -> do
       putStrLn "Failed to parse:"
       print err
-
 {-
-Parsed successfully:
-Node {rootLabel = Vector 2, subForest = [Node {rootLabel = Scalar 3, subForest = []},Node {rootLabel = Gap 1, subForest = []},Node {rootLabel = Vector 4, subForest = [Node {rootLabel = Scalar 5, subForest = []},Node {rootLabel = Gap 2, subForest = []}]}]}
-Vector 2
-|
-+- Scalar 3
-|
-+- Gap 1
-|
-`- Vector 4
-   |
-   +- Scalar 5
-   |
-   `- Gap 2
+>>> componentToString createComponent
+"(2 (3 -1 (4 (5 -2))))"
  -}
--- test simple case
-data NestedList
-  = Number Int
-  | List [NestedList]
-  deriving (Show)
-
--- Parser for NestedList
-value :: Parser NestedList
-value =
-  List <$> (char '(' *> sepBy value spaces <* char ')')
-    <|> Number . read <$> many1 (digit <|> char '-')
-
--- Function to parse a LISP-style list
-parseLISP :: String -> Either ParseError NestedList
-parseLISP input = parse (value <* eof) "" input
-
--- test1 :: IO ()
--- test1 = do
---   let example = "(1 (2 (3 -4)) 5 (6 (7 (8 (-9 10)))))"
---   let parsed = parseLISP example
---   case parsed of
---     Right list -> do
---       putStrLn "Parsed successfully:"
---       print list
---     Left err -> do
---       putStrLn "Failed to parse:"
---       print err
-{-
-Parsed successfully:
-List [Number 1,List [Number 2,List [Number 3,Number (-4)]],Number 5,List [Number 6,List [Number 7,List [Number 8,List [Number (-9),Number 10]]]]]
- -}
-nestedListToComponent :: NestedList -> Component
-nestedListToComponent (Number n) = scalar n
-nestedListToComponent (List []) = vector 0 []
-nestedListToComponent (List [Number n]) = scalar n
-nestedListToComponent (List (Number x:xs)) =
-  vector x (map nestedListToComponent xs)
-nestedListToComponent _ = error "Invalid nested list"
-
-example :: String
-example = "(1 1 (1 (1 1 1)) 1)"
-
-parsed :: Either ParseError NestedList
-parsed = parseLISP example
-
-comp :: Component
-comp = nestedListToComponent $ fromRight (List []) parsed
-{-
->>> isValidComponent comp
-True
-
-printTree comp
-
--}
