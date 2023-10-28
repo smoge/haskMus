@@ -24,8 +24,20 @@ isValidComponent (T.Node (Gap n) [])    = n > 0
 isValidComponent (T.Node (Vector n) cs) = n > 0 && all isValidComponent cs
 isValidComponent _                      = False
 
+changeRootVectorValue :: Int -> Component -> Component
+changeRootVectorValue n (T.Node (Vector _) cs) = T.Node (Vector n) cs
+changeRootVectorValue _ t                      = t
+
+setRootVectorTo1 :: Component -> Component
+setRootVectorTo1 = changeRootVectorValue 1
+
 {-
-isValidComponent exampleComponent1
+test = setRootVectorTo1 exampleComponent1
+
+printTree exampleComponent1
+
+printTree test
+
  -}
 -- | Extracts the shape of a Component.
 shape :: Component -> [Int]
@@ -419,6 +431,19 @@ Vector 3
    `- Gap 4
 
 
+printTree reconstructedComponent1
+
+Vector 3
+|
++- Scalar 1
+|
++- Gap 2
+|
+`- Vector 2
+   |
+   +- Scalar 3
+   |
+   `- Gap 4
 
 
 >>> depthOfTree exampleComponent1
