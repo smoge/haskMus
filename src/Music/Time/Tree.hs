@@ -1,5 +1,7 @@
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Eta reduce" #-}
 
 module Music.Time.Tree where
 
@@ -7,6 +9,7 @@ import           Data.Foldable                     (find)
 import           Data.GraphViz.Attributes.Complete (GraphSize (GSize))
 import           Data.List                         (nub)
 import           Data.Ratio
+import           Data.Tree
 import qualified Data.Tree                         as T
 
 -- | ComponentLabel represents individual nodes in our Component tree.
@@ -17,6 +20,25 @@ data ComponentLabel
   deriving (Eq, Show, Ord)
 
 type Component = T.Tree ComponentLabel
+
+scalar :: Int -> Component
+scalar n = T.Node (Scalar n) []
+
+gap :: Int -> Component
+gap n = T.Node (Gap n) []
+
+vector :: Int -> [Component] -> Component
+vector n cs = T.Node (Vector n) cs
+
+printTree :: Component -> IO ()
+printTree = putStrLn . T.drawTree . fmap show
+
+printTree' :: Show a => T.Tree a -> IO ()
+printTree' = putStrLn . T.drawTree . fmap show
+
+--test
+createComponent :: Component
+createComponent = vector 2 [scalar 3, gap 1, vector 4 [scalar 5, gap 2]]
 
 isValidComponent :: Component -> Bool
 isValidComponent (T.Node (Scalar n) []) = n > 0
@@ -32,11 +54,70 @@ setRootVectorTo1 :: Component -> Component
 setRootVectorTo1 = changeRootVectorValue 1
 
 {-
+tree1 = Node (+ 1) [Node (* 2) []]
+
+tree2 = Node 3 [Node 4 []]
+
+resultTree = tree1 <*> tree2
+-}
+{-
 test = setRootVectorTo1 exampleComponent1
 
 printTree exampleComponent1
 
 printTree test
+
+ -}
+{-
+
+mzip :: T.Tree a -> T.Tree b -> T.Tree (a, b)
+mzip (T.Node a as) (T.Node b bs) = T.Node (a, b) (zipWith mzip as bs)
+
+mzipWith :: (a -> b -> c) -> T.Tree a -> T.Tree b -> T.Tree c
+mzipWith f (T.Node a as) (T.Node b bs) = T.Node (f a b) (zipWith (mzipWith f) as bs)
+mzipWith _ _ _                         = T.Node undefined []
+
+tree1 :: T.Tree Int
+tree1 = T.Node 1 [T.Node 2 [], T.Node 3 [T.Node 4 []]]
+
+tree2 :: T.Tree String
+tree2 = T.Node "a" [T.Node "b" [], T.Node "c" [T.Node "d" []]]
+
+zippedTree :: T.Tree (Int, String)
+zippedTree = mzip tree1 tree2
+
+
+printTreeAb :: (Show a, Show b) => T.Tree (a, b) -> IO ()
+printTreeAb = putStrLn . T.drawTree . fmap show
+
+printTreeAb zippedTree
+
+-- mzipWith
+
+tree3 :: T.Tree Int
+tree3 = T.Node 1 [T.Node 2 [], T.Node 3 [T.Node 4 []]]
+
+tree4 :: T.Tree Int
+tree4 = T.Node 10 [T.Node 20 [], T.Node 30 [T.Node 40 []]]
+
+zippedTree :: T.Tree Int
+zippedTree = mzipWith (*) tree3 tree4
+
+printTree' :: Show a => T.Tree a -> IO ()
+printTree' = putStrLn . T.drawTree . fmap show
+
+printTree' tree3
+
+printTree' tree4
+
+printTree' zippedTree
+10
+|
++- 40
+|
+`- 90
+   |
+   `- 160
 
  -}
 -- | Extracts the shape of a Component.
@@ -56,8 +137,8 @@ values (T.Node (Vector val) children) = val : concatMap values children
 -------------------------------------------------------------------------------
 -- | Reconstructs a Component from shape and values.
 reconstructComponent :: [Int] -> [Int] -> Component
-reconstructComponent shape values =
-  let (tree, _, _) = reconstructComponentHelper shape values
+reconstructComponent shape_ values_ =
+  let (tree, _, _) = reconstructComponentHelper shape_ values_
    in tree
 
 reconstructComponentHelper :: [Int] -> [Int] -> (Component, [Int], [Int])
@@ -79,8 +160,8 @@ reconstructComponentHelper _ _ = error "Mismatch between shape and values."
 
 extractComponents :: Int -> [Int] -> [Int] -> ([Component], [Int], [Int])
 extractComponents 0 s v = ([], s, v)
-extractComponents n shape values =
-  let (tree, newShape, newValues) = reconstructComponentHelper shape values
+extractComponents n shape_ values_ =
+  let (tree, newShape, newValues) = reconstructComponentHelper shape_ values_
       (trees, finalShape, finalValues) =
         extractComponents (n - 1) newShape newValues
    in (tree : trees, finalShape, finalValues)
@@ -157,9 +238,6 @@ partitionRational inteiro lista = map (* inteiro) normalizedList
 
 flattenTree :: Component -> [ComponentLabel]
 flattenTree = T.flatten
-
-printTree :: Component -> IO ()
-printTree = putStrLn . T.drawTree . fmap show
 
 filterOutGaps :: Component -> Component
 filterOutGaps (T.Node label subs) =
@@ -250,9 +328,9 @@ Vector 3
 
   -}
 findNodeByValue :: Int -> Component -> Maybe Component
-findNodeByValue val (node@(T.Node (Scalar n) _))
+findNodeByValue val node@(T.Node (Scalar n) _)
   | n == val = Just node
-findNodeByValue val (node@(T.Node (Gap g) _))
+findNodeByValue val node@(T.Node (Gap g) _)
   | g == (-val) = Just node
 findNodeByValue val (T.Node _ subs) =
   case mapMaybe (findNodeByValue val) subs of
@@ -306,7 +384,7 @@ allScalars = mapMaybe scalarValue . T.flatten
 -- allScalars exampleComponent1
 -- Mapping Components to a New Type:
 mapToNewType :: (ComponentLabel -> newLabel) -> Component -> T.Tree newLabel
-mapToNewType f = fmap f
+mapToNewType = fmap
 
 {-
 
