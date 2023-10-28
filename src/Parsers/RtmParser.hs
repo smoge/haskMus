@@ -1,3 +1,6 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Eta reduce" #-}
+
 module Parsers.RtmParser where
 
 import           Control.Applicative
@@ -112,18 +115,17 @@ value =
 parseLISP :: String -> Either ParseError NestedList
 parseLISP input = parse (value <* eof) "" input
 
-test1 :: IO ()
-test1 = do
-  let example = "(1 (2 (3 -4)) 5 (6 (7 (8 (-9 10)))))"
-  let parsed = parseLISP example
-  case parsed of
-    Right list -> do
-      putStrLn "Parsed successfully:"
-      print list
-    Left err -> do
-      putStrLn "Failed to parse:"
-      print err
-
+-- test1 :: IO ()
+-- test1 = do
+--   let example = "(1 (2 (3 -4)) 5 (6 (7 (8 (-9 10)))))"
+--   let parsed = parseLISP example
+--   case parsed of
+--     Right list -> do
+--       putStrLn "Parsed successfully:"
+--       print list
+--     Left err -> do
+--       putStrLn "Failed to parse:"
+--       print err
 {-
 Parsed successfully:
 List [Number 1,List [Number 2,List [Number 3,Number (-4)]],Number 5,List [Number 6,List [Number 7,List [Number 8,List [Number (-9),Number 10]]]]]
@@ -137,10 +139,13 @@ nestedListToComponent (List (x:xs)) =
     getNumber (Number n) = n
     getNumber _          = 0
 
+example :: String
 example = "(1 1 (1 (1 1 1)) 1)"
 
+parsed :: Either ParseError NestedList
 parsed = parseLISP example
 
+comp :: Component
 comp = nestedListToComponent $ fromRight (List []) parsed
 {-
 >>> isValidComponent comp
