@@ -1,6 +1,6 @@
 # Git push all repos
+# git push -u gh-origin main
 push:
-    git push -u gh-origin main
     git push -u origin main
 
 # Stack build file-watch
@@ -36,3 +36,7 @@ format:
     ormolu -i ./src/*/*
     ormolu -i ./test/*
     
+# docs
+# stack haddock --haddock-arguments --theme="./my.css"
+docs:
+    stack haddock 

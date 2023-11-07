@@ -1,5 +1,5 @@
-#resolver: nightly-2023-10-28
-resolver: lts-21.19
+resolver: nightly-2023-11-07
+#resolver: lts-21.19
 
 packages:
   - "."
@@ -8,4 +8,5 @@ extra-deps:
   - haskell-dap-0.0.16.0@sha256:5ee4fba7ce1b8220f486a5251a941e6cd739ab2330e8f25efc5af553a4e1c61d,944
   - ghci-dap-0.0.21.0@sha256:5a14d13b15701887b3fcc9ff631b676891c1b5dc22fcefeee1ec2832c1eb18b0,3326
   # - hsc3-0.20
+
 extra-package-dbs: []

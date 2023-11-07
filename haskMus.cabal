@@ -18,7 +18,7 @@ build-type:    Simple
 -- extra-source-files:  readme.md
 --                      changelog.md
 
-tested-with:   GHC ==9.4.7 || ==9.6.3
+tested-with:   GHC ==9.4.7 || ==9.6.3 || ==9.8.1
 
 library
   hs-source-dirs:     src
@@ -34,29 +34,28 @@ library
     Time.TimeSignature
 
   build-depends:
-    , base                               >=4.17.2    && <4.19
-    , containers                         >=0.6.7     && <0.7
+    , base                               >=4.17.2    && <4.20
+    , containers                         
     , data-default
     , data-default-class
     , data-default-instances-containers
     , data-default-instances-dlist
     , data-default-instances-old-locale
-    , doctest                            >=0.20.1    && <0.22
-    , fgl                                >=5.8.0     && <5.9
-    , graphviz                           >=2999.20.1 && <2999.21
-    , hspec                              >=2.10.0    && <2.13
-    , HUnit                              >=1.6.2     && <1.7
-    , lens                               >=5.2.3     && <5.4
-    , linear                             >=1.22      && <1.23
-    , parsec                             >=3.1.16    && <3.2
-    , pretty-simple                      >=4.1.2     && <4.2
-    , QuickCheck                         >=2.14.3    && <2.15
-    , rando                              >=0.0.0     && <0.1
-    , random-fu                          >=0.3.0     && <0.4
+    , doctest                           
+    , fgl                                                 
+    , hspec                             
+    , HUnit                             
+    , lens                              
+    , linear                            
+    , parsec                            
+    , pretty-simple                     
+    , QuickCheck                        
+    , rando                             
+    , random-fu                         
     , random-shuffle
     , template-haskell
-    , text                               >=2.0.2     && <2.2
-    , vector-space                       >=0.16      && <0.17
+    , text                               
+    , vector-space                    
 
   --  , bimap >= 0.5.0 && < 0.6
   --  , markov-chain >= 0.0.3 && < 0.1
@@ -123,7 +122,7 @@ test-suite haskMus-test
     PitchSpec
 
   build-depends:
-    , base                        >=4.17.2 && <4.19
+    , base                        >=4.17.2 && <4.20
     , haskMus
     , hspec
     , HUnit

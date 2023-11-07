@@ -38,7 +38,7 @@ instance Default Dur where
 -- Dur (2 % 3)
 --
 -- >>> 4 %/ 6
--- Dur (2 % 3) -- Automatically simplified to lowest terms.
+-- NOW Dur (2 % 3)
 infix 7 %/
 
 (%/) :: Integer -> Integer -> Dur
@@ -51,10 +51,10 @@ x %/ y = dur (x % y)
 -- >>> dur 0.5
 -- Dur (1 % 2)
 --
--- >>> dur (1/3)
+-- >>> dur (1%3)
 -- Dur (1 % 3)
-dur :: Rational -> Dur
-dur = Dur
+dur :: (Real a) => a  -> Dur
+dur = Dur . toRational 
 
 -- | The 'HasDur' class is used for types that can be converted to and from 'Dur',
 -- a representation of duration as a rational number. This allows for abstraction
@@ -123,10 +123,11 @@ normalizeDurList durations = [toDur x / toDur total | x <- durations]
   where
     total = sum $ map (unDur . toDur) durations
 
--- | Divides eachlues.
---
--- >>> [1, 1/2, 1/3]  |/ 2  :: [Dur]
--- [ Dur (1 % 2), Dur (1 % 4), Dur (1 % 6)]
+-- | Divides each value in a list of durations by a 'Real' value. 
+-- FIXME 
+-- >>> [Dur (1), Dur(1/2), Dur(1/3)]  |/ 2  
+-- WAS NOW [Dur (1 % 2),Dur (1 % 4),Dur (1 % 6)]
+-- NOW [Dur (1 % 2),Dur (1 % 4),Dur (1 % 6)]
 (|/) :: (HasDur a, Real b) => [a] -> b -> [a]
 durations |/ divisorValue =
   map
@@ -140,9 +141,9 @@ durations |/ divisorValue =
 -- | Multiplies each value in a list of durations by a 'Real' value. Works with
 -- both 'Integer' and 'Rational' as divisor values.
 --
--- >>>  [1/4, 2/3, 3/4] |* 2 :: [Dur]
--- [Dur (1 % 2),Dur (4 % 3),Dur (3 % 2)]
-(|*) :: (HasDur a, Real b, HasDur c) => [a] -> b -> [c]
+-- >>> [Dur (1), Dur(1/2), Dur(1/3)] |* 2
+-- NOW [Dur (2 % 1),Dur (1 % 1),Dur (2 % 3)]
+(|*) :: (HasDur a, Real b) => [a] -> b -> [a]
 durations |* multiplierValue =
   map
     ( \durVal ->
