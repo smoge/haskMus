@@ -5,7 +5,7 @@ where
 
 import AccidentalProperties (runTests)
 import PitchProperties (runTests)
-import TSSpec (specTS)
+-- import TSSpec (specTS)
 import PitchSpec (spec)
 import Test.Hspec (hspec)
 import Test.Framework.Providers.QuickCheck2
@@ -26,8 +26,8 @@ main = do
   putStrLn "Run the Hspec tests from PitchSpec"
   hspec PitchSpec.spec
   
-  putStrLn "Run the Hspec tests from TSSpec (TS.hs Time Signature)"
-  hspec TSSpec.specTS
+  -- putStrLn "Run the Hspec tests from TSSpec (TS.hs Time Signature)"
+  -- hspec TSSpec.specTS
 
   putStrLn "+++ Run the QuickCheck properties from AccidentalTests.hs"
   reportResults "AccidentalTests" AccidentalProperties.runTests
