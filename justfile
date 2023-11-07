@@ -26,3 +26,17 @@ cabal_bounds:
 # Clean the project
 clean:
     stack clean
+    
+# Format Haskell project with fourmolu
+fourmat:
+    @echo "Formating the Haskell project (fourmolu)..."
+    fourmolu -i ./src/*/*
+    fourmolu -i ./src/*
+    fourmolu -i ./test/*
+
+# Format Haskell project with ormolu
+format:
+    @echo "Formating the Haskell project (ormolu)..."
+    ormolu -i ./src/*/*
+    ormolu -i ./test/*
+    

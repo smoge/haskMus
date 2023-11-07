@@ -1,40 +1,41 @@
-{-# LANGUAGE AllowAmbiguousTypes       #-}
-{-# LANGUAGE DataKinds                 #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE FlexibleContexts          #-}
-{-# LANGUAGE FlexibleInstances         #-}
-{-# LANGUAGE GADTs                     #-}
-{-# LANGUAGE InstanceSigs              #-}
-{-# LANGUAGE KindSignatures            #-}
-{-# LANGUAGE OverloadedStrings         #-}
-{-# LANGUAGE PolyKinds                 #-}
-{-# LANGUAGE TypeApplications          #-}
-{-# LANGUAGE UndecidableInstances      #-}
-{-# LANGUAGE UnicodeSyntax             #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE UnicodeSyntax #-}
 
-module Music.Pitch.Accidental
-  ( Accidental(..)
-  , accidentalToSemitones
-  , semitonesToAccidental
-  , modifyAccidental
-  , accToLily
-  , checkAccidental
-  , addAccidental
-  , allAccidentals
-  , allSemitones
-  , AccidentalString(..)
-  ) where
+module Pitch.Accidental
+  ( Accidental (..),
+    accidentalToSemitones,
+    semitonesToAccidental,
+    modifyAccidental,
+    accToLily,
+    checkAccidental,
+    addAccidental,
+    allAccidentals,
+    allSemitones,
+    AccidentalString (..),
+  )
+where
 
-import           Data.Kind
-import           Data.List       (isPrefixOf)
+import Data.Kind
+import Data.List (isPrefixOf)
 import qualified Data.Map.Strict as Map
-import           Data.Proxy
-import           Data.Ratio
-import           Data.String
-import qualified Data.Text       as T
-import           GHC.TypeLits    hiding (Natural)
-import           Test.QuickCheck
-import           Text.Printf
+import Data.Proxy
+import Data.Ratio
+import Data.String
+import qualified Data.Text as T
+import GHC.TypeLits hiding (Natural)
+import Test.QuickCheck
+import Text.Printf
 
 -- // SECTION   ACCIDENTAL
 data Accidental
@@ -53,9 +54,10 @@ data Accidental
 class IsAccidental a where
   toAccidental :: a -> Accidental
 
-data SomeAccidental =
-  forall accidental. IsAccidental accidental =>
-                     SomeAccidental accidental
+data SomeAccidental
+  = forall accidental.
+    (IsAccidental accidental) =>
+    SomeAccidental accidental
 
 instance IsAccidental SomeAccidental where
   toAccidental :: SomeAccidental -> Accidental
@@ -67,7 +69,8 @@ newtype AccidentalSelection selection = AccidentalSelection
 
 class AccClass (notename :: Accidental) where
   sayAccidental :: String
-  -- unicodeAcc :: String
+
+-- unicodeAcc :: String
 
 instance Show SomeAccidental where
   show = show . toAccidental
@@ -107,6 +110,7 @@ acidente1 = "ff"
 type AccSelection = [String]
 
 -- >>> read @Accidental "f"
+
 -- | Converts a string to an accidental
 -- >>>  "ff" ::  Accidental
 -- >>>  "n" ::  Accidental
@@ -117,18 +121,18 @@ type AccSelection = [String]
 -- QuarterSharp
 -- QuarterFlat
 -- instance Num Accidental where
---   (+) a b = toAccidental $ accidentalToSemitones a + accidentalToSemitones b
---   (-) a b = toAccidental $ accidentalToSemitones a - accidentalToSemitones b
---   (*) a b = toAccidental $ accidentalToSemitones a * accidentalToSemitones b
---   abs a = toAccidental $ abs (accidentalToSemitones a)
---   signum a =
---     case compare (accidentalToSemitones a) 0 of
---       EQ -> Natural
---       GT -> Sharp
---       LT -> Flat
---   fromInteger n = toAccidental (fromInteger n)
---   negate (Custom r) = (Custom (-r))
---   negate a = toAccidental $ negate (accidentalToSemitones a)
+--  (+) a b = toAccidental $ accidentalToSemitones a + accidentalToSemitones b
+--  (-) a b = toAccidental $ accidentalToSemitones a - accidentalToSemitones b
+--  (*) a b = toAccidental $ accidentalToSemitones a * accidentalToSemitones b
+--  abs a = toAccidental $ abs (accidentalToSemitones a)
+--  signum a =
+--    case compare (accidentalToSemitones a) 0 of
+--      EQ -> Natural
+--      GT -> Sharp
+--      LT -> Flat
+--  fromInteger n = toAccidental (fromInteger n)
+--  negate (Custom r) = (Custom (-r))
+--  negate a = toAccidental $ negate (accidentalToSemitones a)
 instance Enum Accidental where
   toEnum n =
     case n of
@@ -174,18 +178,19 @@ instance Bounded Accidental where
 --   | r == 2 = DoubleSharp
 --   | otherwise = (Custom r)
 -- //ANCHOR accidentalToSemitones
+
 -- | Converts an accidental to its corresponding semitone offset as a rational number.
 accidentalToSemitones :: Accidental -> Rational
-accidentalToSemitones DoubleFlat         = -2
-accidentalToSemitones ThreeQuartersFlat  = (-3) % 2
-accidentalToSemitones Flat               = -1
-accidentalToSemitones QuarterFlat        = (-1) % 2
-accidentalToSemitones Natural            = 0
-accidentalToSemitones QuarterSharp       = 1 % 2
-accidentalToSemitones Sharp              = 1
+accidentalToSemitones DoubleFlat = -2
+accidentalToSemitones ThreeQuartersFlat = (-3) % 2
+accidentalToSemitones Flat = -1
+accidentalToSemitones QuarterFlat = (-1) % 2
+accidentalToSemitones Natural = 0
+accidentalToSemitones QuarterSharp = 1 % 2
+accidentalToSemitones Sharp = 1
 accidentalToSemitones ThreeQuartersSharp = 3 % 2
-accidentalToSemitones DoubleSharp        = 2
-accidentalToSemitones (Custom r)         = r
+accidentalToSemitones DoubleSharp = 2
+accidentalToSemitones (Custom r) = r
 
 -- | Converts a semitone offset to the corresponding accidental.
 semitonesToAccidental :: Rational -> Accidental
@@ -202,20 +207,21 @@ semitonesToAccidental r
   | otherwise = (Custom r)
 
 -- error "Invalid semitone offset."
+
 -- | Converts an accidental to its corresponding LilyPond representation.
 -- >>>  map accToLily allAccidentals == map  T.pack ["ff","tqf","f","qf","","qs","s","tqs","ss"]
 -- True
 accToLily :: Accidental -> T.Text
-accToLily DoubleFlat         = T.pack "ff"
-accToLily ThreeQuartersFlat  = T.pack "tqf"
-accToLily Flat               = T.pack "f"
-accToLily QuarterFlat        = T.pack "qf"
-accToLily Natural            = T.pack ""
-accToLily QuarterSharp       = T.pack "qs"
-accToLily Sharp              = T.pack "s"
+accToLily DoubleFlat = T.pack "ff"
+accToLily ThreeQuartersFlat = T.pack "tqf"
+accToLily Flat = T.pack "f"
+accToLily QuarterFlat = T.pack "qf"
+accToLily Natural = T.pack ""
+accToLily QuarterSharp = T.pack "qs"
+accToLily Sharp = T.pack "s"
 accToLily ThreeQuartersSharp = T.pack "tqs"
-accToLily DoubleSharp        = T.pack "ss"
-accToLily (Custom r)         = T.pack $ show r
+accToLily DoubleSharp = T.pack "ss"
+accToLily (Custom r) = T.pack $ show r
 
 -- //ANCHOR OverloadedStrings
 instance IsString Accidental where
@@ -283,6 +289,7 @@ True
 -- "𝄭" :: Accidental
 -- "𝄬" :: Accidental
 -- //ANCHOR - modifyAccidental
+
 -- | Modify the accidental by applying a function to its semitone value. Returns the modified accidental.
 -- >>> modifyAccidental Sharp (*2) == DoubleSharp
 -- True
@@ -322,12 +329,12 @@ checkAccidental acc = semitonesToAccidental (accidentalToSemitones acc) == acc
 -- >>> addAccidental DoubleSharp (1 % 2)
 -- Custom (5 % 2)
 addAccidental ::
-     Accidental
+  Accidental ->
   -- | The delta to modify the accidental
-  -> Rational
+  Rational ->
   -- | The modified accidental
-  -> Accidental
-  -- | The initial accidental
+  Accidental
+-- \| The initial accidental
 addAccidental acc delta
   | newSemitone == -2 = DoubleFlat
   | newSemitone == (-3) % 2 = ThreeQuartersFlat
@@ -347,15 +354,15 @@ addAccidental acc delta
 -- invertAccidental'' = negate
 allAccidentals :: [Accidental]
 allAccidentals =
-  [ DoubleFlat
-  , ThreeQuartersFlat
-  , Flat
-  , QuarterFlat
-  , Natural
-  , QuarterSharp
-  , Sharp
-  , ThreeQuartersSharp
-  , DoubleSharp
+  [ DoubleFlat,
+    ThreeQuartersFlat,
+    Flat,
+    QuarterFlat,
+    Natural,
+    QuarterSharp,
+    Sharp,
+    ThreeQuartersSharp,
+    DoubleSharp
   ]
 
 allSemitones :: [Rational]
@@ -365,13 +372,13 @@ allSemitones = map accidentalToSemitones allAccidentals
 instance Arbitrary Accidental where
   arbitrary =
     frequency
-      [ (10, elements allAccidentals) -- Picking from the predefined list
-      , (1, Custom <$> arbitrary) -- Picking a custom accidental
+      [ (10, elements allAccidentals), -- Picking from the predefined list
+        (1, Custom <$> arbitrary) -- Picking a custom accidental
       ]
 
 -- Newtype wrapper for specific accidental strings
-newtype AccidentalString =
-  AccidentalString String
+newtype AccidentalString
+  = AccidentalString String
   deriving (Show)
 
 -- Arbitrary instance for AccidentalString (QuickCheck)
@@ -379,28 +386,28 @@ instance Arbitrary AccidentalString where
   arbitrary =
     AccidentalString
       <$> elements
-            [ "ff"
-            , "tqf"
-            , "f"
-            , "qf"
-            , ""
-            , "n"
-            , "qs"
-            , "s"
-            , "tqs"
-            , "ss"
-            , "sharp"
-            , "flat"
-            , "natural"
-            , "quartersharp"
-            , "semisharp"
-            , "quarterflat"
-            , "semiflat"
-            , "♭"
-            , "♯"
-            , "♮"
-            , "𝄫"
-            , "𝄪"
-            , "𝄳"
-            , "𝄲"
-            ]
+        [ "ff",
+          "tqf",
+          "f",
+          "qf",
+          "",
+          "n",
+          "qs",
+          "s",
+          "tqs",
+          "ss",
+          "sharp",
+          "flat",
+          "natural",
+          "quartersharp",
+          "semisharp",
+          "quarterflat",
+          "semiflat",
+          "♭",
+          "♯",
+          "♮",
+          "𝄫",
+          "𝄪",
+          "𝄳",
+          "𝄲"
+        ]

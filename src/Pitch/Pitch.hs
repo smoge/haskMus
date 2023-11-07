@@ -1,69 +1,69 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 
-{-# LANGUAGE ConstraintKinds #-}
-
-module Music.Pitch.Pitch where
+module Pitch.Pitch where
 
 import Control.Lens hiding (elements)
+import Data.Map as Map
 import Data.Ratio ((%))
 import Data.String
 import qualified Data.Text as T
-import Music.Pitch.Accidental
-import Test.QuickCheck ( Arbitrary(arbitrary), Gen, elements )
-import Data.Map as Map
+import Pitch.Accidental
+import Test.QuickCheck (Arbitrary (arbitrary), Gen, elements)
 
 -- .// SECTION PITCH / PITCHCLASS
 -- :set -XDataKinds
 
-
 data NoteName = C | D | E | F | G | A | B
   deriving (Eq, Ord, Show, Enum, Bounded)
 
-
-class NoteClass (notename :: NoteName ) where
+class NoteClass (notename :: NoteName) where
   sayNote :: String
 
 class IsNoteName a where
   toNoteName :: a -> NoteName
 
-data SomeNote = forall notename. IsNoteName notename => SomeNote notename
+data SomeNote = forall notename. (IsNoteName notename) => SomeNote notename
 
 instance IsNoteName SomeNote where
   toNoteName :: SomeNote -> NoteName
   toNoteName (SomeNote nn) = toNoteName nn
 
-
-
 newtype NotesSelection = NotesSelection
-  { getNotesSelection :: Map.Map String SomeNote }
-
+  {getNotesSelection :: Map.Map String SomeNote}
 
 instance Show SomeNote where
   show = show . toNoteName
 
 instance NoteClass C where
   sayNote = "c"
+
 instance NoteClass D where
   sayNote = "d"
+
 instance NoteClass E where
   sayNote = "e"
+
 instance NoteClass F where
   sayNote = "f"
+
 instance NoteClass G where
   sayNote = "g"
+
 instance NoteClass A where
   sayNote = "a"
+
 instance NoteClass B where
   sayNote = "b"
 
@@ -73,8 +73,7 @@ instance NoteClass B where
 -- ex1 :: (String, String, String)
 -- ex1 = (sayNote @C, sayNote @D, sayNote  @E)
 
-
--- list = C :+ D 
+-- list = C :+ D
 
 {-ghci> :kind C
 C :: NoteName
@@ -117,8 +116,7 @@ instance Show Octave where
 
 data Pitch where
   Pitch ::
-    { 
-      _noteName :: NoteName,
+    { _noteName :: NoteName,
       _accidental :: Accidental,
       _octave :: Octave
     } ->
@@ -129,8 +127,7 @@ data Pitch where
 --   show :: Pitch -> String
 --   show (Pitch name acc oct) = show name ++ " " ++ show acc ++ " " ++ show oct
 
-
--- //ANCHOR - LENSES 
+-- //ANCHOR - LENSES
 
 makeLensesFor
   [ ("PitchClass", "_noteName"),
@@ -177,7 +174,6 @@ instance HasOctave Octave where
 
 instance HasOctave Pitch where
   octave = lens _octave (\(Pitch nn acc _) o -> Pitch nn acc o)
-
 
 -- //ANCHOR - OVERLOADED STRINGS
 
@@ -274,8 +270,7 @@ C Natural Octave 5
 C Natural Octave 5
 -}
 
-
--- //ANCHOR - QuickCheck 
+-- //ANCHOR - QuickCheck
 
 instance Arbitrary NoteName where
   arbitrary = elements [C, D, E, F, G, A, B]

@@ -1,116 +1,146 @@
-cabal-version:       2.2
+cabal-version: 2.2
+name:          haskMus  
+version:       0.1.0.0
+synopsis:      algorithm composition toolkit in haskell
+description:
+  Algorithm composition toolkit library and DSL designed creation, manipulation, of music structures.
 
-name:                haskMus  
-version:             0.1.0.0
-synopsis:            algorithm composition toolkit in haskell
-description:         Algorithm composition toolkit library and DSL designed creation, manipulation, of music structures.
-homepage:            https://github.com/githubuser/haskMus#readme
-license:             GPL-3.0-or-later
+homepage:      https://github.com/githubuser/haskMus#readme
+license:       GPL-3.0-or-later
+
 --license-file:        license
-author:              bernardo barros
-maintainer:          example@example.com
-copyright:           2023 Bernardo Barros
-category:            music
-build-type:          Simple
+author:        bernardo barros
+maintainer:    example@example.com
+copyright:     2023 Bernardo Barros
+category:      music
+build-type:    Simple
+
 -- build-type:          Simple
 -- extra-source-files:  readme.md
 --                      changelog.md
 
-tested-with: GHC ==9.4.7 || ==9.6.3
-
+tested-with:   GHC ==9.4.7 || ==9.6.3
 
 library
-  hs-source-dirs:      src
-  exposed-modules:     
-    Music.Pitch.Accidental
-    Music.Pitch.Pitch
-    Music.Time.Rtm
-    Music.Time.RT
-    Music.Time.TS
-    Music.Time.Tree
-    Parsers.RtmParser
-  build-depends:       base >= 4.17.2 && < 4.19
-                     , containers >= 0.6.7 && < 0.7
-                     , text >= 2.0.2 && < 2.2
-                     , lens >= 5.2.3 && < 5.4
-                     , hspec  >= 2.10.0 && < 2.13
-                     , doctest >= 0.20.1 && < 0.22
-                     , QuickCheck >= 2.14.3 && < 2.15
-                     , pretty-simple >= 4.1.2 && < 4.2
-                    --  , bimap >= 0.5.0 && < 0.6
-                     , linear >= 1.22 && < 1.23
-                    --  , markov-chain >= 0.0.3 && < 0.1
-                     , rando >= 0.0.0 && < 0.1
-                     , random-fu >= 0.3.0 && < 0.4
-                     , vector-space >= 0.16 && < 0.17
-                     , graphviz  >= 2999.20.1 && < 2999.21
-                     , fgl  >= 5.8.0 && < 5.9
-                     , HUnit >= 1.6.2 && < 1.7
-                     --, witch
-                     , parsec >= 3.1.16 && < 3.2
-  default-language:    Haskell2010
-  ghc-options:         -Wall
-                       -Wcompat
-                       -Widentities
-                       -Wincomplete-record-updates
-                       -Wincomplete-uni-patterns
-                       -Wmissing-export-lists
-                       -Wmissing-home-modules
-                       -Wpartial-fields
-                       -Wredundant-constraints
+  hs-source-dirs:     src
+  exposed-modules:
+    Pitch.Accidental
+    Pitch.Pitch
+    Rtm.Common
+    Rtm.Parser
+    Rtm.QuasiQuoter
+    Rtm.Shape
+    Time.Dur
+    Time.SeqDur
+    Time.TimeSignature
+
+  build-depends:
+    , base                               >=4.17.2    && <4.19
+    , containers                         >=0.6.7     && <0.7
+    , data-default
+    , data-default-class
+    , data-default-instances-containers
+    , data-default-instances-dlist
+    , data-default-instances-old-locale
+    , doctest                            >=0.20.1    && <0.22
+    , fgl                                >=5.8.0     && <5.9
+    , graphviz                           >=2999.20.1 && <2999.21
+    , hspec                              >=2.10.0    && <2.13
+    , HUnit                              >=1.6.2     && <1.7
+    , lens                               >=5.2.3     && <5.4
+    , linear                             >=1.22      && <1.23
+    , parsec                             >=3.1.16    && <3.2
+    , pretty-simple                      >=4.1.2     && <4.2
+    , QuickCheck                         >=2.14.3    && <2.15
+    , rando                              >=0.0.0     && <0.1
+    , random-fu                          >=0.3.0     && <0.4
+    , random-shuffle
+    , template-haskell
+    , text                               >=2.0.2     && <2.2
+    , vector-space                       >=0.16      && <0.17
+
+  --  , bimap >= 0.5.0 && < 0.6
+  --  , markov-chain >= 0.0.3 && < 0.1
+  --, witch
+  default-language:   Haskell2010
+  default-extensions:
+    DataKinds
+    DefaultSignatures
+    DeriveDataTypeable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    DisambiguateRecordFields
+    ExistentialQuantification
+    FlexibleContexts
+    FlexibleInstances
+    GADTSyntax
+    GADTs
+    GeneralizedNewtypeDeriving
+    LambdaCase
+    OverloadedLists
+    OverloadedStrings
+    PolyKinds
+    PostfixOperators
+    QuasiQuotes
+    RankNTypes
+    ScopedTypeVariables
+    TemplateHaskell
+    TupleSections
+    TypeApplications
+    TypeFamilies
+    TypeOperators
+    TypeSynonymInstances
+    TypeSynonymInstances
+    UnicodeSyntax
+
+  ghc-options:
+    -Wall -Wcompat -Widentities -Wincomplete-record-updates
+    -Wincomplete-uni-patterns -Wmissing-export-lists
+    -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
 
 executable haskMus-exe
-  hs-source-dirs:      app
-  main-is:             Main.hs
-  build-depends:       base
-                     , haskMus
-  default-language:    Haskell2010
-  ghc-options:         -Wall
-                       -Wcompat
-                       -Widentities
-                       -Wincomplete-record-updates
-                       -Wincomplete-uni-patterns
-                       -Wmissing-export-lists
-                       -Wmissing-home-modules
-                       -Wpartial-fields
-                       -Wredundant-constraints
-                       -threaded
-                       -rtsopts
-                       -with-rtsopts=-N
+  hs-source-dirs:   app
+  main-is:          Main.hs
+  build-depends:
+    , base
+    , haskMus
+
+  default-language: Haskell2010
+  ghc-options:
+    -Wall -Wcompat -Widentities -Wincomplete-record-updates
+    -Wincomplete-uni-patterns -Wmissing-export-lists
+    -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+    -threaded -rtsopts -with-rtsopts=-N
 
 test-suite haskMus-test
-  type:                exitcode-stdio-1.0
-  hs-source-dirs:      test
-  main-is:             Test.hs
-  other-modules:       AccidentalProperties
-                     , PitchSpec
-                     , PitchProperties
-                    --  , RtmProperties
-                     , TSSpec
-  build-depends:       base >= 4.17.2 && < 4.19
-                     , haskMus 
-                     , HUnit >= 1.6.2 && < 1.7
-                     , test-framework >= 0.8.2 && < 0.9
-                     , test-framework-quickcheck2 >= 0.3.0.5 && < 0.4
-                     , lens >= 5.2.3 && < 5.4
-                     , hspec  >= 2.10.0 && < 2.13
-                     , doctest >= 0.20.1 && < 0.22
-                     , QuickCheck >= 2.14.3 && < 2.15
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          Test.hs
+  other-modules:
+    AccidentalProperties
+    PitchProperties
+    PitchSpec
 
-  default-language:    Haskell2010
-  ghc-options:         -Wall
-                       -Wcompat
-                       -Widentities
-                       -Wincomplete-record-updates
-                       -Wincomplete-uni-patterns
-                       -Wmissing-export-lists
-                       -Wmissing-home-modules
-                       -Wpartial-fields
-                       -Wredundant-constraints
-                       -threaded
-                       -rtsopts
-                       -with-rtsopts=-N
+  build-depends:
+    , base                        >=4.17.2 && <4.19
+    , doctest                     >=0.20.1 && <0.22
+    , haskMus
+    , hspec
+    , HUnit
+    , lens
+    , QuickCheck
+    , test-framework
+    , test-framework-hunit
+    , test-framework-quickcheck2
 
+  default-language: Haskell2010
+  ghc-options:
+    -Wall -Wcompat -Widentities -Wincomplete-record-updates
+    -Wincomplete-uni-patterns -Wmissing-export-lists
+    -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+    -threaded -rtsopts -with-rtsopts=-N
 
 source-repository head
   type:     git

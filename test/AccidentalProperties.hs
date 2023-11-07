@@ -1,14 +1,13 @@
-{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell     #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module AccidentalProperties where
 
-import           Data.List              (sort)
-import           Music.Pitch.Accidental
-import           Test.QuickCheck
-import Data.String (IsString(..))
-
+import Data.List (sort)
+import Data.String (IsString (..))
+import Pitch.Accidental
+import Test.QuickCheck
 
 prop_accidentalToSemitones :: Accidental -> Bool
 prop_accidentalToSemitones acc =
@@ -30,16 +29,18 @@ prop_addition :: Accidental -> Property
 prop_addition acc =
   forAll (elements allSemitones) $ \validSemitone ->
     let modified = validSemitone + accidentalToSemitones acc
-     in modified `elem` allSemitones ==> addAccidental acc validSemitone ==
-        semitonesToAccidental modified
+     in modified `elem` allSemitones ==>
+          addAccidental acc validSemitone
+            == semitonesToAccidental modified
 
 -- Multiplication Property
 prop_multiplication :: Accidental -> Rational -> Property
 prop_multiplication acc factor =
   factor /= 0 ==>
-  let modified = factor * accidentalToSemitones acc
-   in modified `elem` allSemitones ==> modifyAccidental acc (* factor) ==
-      semitonesToAccidental modified
+    let modified = factor * accidentalToSemitones acc
+     in modified `elem` allSemitones ==>
+          modifyAccidental acc (* factor)
+            == semitonesToAccidental modified
 
 -- | Checks whether adding an accidental to its inverse results in the natural accidental.
 prop_addAccidentalInverse :: Accidental -> Bool
@@ -48,34 +49,31 @@ prop_addAccidentalInverse acc =
 
 prop_fromStringValid :: AccidentalString -> Bool
 prop_fromStringValid (AccidentalString str) = case str of
-  "ff" ->  (fromString str :: Accidental)  == DoubleFlat
-  "tqf" ->  (fromString str :: Accidental)  == ThreeQuartersFlat
-  "f" ->  (fromString str :: Accidental)  == Flat
-  "qf" ->  (fromString str :: Accidental)  == QuarterFlat
-  "" ->  (fromString str :: Accidental)  == Natural
-  "n" ->  (fromString str :: Accidental)  == Natural
-  "qs" ->  (fromString str :: Accidental)  == QuarterSharp
-  "s" ->  (fromString str :: Accidental)  == Sharp
-  "tqs" ->  (fromString str :: Accidental)  == ThreeQuartersSharp
-  "ss" ->  (fromString str :: Accidental)  == DoubleSharp
-  "sharp" ->  (fromString str :: Accidental)  == Sharp
-  "flat" ->  (fromString str :: Accidental)  == Flat
-  "natural" ->  (fromString str :: Accidental)  == Natural
-  "quartersharp" ->  (fromString str :: Accidental)  == QuarterSharp
-  "semisharp" ->  (fromString str :: Accidental)  == QuarterSharp
-  "quarterflat" ->  (fromString str :: Accidental)  == QuarterFlat
-  "semiflat" ->  (fromString str :: Accidental)  == QuarterFlat
-  "♭" ->  (fromString str :: Accidental)  == Flat 
-  "♯" ->  (fromString str :: Accidental)  == Sharp
-  "♮" ->  (fromString str :: Accidental)  == Natural
-  "𝄫" ->  (fromString str :: Accidental)  == DoubleFlat
-  "𝄪" ->  (fromString str :: Accidental)  == DoubleSharp
-  "𝄳" ->  (fromString str :: Accidental)  == QuarterFlat
-  "𝄲" ->  (fromString str :: Accidental)  == QuarterSharp
+  "ff" -> (fromString str :: Accidental) == DoubleFlat
+  "tqf" -> (fromString str :: Accidental) == ThreeQuartersFlat
+  "f" -> (fromString str :: Accidental) == Flat
+  "qf" -> (fromString str :: Accidental) == QuarterFlat
+  "" -> (fromString str :: Accidental) == Natural
+  "n" -> (fromString str :: Accidental) == Natural
+  "qs" -> (fromString str :: Accidental) == QuarterSharp
+  "s" -> (fromString str :: Accidental) == Sharp
+  "tqs" -> (fromString str :: Accidental) == ThreeQuartersSharp
+  "ss" -> (fromString str :: Accidental) == DoubleSharp
+  "sharp" -> (fromString str :: Accidental) == Sharp
+  "flat" -> (fromString str :: Accidental) == Flat
+  "natural" -> (fromString str :: Accidental) == Natural
+  "quartersharp" -> (fromString str :: Accidental) == QuarterSharp
+  "semisharp" -> (fromString str :: Accidental) == QuarterSharp
+  "quarterflat" -> (fromString str :: Accidental) == QuarterFlat
+  "semiflat" -> (fromString str :: Accidental) == QuarterFlat
+  "♭" -> (fromString str :: Accidental) == Flat
+  "♯" -> (fromString str :: Accidental) == Sharp
+  "♮" -> (fromString str :: Accidental) == Natural
+  "𝄫" -> (fromString str :: Accidental) == DoubleFlat
+  "𝄪" -> (fromString str :: Accidental) == DoubleSharp
+  "𝄳" -> (fromString str :: Accidental) == QuarterFlat
+  "𝄲" -> (fromString str :: Accidental) == QuarterSharp
   _ -> True
-
-
-
 
 return []
 
