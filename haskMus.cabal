@@ -15,7 +15,6 @@ copyright:     2023 Bernardo Barros
 category:      music
 build-type:    Simple
 
--- build-type:          Simple
 -- extra-source-files:  readme.md
 --                      changelog.md
 
@@ -125,7 +124,6 @@ test-suite haskMus-test
 
   build-depends:
     , base                        >=4.17.2 && <4.19
-    , doctest                     >=0.20.1 && <0.22
     , haskMus
     , hspec
     , HUnit

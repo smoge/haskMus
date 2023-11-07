@@ -186,12 +186,6 @@ tags
 # Built Visual Studio Code Extensions
 *.vsix
 
-.vscode/**
-# !.vscode/settings.json
-# !.vscode/tasks.json
-# !.vscode/launch.json
-# !.vscode/extensions.json
-# !.vscode/*.code-snippets
 
 # Local History for Visual Studio Code
 .history/
@@ -199,13 +193,12 @@ tags
 # Built Visual Studio Code Extensions
 *.vsix
 
-playground/**
+playground/
 
-sketch/**
+sketch/
 
 # !.hlint
 
-assets/**
+assets/
 
-./assets/*
 
