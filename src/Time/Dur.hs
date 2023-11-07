@@ -53,8 +53,8 @@ x %/ y = dur (x % y)
 --
 -- >>> dur (1%3)
 -- Dur (1 % 3)
-dur :: (Real a) => a  -> Dur
-dur = Dur . toRational 
+dur :: Rational  -> Dur
+dur = Dur 
 
 -- | The 'HasDur' class is used for types that can be converted to and from 'Dur',
 -- a representation of duration as a rational number. This allows for abstraction
