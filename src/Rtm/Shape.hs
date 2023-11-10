@@ -15,7 +15,7 @@ extractShape :: Rtm -> (ShapeTree (), [RtmLabel])
 extractShape = go
   where
     go (Node label children) =
-      let (childShapes, childValues) = unzip (map go children)
+      let (childShapes, childValues) = unzip (fmap go children)
        in (ShapeNode () childShapes, label : concat childValues)
 
 -- | Reconstruct an Rtm from its shape and a list of values
@@ -33,7 +33,7 @@ rHelper = go
 
     goChildren (cs, vs) z =
       let (child, newVs) = go z vs
-       in (cs ++ [child], newVs)
+       in (cs <> [child], newVs)
 
 -- ====== TESTS ======= --
 

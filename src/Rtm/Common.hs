@@ -1,8 +1,6 @@
 -- |
 -- Module      : Rtm.Common
 -- Description : Common functions and types for RTMs (Rhythm Trees)
--- Maintainer  : smoge
--- Stability   : experimental
 --
 -- This module provides common functions and types for RTMs (Rhythmic Trees).
 -- An RTM is a tree-like data structure that represents a musical pattern.
@@ -33,18 +31,21 @@ module Rtm.Common
   )
 where
 
-import Data.Data
-import Data.Maybe (mapMaybe)
-import Data.Tree
+import           Data.Data
+import           Data.Maybe (mapMaybe)
+import           Data.Tree
 
+-- | Data type representing different types of Rtm labels.
 data RtmLabel
-  = RtmScalar Int
-  | RtmGap Int
-  | RtmVector Int
-  | RtmCons
+  = RtmScalar Int -- ^ A scalar label with an integer value.
+  | RtmGap Int -- ^ A gap label with an integer value.
+  | RtmVector Int -- ^ A vector label with an integer value.
+  | RtmCons -- ^ A cons label.
   deriving (Eq, Show, Data)
 
 -- | The Rtm data type represents an RTM (Rose Tree Model).
+-- Scalar and Gap are Leafs (with a value but no children).
+-- RtmVectors are Branches (with a value and children).
 type Rtm = Tree RtmLabel
 
 -- | Convert an RTM to a string representation.
@@ -53,9 +54,9 @@ type Rtm = Tree RtmLabel
 -- "(1 -3 (2 (1 -1 1)) 1)"
 showRtm :: Rtm -> String
 showRtm (Node (RtmScalar num) []) = show num
-showRtm (Node (RtmGap num) []) = "-" ++ show num
-showRtm (Node (RtmVector num) children) = "(" ++ show num ++ " " ++ "(" ++ unwords (map showRtm children) ++ "))"
-showRtm (Node RtmCons children) = "(" ++ unwords (map showRtm children) ++ ")"
+showRtm (Node (RtmGap num) []) = "-" <> show num
+showRtm (Node (RtmVector num) children) = "(" <> show num <> " " <> "(" <> unwords (fmap showRtm children) <> "))"
+showRtm (Node RtmCons children) = "(" <> unwords (fmap showRtm children) <> ")"
 showRtm _ = error "Invalid Rtm structure"
 
 -- | Scalar constructor.
@@ -121,16 +122,17 @@ printRtm = putStrLn . drawTree . fmap show
 -- | Get the depth of an Rtm.
 rtmDepth :: Rtm -> Int
 rtmDepth (Node _ []) = 1
-rtmDepth (Node _ subs) = 1 + maximum (map rtmDepth subs)
+rtmDepth (Node _ subs) = 1 + maximum (fmap rtmDepth subs)
 
--- | Collapse gaps in an Rtm.
+-- | Given an Rtm, collapses all gaps in the tree by summing consecutive gaps
+-- and returning a new Rtm with the gaps collapsed. 
 collapseRtmGaps :: Rtm -> Rtm
 collapseRtmGaps (Node z children) = Node z (processChildren children)
   where
     processChildren [] = []
     processChildren (Node (RtmGap y) [] : xs) =
       let (rests, remainder) = span isRest xs
-          total_ = y + sum (map getRestValue rests)
+          total_ = y + sum (fmap getRestValue rests)
        in Node (RtmGap total_) [] : processChildren remainder
     processChildren (x : xs) = collapseRtmGaps x : processChildren xs
 
@@ -149,11 +151,13 @@ noRtmGaps = fmap noGap
 
 -- | Count the number of scalar nodes in an Rtm.
 countRtmScalars :: Rtm -> Int
-countRtmScalars (Node (RtmScalar _) children) = 1 + sum (map countRtmScalars children)
-countRtmScalars (Node _ children) = sum (map countRtmScalars children)
+countRtmScalars (Node (RtmScalar _) children) = 1 + sum (fmap countRtmScalars children)
+countRtmScalars (Node _ children) = sum (fmap countRtmScalars children)
 
---
 
+-- | Given a list of RtmLabels, returns a list of Ints extracted from the labels
+--   that carry an Int. RtmScalar, RtmGap and RtmVector carry an Int, while
+--   RtmCons and any other label do not.
 extractIntsFromLabels :: [RtmLabel] -> [Int]
 extractIntsFromLabels = mapMaybe extractInt
   where
@@ -175,10 +179,10 @@ reconstructLabelsFromInts :: [Int] -> [RtmLabel] -> [RtmLabel]
 reconstructLabelsFromInts ints = snd . foldl insertInt (ints, [])
   where
     insertInt :: ([Int], [RtmLabel]) -> RtmLabel -> ([Int], [RtmLabel])
-    insertInt (n : ns, ls) (RtmScalar _) = (ns, ls ++ [RtmScalar n])
-    insertInt (n : ns, ls) (RtmGap _) = (ns, ls ++ [RtmGap n])
-    insertInt (n : ns, ls) (RtmVector _) = (ns, ls ++ [RtmVector n])
-    insertInt (ns, ls) rtmConsLabel = (ns, ls ++ [rtmConsLabel]) -- RtmCons or any other label type
+    insertInt (n : ns, ls) (RtmScalar _) = (ns, ls <> [RtmScalar n])
+    insertInt (n : ns, ls) (RtmGap _) = (ns, ls <> [RtmGap n])
+    insertInt (n : ns, ls) (RtmVector _) = (ns, ls <> [RtmVector n])
+    insertInt (ns, ls) rtmConsLabel = (ns, ls <> [rtmConsLabel]) -- RtmCons or any other label type
 
 -- | An example Rtm.
 example :: Rtm

@@ -20,7 +20,7 @@ newtype Dur = Dur
   deriving (Eq, Ord, Num, Fractional, Real)
 
 instance Show Dur where
-  show (Dur x) = "Dur (" ++ show x ++ ")"
+  show (Dur x) = "Dur (" <> show x <> ")"
 
 -- | Default value for 'Dur'
 -- >>> def :: Dur
@@ -130,7 +130,7 @@ normalizeDurList durations = [toDur x / toDur total | x <- durations]
 -- NOW [Dur (1 % 2),Dur (1 % 4),Dur (1 % 6)]
 (|/) :: (HasDur a, Real b) => [a] -> b -> [a]
 durations |/ divisorValue =
-  map
+  fmap
     ( \durVal ->
         let durRational = toRational (toDur durVal)
             divisor = toRational divisorValue
@@ -145,7 +145,7 @@ durations |/ divisorValue =
 -- NOW [Dur (2 % 1),Dur (1 % 1),Dur (2 % 3)]
 (|*) :: (HasDur a, Real b) => [a] -> b -> [a]
 durations |* multiplierValue =
-  map
+  floatDigitsmap
     ( \durVal ->
         let durRational = toRational (toDur durVal)
             multiplier = toRational multiplierValue

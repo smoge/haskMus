@@ -21,5 +21,5 @@ rtm =
 
 rtmToExp :: (MonadFail m, Quote m) => String -> m Exp
 rtmToExp s = case Rtm.Parser.parseRtm s of
-  Left err -> fail $ "Parse error: " ++ show err
+  Left err -> fail $ "Parse error: " <> show err
   Right tree -> dataToExpQ (const Nothing) tree

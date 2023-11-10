@@ -1,6 +1,6 @@
-{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE InstanceSigs        #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell     #-}
 
 -- | This module defines a representation of musical time signatures and
 -- provides functionality to convert between 'TimeSignature' and 'Dur'
@@ -16,10 +16,11 @@ module Time.TimeSignature
   )
 where
 
-import Data.Bits ((.&.))
-import Data.Default
-import Data.Ratio
-import Time.Dur
+import           Data.Bits    ((.&.))
+import           Data.Default
+import           Data.Ratio
+import           Time.Dur
+
 
 -- | A data type representing a time signature in music, which specifies the
 -- number of beats in a measure ('upper') and the note value that constitutes
@@ -34,7 +35,7 @@ data TimeSignature = TimeSignature
 
 instance Show TimeSignature where
   show :: TimeSignature -> String
-  show (TimeSignature n d) = "TimeSignature " ++ show n ++ "/" ++ show d
+  show (TimeSignature n d) = "TimeSignature " <> show n <> "/" <> show d
 
 infixr 7 //
 
@@ -121,7 +122,7 @@ durToTimeSig8 durat
     den = (denominator . unDur) durat
 
 powersOfTwo :: [Integer]
-powersOfTwo = [2 ^ x | x <- [0 .. 10] :: [Integer]]
+powersOfTwo = fmap (2 ^) ([0 .. 10] :: [Integer])
 
 isPowerOfTwo :: Integer -> Bool
 isPowerOfTwo n = n > 0 && (n .&. (n - 1)) == 0

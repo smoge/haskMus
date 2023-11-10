@@ -1,45 +1,51 @@
 module Pitch.Pitch where
 
-import Control.Applicative (liftA2)
-import Control.Lens hiding (elements)
-import Data.Fixed (mod')
-import Data.Maybe (fromMaybe)
-import Data.Ratio ((%))
-import Data.String
-import Pitch.Accidental
-import Test.QuickCheck (Arbitrary (arbitrary), Gen, elements)
-import Util.Fraction (splitFraction)
+import           Control.Applicative (liftA2)
+import           Control.Lens        hiding (elements)
+import           Data.Fixed          (mod')
+import           Data.Maybe          (fromMaybe)
+import           Data.Ratio          ((%))
+import           Data.String
+import           Pitch.Accidental
+import           Test.QuickCheck     (Arbitrary (arbitrary), Gen, elements)
+import           Util.Fraction       (splitFraction)
 
 -- Data types and their instances
 data NoteName = C | D | E | F | G | A | B
   deriving (Eq, Ord, Show, Enum, Bounded)
 
+-- | The basis for representing intervals.
 data IntervalBasis = Chromatic | Diatonic
   deriving (Eq, Ord, Show, Enum)
 
+-- | A pitch class represents a specific note with its accidental.
 data PitchClass where
+  -- | Construct a pitch class with a given note name and accidental.
   PitchClass ::
-    { _noteName :: NoteName,
-      _accidental :: Accidental
+    { _noteName :: NoteName, -- ^ The name of the note.
+      _accidental :: Accidental -- ^ The accidental of the note.
     } ->
     PitchClass
 
+-- | A pitch represents a specific note with its accidental and octave.
 data Pitch where
+  -- | Construct a pitch with a given note name, accidental, and octave.
   Pitch ::
-    { _noteName :: NoteName,
-      _accidental :: Accidental,
-      _octave :: Octave
+    { _noteName :: NoteName, -- ^ The name of the note.
+      _accidental :: Accidental, -- ^ The accidental of the note.
+      _octave :: Octave -- ^ The octave of the note.
     } ->
     Pitch
 
+-- | A newtype wrapper for representing octaves.
 newtype Octave = Octave {getOctaves :: Int}
   deriving (Eq, Ord)
 
 data SomeNote = forall notename. (IsNoteName notename) => SomeNote notename
 
------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 --  Type classes
------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 
 class NoteClass (noteName :: NoteName) where
   sayNote :: String
@@ -63,26 +69,38 @@ class HasOctave a where
 -- Instances
 -----------------------------------------------------------------------------------------------------
 
+-- | Typeclass instance for retrieving the note name of a Pitch.
 instance HasNoteName Pitch where
+  -- | Extracts the note name from a Pitch and applies a function to it.
   noteName f (Pitch nn acc o) = (\nn' -> Pitch nn' acc o) <$> f nn
 
+-- | Typeclass that represents a type with an accidental.
 instance HasAccidental Pitch where
+  -- | Modifies the accidental of a Pitch using the provided function.
   accidental f (Pitch nn acc o) = (\acc' -> Pitch nn acc' o) <$> f acc
 
+-- | Typeclass that represents a type with a pitch class.
 instance HasPitchClass Pitch where
+  -- | Lens that focuses on the pitch class of a Pitch.
   pitchClass :: Lens' Pitch PitchClass
   pitchClass f (Pitch nn acc o) = (\(PitchClass nn' acc') -> Pitch nn' acc' o) <$> f (PitchClass nn acc)
 
+-- | Typeclass that represents a type with a note name.
 instance HasNoteName PitchClass where
+  -- | Modifies the note name of a PitchClass using the provided function.
   noteName f (PitchClass nn acc) = (`PitchClass` acc) <$> f nn
 
+-- | Typeclass that represents a type with an accidental.
 instance HasAccidental PitchClass where
+  -- | Modifies the accidental of a PitchClass using the provided function.
   accidental f (PitchClass nn acc) = PitchClass nn <$> f acc
 
+-- | Typeclass that represents a type that can be converted to a NoteName.
 instance IsNoteName SomeNote where
+  -- | Converts a SomeNote to a NoteName.
   toNoteName :: SomeNote -> NoteName
   toNoteName (SomeNote nn) = toNoteName nn
-
+  
 instance Show SomeNote where
   show = show . toNoteName
 
@@ -116,17 +134,17 @@ instance IsString NoteName where
   fromString "g" = G
   fromString "a" = A
   fromString "b" = B
-  fromString s = error $ "Invalid NoteName string: " ++ s
+  fromString s = error $ "Invalid NoteName string: " <> s
 
 instance Show PitchClass where
-  show (PitchClass name acc) = show name ++ " " ++ show acc
+  show (PitchClass name acc) = show name <> " " <> show acc
 
 instance Show Octave where
-  show (Octave o) = "Octave " ++ show o
+  show (Octave o) = "Octave " <> show o
 
 instance Show Pitch where
   show :: Pitch -> String
-  show (Pitch name acc oct) = show name ++ " " ++ show acc ++ " " ++ show oct
+  show (Pitch name acc oct) = show name <> " " <> show acc <> " " <> show oct
 
 -- Functions
 makeLensesFor
@@ -157,7 +175,7 @@ noteNameToRational' = [(C, 0), (D, 2), (E, 4), (F, 5), (G, 7), (A, 9), (B, 11)]
 noteNameToRational :: NoteName -> Rational
 noteNameToRational name = case Prelude.lookup name noteNameToRational' of
   Just val -> val
-  Nothing -> error ("NoteName " ++ show name ++ " not found")
+  Nothing -> error ("NoteName " <> show name <> " not found")
 
 allPitchClasses :: [PitchClass]
 allPitchClasses = liftA2 PitchClass [C, D, E, F, G, A, B] allAccidentals
@@ -189,9 +207,7 @@ allEnharmonics = map enharmonics allPitchClasses
 allEnharmonicsMapping :: [(PitchClass, [PitchClass])]
 allEnharmonicsMapping = zip allPitchClasses allEnharmonics
 
-
-
-{- ----------------------------------- TITLE ----------------------------------------------------------
+{- ----------------------------------- playground ----------------------------------------------------------
 
 c = PitchClass C Natural
 c ^. noteName
@@ -219,7 +235,6 @@ has (accidental . only Natural) c
 -- If the accidental is Natural, change it to Flat.
 c & accidental . filtered (== Natural) .~ Flat
 C Flat
-
 
 >>> p = Pitch C Natural (Octave 4)
 >>> p ^. noteName
@@ -251,9 +266,7 @@ C Natural Octave 5
 >>> p & octave %~ (\(Octave o) -> Octave (o + 1))  -- Increment the octave by 1
 C Natural Octave 5
 
------------------------------------------------------------------------------------------------------ -} 
-
-
+----------------------------------------------------------------------------------------------------- -}
 
 ------------------------------
 -------- ===TESTS=== ---------
