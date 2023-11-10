@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 module Pitch.Pitch where
 
 import           Control.Applicative (liftA2)
@@ -65,9 +66,9 @@ class HasPitchClass a where
 class HasOctave a where
   octave :: Lens' a Octave
 
------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 -- Instances
------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 
 -- | Typeclass instance for retrieving the note name of a Pitch.
 instance HasNoteName Pitch where
@@ -207,7 +208,7 @@ allEnharmonics = map enharmonics allPitchClasses
 allEnharmonicsMapping :: [(PitchClass, [PitchClass])]
 allEnharmonicsMapping = zip allPitchClasses allEnharmonics
 
-{- ----------------------------------- playground ----------------------------------------------------------
+{- ---------------------------- playground -----------------------------------
 
 c = PitchClass C Natural
 c ^. noteName
@@ -266,7 +267,7 @@ C Natural Octave 5
 >>> p & octave %~ (\(Octave o) -> Octave (o + 1))  -- Increment the octave by 1
 C Natural Octave 5
 
------------------------------------------------------------------------------------------------------ -}
+-------------------------------------------------------------------------------- -}
 
 ------------------------------
 -------- ===TESTS=== ---------
