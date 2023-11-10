@@ -1,5 +1,3 @@
-
-
 module Pitch.Accidental
   ( Accidental (..),
     accidentalToSemitones,

@@ -1,19 +1,22 @@
+-- :set -XDataKinds
 
 module Pitch.Pitch where
 
+-- import Data.Map as Map
+
+import Control.Applicative (liftA2)
 import Control.Lens hiding (elements)
-import Data.Map as Map
--- import Data.Ratio
+import Data.Fixed (mod')
+import Data.Ratio
 import Data.String
 import Pitch.Accidental
 import Test.QuickCheck (Arbitrary (arbitrary), Gen, elements)
-
--- :set -XDataKinds
+import Util.Fraction (splitFraction)
 
 data NoteName = C | D | E | F | G | A | B
   deriving (Eq, Ord, Show, Enum, Bounded)
 
-class NoteClass (notename :: NoteName) where
+class NoteClass (noteName :: NoteName) where
   sayNote :: String
 
 class IsNoteName a where
@@ -25,8 +28,8 @@ instance IsNoteName SomeNote where
   toNoteName :: SomeNote -> NoteName
   toNoteName (SomeNote nn) = toNoteName nn
 
-newtype NotesSelection = NotesSelection
-  {getNotesSelection :: Map.Map String SomeNote}
+-- newtype NotesSelection = NotesSelection
+--   {getNotesSelection :: Map.Map String SomeNote}
 
 instance Show SomeNote where
   show = show . toNoteName
@@ -52,21 +55,6 @@ instance NoteClass A where
 instance NoteClass B where
   sayNote = "b"
 
--- note1 :: NoteName
--- note1 =  "c"
-
--- ex1 :: (String, String, String)
--- ex1 = (sayNote @C, sayNote @D, sayNote  @E)
-
--- list = C :+ D
-
-{-ghci> :kind C
-C :: NoteName
-
-ghci>' :kind! C'
-C :: NoteName
-= C
-  -}
 instance IsString NoteName where
   fromString :: String -> NoteName
   fromString "c" = C
@@ -87,10 +75,8 @@ data PitchClass where
       _accidental :: Accidental
     } ->
     PitchClass
-  deriving (Eq, Ord)
 
 instance Show PitchClass where
-  show :: PitchClass -> String
   show (PitchClass name acc) = show name ++ " " ++ show acc
 
 newtype Octave = Octave {getOctaves :: Int}
@@ -106,11 +92,10 @@ data Pitch where
       _octave :: Octave
     } ->
     Pitch
-  deriving (Eq, Ord, Show)
 
--- instance Show Pitch where
---   show :: Pitch -> String
---   show (Pitch name acc oct) = show name ++ " " ++ show acc ++ " " ++ show oct
+instance Show Pitch where
+  show :: Pitch -> String
+  show (Pitch name acc oct) = show name ++ " " ++ show acc ++ " " ++ show oct
 
 makeLensesFor
   [ ("PitchClass", "_noteName"),
@@ -120,6 +105,54 @@ makeLensesFor
     ("Pitch", "_octave")
   ]
   ''PitchClass
+
+-- | Converts a `PitchClass` to a `Rational` value.
+pcToRational :: PitchClass -> Rational
+pcToRational pc = base + acVal
+  where
+    base = case Prelude.lookup nm noteNameToRational' of
+      Just val -> val
+      Nothing -> error "NoteName not found"
+    acVal = accidentalToSemitones ac :: Rational
+    nm = pc ^. noteName
+    ac = pc ^. accidental
+
+-- | Checks if two `PitchClass` values are enharmonic equivalents.
+-- >>> PitchClass C Sharp =~ PitchClass D Flat
+(=~) :: PitchClass -> PitchClass -> Bool
+pc1 =~ pc2 = (pcToRational pc1 `mod'` 12) == (pcToRational pc2 `mod'` 12)
+
+-- | Lookup table for converting `NoteName` to `Rational` values.
+noteNameToRational' :: [(NoteName, Rational)]
+noteNameToRational' = [(C, 0), (D, 2), (E, 4), (F, 5), (G, 7), (A, 9), (B, 11)]
+
+-- | Converts a `NoteName` to a `Rational` value.
+noteNameToRational :: NoteName -> Rational
+noteNameToRational name = case Prelude.lookup name noteNameToRational' of
+  Just val -> val
+  Nothing -> error ("NoteName " ++ show name ++ " not found")
+
+-- | List of all possible `PitchClass` values.
+allPitchClasses :: [PitchClass]
+allPitchClasses = liftA2 PitchClass [C, D, E, F, G, A, B] allAccidentals
+
+-- | List of all `PitchClass` values converted to `Rational`.
+allPCRationals :: [Rational]
+allPCRationals = map pcToRational allPitchClasses
+
+-- | Returns a list of enharmonic equivalents for a given `Rational` value.
+-- >>> enharmonicPCEquivs' (3%2)
+enharmonicPCEquivs :: Rational -> [(Rational, PitchClass)]
+enharmonicPCEquivs val =
+  [(v, pc) | pc <- liftA2 PitchClass [C, D, E, F, G, A, B] allAccidentals, let v = pcToRational pc, v `mod'` 12 == val `mod'` 12]
+
+-- | Type alias for the mapping of `Rational` values to lists of `PitchClass` values.
+type EnharmonicMapping = [(Rational, [PitchClass])]
+
+-- | Creates an enharmonic mapping for a list of `Rational` values.
+enharmonicMapping :: [Rational] -> EnharmonicMapping
+enharmonicMapping = map (\r -> (r, snd <$> enharmonicPCEquivs r))
+
 
 class HasNoteName a where
   noteName :: Lens' a NoteName
@@ -149,44 +182,24 @@ instance HasNoteName PitchClass where
 instance HasAccidental PitchClass where
   accidental f (PitchClass nn acc) = PitchClass nn <$> f acc
 
-instance HasAccidental Accidental where
-  accidental = id
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
 
-instance HasOctave Octave where
-  octave = id
+-- note1 :: NoteName
+-- note1 =  "c"
 
-instance HasOctave Pitch where
-  octave = lens _octave (\(Pitch nn acc _) o -> Pitch nn acc o)
+-- ex1 :: (String, String, String)
+-- ex1 = (sayNote @C, sayNote @D, sayNote  @E)
 
-instance IsString PitchClass where
-  fromString :: String -> PitchClass
-  fromString "C" = PitchClass C Natural
-  fromString "c" = PitchClass C Natural
-  fromString "C#" = PitchClass C Sharp
-  fromString "c#" = PitchClass C Sharp
-  fromString "D" = PitchClass D Natural
-  fromString "d" = PitchClass D Natural
-  fromString "D#" = PitchClass D Sharp
-  fromString "d#" = PitchClass D Sharp
-  fromString "E" = PitchClass E Natural
-  fromString "e" = PitchClass E Natural
-  fromString "E#" = PitchClass E Sharp
-  fromString "e#" = PitchClass E Sharp
-  fromString "F" = PitchClass F Natural
-  fromString "f" = PitchClass F Natural
-  fromString "F#" = PitchClass F Sharp
-  fromString "f#" = PitchClass F Sharp
-  fromString "G" = PitchClass G Natural
-  fromString "g" = PitchClass G Natural
-  fromString "G#" = PitchClass G Sharp
-  fromString "g#" = PitchClass G Sharp
-  fromString "A" = PitchClass A Natural
-  fromString "a" = PitchClass A Natural
-  fromString "A#" = PitchClass A Sharp
-  fromString "a#" = PitchClass A Sharp
-  fromString "B" = PitchClass B Natural
-  fromString "b" = PitchClass B Natural
-  fromString s = error $ "Invalid PitchClass string: " ++ s
+-- list = C :+ D
+
+{-ghci> :kind C
+C :: NoteName
+
+ghci>' :kind! C'
+C :: NoteName
+= C
+  -}
 
 {-
 >>> c = PitchClass C Natural
