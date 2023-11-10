@@ -43,10 +43,10 @@ infixr 7 //
 -- ==== __Examples__
 --
 -- >>> 4 // 4
--- NOW TimeSignature 4/4
+-- TimeSignature 4/4
 --
 -- >>> 6 // 8
--- NOW TimeSignature 6/8
+-- TimeSignature 6/8
 (//) :: Integer -> Integer -> TimeSignature
 n // d = time n d
 

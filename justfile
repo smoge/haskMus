@@ -27,7 +27,6 @@ clean:
 fourmat:
     @echo "Formating the Haskell project (fourmolu)..."
     fourmolu -i ./src/*/*
-    fourmolu -i ./src/*
     fourmolu -i ./test/*
 
 # Format Haskell project with ormolu

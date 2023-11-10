@@ -10,6 +10,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE UnicodeSyntax #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
 {-# HLINT ignore "Redundant bracket" #-}
 
 module Pitch.Accidental
@@ -58,11 +59,12 @@ instance IsAccidental SomeAccidental where
   toAccidental :: SomeAccidental -> Accidental
   toAccidental (SomeAccidental acc) = toAccidental acc
 
-newtype AccidentalSelection selection = AccidentalSelection
-  { getAccidentalSelection :: Map.Map String SomeAccidental
-  }
+-- newtype AccidentalSelection selection = AccidentalSelection
+--   { getAccidentalSelection :: Map.Map String SomeAccidental
+--   }
+-- type AccSelection = [String]
 
-class AccClass (notename :: Accidental) where
+class AccClass (accNme :: Accidental) where
   sayAccidental :: String
 
 instance Show SomeAccidental where
@@ -100,8 +102,6 @@ instance AccClass DoubleSharp where
 
 -- ex1 :: (String, String, String)
 -- ex1 = (sayAccidental @Flat, sayAccidental @QuarterSharp, sayAccidental  @DoubleSharp)
-
-type AccSelection = [String]
 
 -- >>> read @Accidental "f"
 
@@ -247,8 +247,6 @@ instance IsString Accidental where
     | "custom " `isPrefixOf` str = Custom (read (drop 7 str) :: Rational)
     | otherwise = error $ "Invalid Accidental string: " ++ str
 
-
-
 -- | Modify the accidental by applying a function to its semitone value. Returns the modified accidental.
 -- >>> modifyAccidental Sharp (*2) == DoubleSharp
 -- True
@@ -284,7 +282,7 @@ checkAccidental acc = semitonesToAccidental (accidentalToSemitones acc) == acc
 -- True
 -- True
 -- True
--- //ANCHOR - addAccidental
+
 -- >>> addAccidental DoubleSharp (1 % 2)
 -- Custom (5 % 2)
 addAccidental ::
@@ -327,7 +325,6 @@ allAccidentals =
 allSemitones :: [Rational]
 allSemitones = map accidentalToSemitones allAccidentals
 
--- //ANCHOR  - QUICKCHECK
 instance Arbitrary Accidental where
   arbitrary =
     frequency

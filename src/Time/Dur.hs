@@ -53,8 +53,8 @@ x %/ y = dur (x % y)
 --
 -- >>> dur (1%3)
 -- Dur (1 % 3)
-dur :: Rational  -> Dur
-dur = Dur 
+dur :: Rational -> Dur
+dur = Dur
 
 -- | The 'HasDur' class is used for types that can be converted to and from 'Dur',
 -- a representation of duration as a rational number. This allows for abstraction
@@ -123,9 +123,9 @@ normalizeDurList durations = [toDur x / toDur total | x <- durations]
   where
     total = sum $ map (unDur . toDur) durations
 
--- | Divides each value in a list of durations by a 'Real' value. 
--- FIXME 
--- >>> [Dur (1), Dur(1/2), Dur(1/3)]  |/ 2  
+-- | Divides each value in a list of durations by a 'Real' value.
+-- FIXME
+-- >>> [Dur (1), Dur(1/2), Dur(1/3)]  |/ 2
 -- WAS NOW [Dur (1 % 2),Dur (1 % 4),Dur (1 % 6)]
 -- NOW [Dur (1 % 2),Dur (1 % 4),Dur (1 % 6)]
 (|/) :: (HasDur a, Real b) => [a] -> b -> [a]

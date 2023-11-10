@@ -1,3 +1,15 @@
+-- |
+-- Module      : Rtm.Common
+-- Description : Common functions and types for RTMs (Rhythm Trees)
+-- Maintainer  : smoge
+-- Stability   : experimental
+--
+-- This module provides common functions and types for RTMs (Rhythmic Trees).
+-- An RTM is a tree-like data structure that represents a musical pattern.
+--
+-- ``A rhythm tree is a list representing a rhythmic structure. This list is
+-- organized hierarchically in sub lists , just as time is organized in measures,
+-- time signatures, pulses and rhythmic elements in the traditional notation.''
 module Rtm.Common
   ( RtmLabel (..),
     Rtm,
@@ -24,13 +36,6 @@ where
 import Data.Data
 import Data.Maybe (mapMaybe)
 import Data.Tree
-
--- | An example Rtm.
-example :: Rtm
-example = rtm' [s 1, g 3, 2 |: [s 1, g 1, s 1], s 1]
-
-main :: IO ()
-main = printRtm example
 
 data RtmLabel
   = RtmScalar Int
@@ -174,3 +179,10 @@ reconstructLabelsFromInts ints = snd . foldl insertInt (ints, [])
     insertInt (n : ns, ls) (RtmGap _) = (ns, ls ++ [RtmGap n])
     insertInt (n : ns, ls) (RtmVector _) = (ns, ls ++ [RtmVector n])
     insertInt (ns, ls) rtmConsLabel = (ns, ls ++ [rtmConsLabel]) -- RtmCons or any other label type
+
+-- | An example Rtm.
+example :: Rtm
+example = rtm' [s 1, g 3, 2 |: [s 1, g 1, s 1], s 1]
+
+main :: IO ()
+main = printRtm example
