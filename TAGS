@@ -353,176 +353,186 @@ buildComplexComponent buildComplexComponent513,514
 componentTree componentTree524,525
 main main532,533
 
-./src/Pitch/Accidental.hs,2886
-module Pitch.AccidentalPitch.Accidental16,17
-data AccidentalAccidental46,47
-  = DoubleFlatDoubleFlat47,48
-  | ThreeQuartersFlatThreeQuartersFlat48,49
-  | FlatFlat49,50
-  | QuarterFlatQuarterFlat50,51
-  | NaturalNatural51,52
-  | QuarterSharpQuarterSharp52,53
-  | SharpSharp53,54
-  | ThreeQuartersSharpThreeQuartersSharp54,55
-  | DoubleSharpDoubleSharp55,56
-  | Custom Custom56,57
-sharpenQ sharpenQ73,74
-sharpenS sharpenS76,77
-flattenQ flattenQ79,80
-flattenS flattenS82,83
-accidentalCompare accidentalCompare86,87
-scrambled1 scrambled189,90
-class IsAccidental IsAccidental105,106
-  toAccidental toAccidental106,107
-data SomeAccidentalSomeAccidental108,109
-  = forall forall109,110
-instance IsAccidental IsAccidental SomeAccidental113,114
-  toAccidental toAccidental114,115
-instance IsAccidental IsAccidental Accidental118,119
-  toAccidental toAccidental119,120
-instance IsAccidental IsAccidental Rational122,123
-  toAccidental toAccidental123,124
-class AccClass AccClass133,134
-  sayAccidental sayAccidental134,135
-instance Show Show SomeAccidental136,137
-  show show137,138
-instance AccClass AccClass DoubleFlat139,140
-  sayAccidental sayAccidental140,141
-instance AccClass AccClass Flat142,143
-  sayAccidental sayAccidental143,144
-instance AccClass AccClass Natural145,146
-  sayAccidental sayAccidental146,147
-instance AccClass AccClass QuarterFlat148,149
-  sayAccidental sayAccidental149,150
-instance AccClass AccClass QuarterSharp151,152
-  sayAccidental sayAccidental152,153
-instance AccClass AccClass Sharp154,155
-  sayAccidental sayAccidental155,156
-instance AccClass AccClass ThreeQuartersSharp157,158
-  sayAccidental sayAccidental158,159
-instance AccClass AccClass ThreeQuartersFlat160,161
-  sayAccidental sayAccidental161,162
-instance AccClass AccClass DoubleSharp163,164
-  sayAccidental sayAccidental164,165
-instance Enum Enum Accidental199,200
-  toEnum toEnum200,201
-  fromEnum fromEnum212,213
-  succ succ224,225
-  pred pred229,230
-instance Bounded Bounded Accidental235,236
-  minBound minBound236,237
-  maxBound maxBound237,238
-accidentalToSemitones accidentalToSemitones240,241
-semitonesToAccidental semitonesToAccidental253,254
-accToLily accToLily271,272
-instance IsString IsString Accidental284,285
-  fromString fromString285,286
-    | "custom " `isPrefixOf`isPrefixOf310,311
-modifyAccidental modifyAccidental316,317
-checkAccidental checkAccidental333,334
-addAccidental addAccidental342,343
-allAccidentals allAccidentals360,361
-allSemitones allSemitones373,374
-shuffled1 shuffled1377,378
-shuffled2 shuffled2380,381
-instance Arbitrary Arbitrary Accidental400,401
-  arbitrary arbitrary401,402
-newtype AccidentalStringAccidentalString408,409
-instance Arbitrary Arbitrary AccidentalString413,414
-  arbitrary arbitrary414,415
+./src/Pitch/Accidental.hs,3073
+module Pitch.AccidentalPitch.Accidental0,1
+data AccidentalAccidental27,28
+  = DoubleFlatDoubleFlat28,29
+  | ThreeQuartersFlatThreeQuartersFlat29,30
+  | FlatFlat30,31
+  | QuarterFlatQuarterFlat31,32
+  | NaturalNatural32,33
+  | QuarterSharpQuarterSharp33,34
+  | SharpSharp34,35
+  | ThreeQuartersSharpThreeQuartersSharp35,36
+  | DoubleSharpDoubleSharp36,37
+  | Custom Custom37,38
+sharpenQ sharpenQ49,50
+sharpenS sharpenS52,53
+flattenQ flattenQ55,56
+flattenS flattenS58,59
+accidentalCompare accidentalCompare61,62
+class IsAccidental IsAccidental73,74
+  toAccidental toAccidental74,75
+data SomeAccidentalSomeAccidental76,77
+  = forall forall77,78
+instance IsAccidental IsAccidental SomeAccidental81,82
+  toAccidental toAccidental82,83
+instance IsAccidental IsAccidental Accidental85,86
+  toAccidental toAccidental86,87
+instance IsAccidental IsAccidental Rational89,90
+  toAccidental toAccidental90,91
+class AccClass AccClass93,94
+  sayAccidental sayAccidental94,95
+instance Show Show SomeAccidental96,97
+  show show97,98
+instance AccClass AccClass DoubleFlat99,100
+  sayAccidental sayAccidental100,101
+instance AccClass AccClass Flat102,103
+  sayAccidental sayAccidental103,104
+instance AccClass AccClass Natural105,106
+  sayAccidental sayAccidental106,107
+instance AccClass AccClass QuarterFlat108,109
+  sayAccidental sayAccidental109,110
+instance AccClass AccClass QuarterSharp111,112
+  sayAccidental sayAccidental112,113
+instance AccClass AccClass Sharp114,115
+  sayAccidental sayAccidental115,116
+instance AccClass AccClass ThreeQuartersSharp117,118
+  sayAccidental sayAccidental118,119
+instance AccClass AccClass ThreeQuartersFlat120,121
+  sayAccidental sayAccidental121,122
+instance AccClass AccClass DoubleSharp123,124
+  sayAccidental sayAccidental124,125
+instance Num Num Accidental149,150
+  (+(+)150,151
+  (-(-)151,152
+  (*(*)152,153
+  abs abs153,154
+  signum signum154,155
+  fromInteger fromInteger159,160
+  negate negate160,161
+instance Enum Enum Accidental163,164
+  toEnum toEnum164,165
+  fromEnum fromEnum176,177
+  succ succ188,189
+  pred pred193,194
+instance Bounded Bounded Accidental198,199
+  minBound minBound199,200
+  maxBound maxBound200,201
+accidentalToSemitones accidentalToSemitones203,204
+semitonesToAccidental semitonesToAccidental216,217
+accToLily accToLily232,233
+instance Read Read Accidental244,245
+  readsPrec readsPrec245,246
+instance IsString IsString Accidental269,270
+  fromString fromString270,271
+    | "custom " `isPrefixOf`isPrefixOf295,296
+modifyAccidental modifyAccidental301,302
+checkAccidental checkAccidental318,319
+addAccidental addAccidental327,328
+invertAccidental invertAccidental343,344
+allAccidentals allAccidentals346,347
+allSemitones allSemitones359,360
+instance Arbitrary Arbitrary Accidental374,375
+  arbitrary arbitrary375,376
+newtype AccidentalStringAccidentalString382,383
+instance Arbitrary Arbitrary AccidentalString387,388
+  arbitrary arbitrary388,389
 
-./src/Pitch/Pitch.hs,3283
-module Pitch.Pitch Pitch.Pitch14,15
-data NoteName NoteName27,28
-data NoteName = C C27,28
-data NoteName = C | D D27,28
-data NoteName = C | D | E E27,28
-data NoteName = C | D | E | F F27,28
-data NoteName = C | D | E | F | G G27,28
-data NoteName = C | D | E | F | G | A A27,28
-data NoteName = C | D | E | F | G | A | BB27,28
-class NoteClass NoteClass30,31
-  sayNote sayNote31,32
-class IsNoteName IsNoteName33,34
-  toNoteName toNoteName34,35
-data SomeNote SomeNote36,37
-data SomeNote = forall forall36,37
-instance IsNoteName IsNoteName SomeNote38,39
-  toNoteName toNoteName39,40
-newtype NotesSelection NotesSelection42,43
-  {getNotesSelection getNotesSelection43,44
-instance Show Show SomeNote45,46
-  show show46,47
-instance NoteClass NoteClass C48,49
-  sayNote sayNote49,50
-instance NoteClass NoteClass D51,52
-  sayNote sayNote52,53
-instance NoteClass NoteClass E54,55
-  sayNote sayNote55,56
-instance NoteClass NoteClass F57,58
-  sayNote sayNote58,59
-instance NoteClass NoteClass G60,61
-  sayNote sayNote61,62
-instance NoteClass NoteClass A63,64
-  sayNote sayNote64,65
-instance NoteClass NoteClass B66,67
-  sayNote sayNote67,68
-instance IsString IsString NoteName84,85
-  fromString fromString85,86
-data IntervalBasis IntervalBasis95,96
-data IntervalBasis = Chromatic Chromatic95,96
-data IntervalBasis = Chromatic | DiatonicDiatonic95,96
-data PitchClass PitchClass98,99
-  PitchClass PitchClass99,100
-    { _noteName _noteName100,101
-      _accidental _accidental101,102
-  PitchClass PitchClass99,100
-instance Show Show PitchClass106,107
-  show show107,108
-newtype Octave Octave110,111
-newtype Octave = Octave {getOctaves getOctaves110,111
-instance Show Show Octave113,114
-  show show114,115
-data Pitch Pitch116,117
-  Pitch Pitch117,118
-    { _noteName _noteName118,119
-      _accidental _accidental119,120
-      _octave _octave120,121
-  Pitch Pitch117,118
-class HasNoteName HasNoteName140,141
-  noteName noteName141,142
-class HasAccidental HasAccidental143,144
-  accidental accidental144,145
-class HasPitchClass HasPitchClass146,147
-  pitchClass pitchClass147,148
-class HasOctave HasOctave149,150
-  octave octave150,151
-instance HasNoteName HasNoteName Pitch152,153
-  noteName noteName153,154
-instance HasAccidental HasAccidental Pitch155,156
-  accidental accidental156,157
-instance HasPitchClass HasPitchClass Pitch158,159
-  pitchClass pitchClass159,160
-instance HasNoteName HasNoteName PitchClass162,163
+./src/Pitch/Pitch.hs,3288
+module Pitch.Pitch Pitch.Pitch0,1
+data NoteName NoteName11,12
+data NoteName = C C11,12
+data NoteName = C | D D11,12
+data NoteName = C | D | E E11,12
+data NoteName = C | D | E | F F11,12
+data NoteName = C | D | E | F | G G11,12
+data NoteName = C | D | E | F | G | A A11,12
+data NoteName = C | D | E | F | G | A | BB11,12
+class NoteClass NoteClass14,15
+  sayNote sayNote15,16
+class IsNoteName IsNoteName17,18
+  toNoteName toNoteName18,19
+data SomeNote SomeNote20,21
+data SomeNote = forall forall20,21
+instance IsNoteName IsNoteName SomeNote22,23
+  toNoteName toNoteName23,24
+instance Show Show SomeNote26,27
+  show show27,28
+instance NoteClass NoteClass C29,30
+  sayNote sayNote30,31
+instance NoteClass NoteClass D32,33
+  sayNote sayNote33,34
+instance NoteClass NoteClass E35,36
+  sayNote sayNote36,37
+instance NoteClass NoteClass F38,39
+  sayNote sayNote39,40
+instance NoteClass NoteClass G41,42
+  sayNote sayNote42,43
+instance NoteClass NoteClass A44,45
+  sayNote sayNote45,46
+instance NoteClass NoteClass B47,48
+  sayNote sayNote48,49
+instance IsString IsString NoteName50,51
+  fromString fromString51,52
+data IntervalBasis IntervalBasis61,62
+data IntervalBasis = Chromatic Chromatic61,62
+data IntervalBasis = Chromatic | DiatonicDiatonic61,62
+data PitchClass PitchClass64,65
+  PitchClass PitchClass65,66
+    { _noteName _noteName66,67
+      _accidental _accidental67,68
+  PitchClass PitchClass65,66
+instance Show Show PitchClass71,72
+  show show72,73
+newtype Octave Octave74,75
+newtype Octave = Octave {getOctaves getOctaves74,75
+instance Show Show Octave77,78
+  show show78,79
+data Pitch Pitch80,81
+  Pitch Pitch81,82
+    { _noteName _noteName82,83
+      _accidental _accidental83,84
+      _octave _octave84,85
+  Pitch Pitch81,82
+instance Show Show Pitch88,89
+  show show89,90
+pcToRational pcToRational102,103
+(=(=~)114,115
+pc1 pc1115,116
+noteNameToRational' noteNameToRational'118,119
+noteNameToRational noteNameToRational122,123
+allPitchClasses allPitchClasses128,129
+allPCRationals allPCRationals132,133
+enharmonicPCEquivs enharmonicPCEquivs139,140
+type EnharmonicMapping EnharmonicMapping144,145
+enharmonicMapping enharmonicMapping147,148
+class HasNoteName HasNoteName150,151
+  noteName noteName151,152
+class HasAccidental HasAccidental153,154
+  accidental accidental154,155
+class HasPitchClass HasPitchClass156,157
+  pitchClass pitchClass157,158
+class HasOctave HasOctave159,160
+  octave octave160,161
+instance HasNoteName HasNoteName Pitch162,163
   noteName noteName163,164
-instance HasAccidental HasAccidental PitchClass165,166
+instance HasAccidental HasAccidental Pitch165,166
   accidental accidental166,167
-instance HasAccidental HasAccidental Accidental168,169
-  accidental accidental169,170
-instance HasOctave HasOctave Octave171,172
-  octave octave172,173
-instance HasOctave HasOctave Pitch174,175
-  octave octave175,176
-instance IsString IsString PitchClass179,180
-  fromString fromString180,181
-instance Arbitrary Arbitrary NoteName276,277
-  arbitrary arbitrary277,278
-instance Arbitrary Arbitrary PitchClass279,280
-  arbitrary arbitrary280,281
-instance Arbitrary Arbitrary Octave282,283
-  arbitrary arbitrary283,284
-instance Arbitrary Arbitrary Pitch286,287
-  arbitrary arbitrary287,288
+instance HasPitchClass HasPitchClass Pitch168,169
+  pitchClass pitchClass169,170
+instance HasNoteName HasNoteName PitchClass172,173
+  noteName noteName173,174
+instance HasAccidental HasAccidental PitchClass175,176
+  accidental accidental176,177
+instance Arbitrary Arbitrary NoteName264,265
+  arbitrary arbitrary265,266
+instance Arbitrary Arbitrary PitchClass267,268
+  arbitrary arbitrary268,269
+instance Arbitrary Arbitrary Octave270,271
+  arbitrary arbitrary271,272
+instance Arbitrary Arbitrary Pitch274,275
+  arbitrary arbitrary275,276
 
 ./src/Rtm/Common.hs,902
 module Rtm.CommonRtm.Common12,13
@@ -669,3 +679,8 @@ durToTimeSig durToTimeSig95,96
 durToTimeSig8 durToTimeSig8115,116
 powersOfTwo powersOfTwo122,123
 isPowerOfTwo isPowerOfTwo125,126
+
+./src/Util/Fraction.hs,111
+module Util.FractionUtil.Fraction0,1
+splitFraction splitFraction8,9
+unsplitFraction unsplitFraction13,14

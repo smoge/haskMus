@@ -10,7 +10,7 @@
 - ignore: { name: Eta reduce }
 
 - extensions:
-    - default: false
+    - default: true
     - name: [ImportQualifiedPost]
     - name:
         [

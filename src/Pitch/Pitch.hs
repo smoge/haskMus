@@ -3,9 +3,10 @@ module Pitch.Pitch where
 import Control.Applicative (liftA2)
 import Control.Lens hiding (elements)
 import Data.Fixed (mod')
-import Data.Ratio
+import Data.Ratio ((%))
 import Data.String
 import Pitch.Accidental
+import Data.Maybe (fromMaybe)
 import Test.QuickCheck (Arbitrary (arbitrary), Gen, elements)
 import Util.Fraction (splitFraction)
 
@@ -111,7 +112,9 @@ pcToRational pc = base + acVal
     ac = pc ^. accidental
 
 -- | Checks if two `PitchClass` values are enharmonic equivalents.
--- >>> PitchClass C Sharp =~ PitchClass D Flat
+--
+-- >>> PitchClass C Sharp =~ PitchClass D Flat 
+-- True
 (=~) :: PitchClass -> PitchClass -> Bool
 pc1 =~ pc2 = (pcToRational pc1 `mod'` 12) == (pcToRational pc2 `mod'` 12)
 
@@ -134,10 +137,20 @@ allPCRationals :: [Rational]
 allPCRationals = map pcToRational allPitchClasses
 
 -- | Returns a list of enharmonic equivalents for a given `Rational` value.
--- >>> enharmonicPCEquivs' (3%2)
+--
+-- >>> enharmonicPCEquivs (3%2)
+-- [(3 % 2,C ThreeQuartersSharp),(3 % 2,D QuarterFlat)]
 enharmonicPCEquivs :: Rational -> [(Rational, PitchClass)]
 enharmonicPCEquivs val =
   [(v, pc) | pc <- liftA2 PitchClass [C, D, E, F, G, A, B] allAccidentals, let v = pcToRational pc, v `mod'` 12 == val `mod'` 12]
+
+-- | Returns a list of enharmonic equivalents for a given `PitchClass` value.
+--
+-- >>> enharmonicPCEquivs (PitchClass C Natural)
+--
+enharmonicPCEquivs' :: PitchClass -> [(Rational, PitchClass)]
+enharmonicPCEquivs' pc =
+  [(v, pc') | pc' <- liftA2 PitchClass [C, D, E, F, G, A, B] allAccidentals, let v = pcToRational pc', v `mod'` 12 == pcToRational pc `mod'` 12]
 
 -- | Type alias for the mapping of `Rational` values to lists of `PitchClass` values.
 type EnharmonicMapping = [(Rational, [PitchClass])]
@@ -145,6 +158,35 @@ type EnharmonicMapping = [(Rational, [PitchClass])]
 -- | Creates an enharmonic mapping for a list of `Rational` values.
 enharmonicMapping :: [Rational] -> EnharmonicMapping
 enharmonicMapping = map (\r -> (r, snd <$> enharmonicPCEquivs r))
+
+
+
+{- | Using the 'enharmonicMapping' function, this utility generates a list of
+all enharmonic representations for a given 'PitchClass'. If no enharmonic
+equivalents are found, it returns a list containing the original 'PitchClass'.
+
+For instance, for a 'PitchClass' corresponding to C Sharp:
+
+enharmonics (PitchClass C Sharp) 
+-- [C Sharp,D Flat,B DoubleSharp]
+
+-}
+enharmonics :: PitchClass -> [PitchClass]
+enharmonics pc = fromMaybe [pc] (lookup (pcToRational pc) out)
+    where
+        out = enharmonicMapping [pcToRational pc]
+
+allEnharmonics :: [[PitchClass]]
+allEnharmonics = map enharmonics allPitchClasses
+
+allEnharmonicsMapping :: [(PitchClass, [PitchClass])]
+allEnharmonicsMapping = zip allPitchClasses allEnharmonics
+
+
+{- -----------------------------------  ----------------------------------------------------------
+
+----------------------------------------------------------------------------------------------------- -} 
+
 
 class HasNoteName a where
   noteName :: Lens' a NoteName
@@ -185,18 +227,20 @@ instance HasAccidental PitchClass where
 
 -- list = C :+ D
 
-{-ghci> :kind C
+{-ghci> 
+
+:kind C
 C :: NoteName
 
-ghci>' :kind! C'
+:kind! C'
 C :: NoteName
 = C
   -}
 
 {-
->>> c = PitchClass C Natural
->>> c ^. noteName
->>> c ^. accidental
+c = PitchClass C Natural
+c ^. noteName
+c ^. accidental
 C
 Natural
 
@@ -208,17 +252,17 @@ C Sharp
 >>> c & accidental %~ (\x -> addAccidental x (1%2))
 C QuarterSharp
 
->>> pitchClasses = map (\x -> PitchClass x Natural) [C .. B]
+pitchClasses = map (\x -> PitchClass x Natural) [C .. B]
 -- Changes the accidental of every PitchClass in the list to Flat
->>> pitchClasses & each . accidental .~ Flat
+pitchClasses & each . accidental .~ Flat
 [C Flat,D Flat,E Flat,F Flat,G Flat,A Flat,B Flat]
 
 -- Checks if 'c' has an accidental of Natural
->>> has (accidental . only Natural) c
-True
+has (accidental . only Natural) c
+--True
 
 -- If the accidental is Natural, change it to Flat.
->>> c & accidental . filtered (== Natural) .~ Flat
+c & accidental . filtered (== Natural) .~ Flat
 C Flat
 
 -}
