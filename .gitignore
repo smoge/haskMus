@@ -205,3 +205,5 @@ assets/
 .vscode/tasks.json
 managed_context/metadata.json
 test_suite_analysis/metadata.json
+docs/L19_Agon.txt
+docs/L19_Agon.pdf

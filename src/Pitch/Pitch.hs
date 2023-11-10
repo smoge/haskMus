@@ -1,28 +1,13 @@
-{-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeOperators #-}
 
 module Pitch.Pitch where
 
 import Control.Lens hiding (elements)
 import Data.Map as Map
-import Data.Ratio ((%))
+-- import Data.Ratio
 import Data.String
-import qualified Data.Text as T
 import Pitch.Accidental
 import Test.QuickCheck (Arbitrary (arbitrary), Gen, elements)
 
--- .// SECTION PITCH / PITCHCLASS
 -- :set -XDataKinds
 
 data NoteName = C | D | E | F | G | A | B
@@ -127,8 +112,6 @@ data Pitch where
 --   show :: Pitch -> String
 --   show (Pitch name acc oct) = show name ++ " " ++ show acc ++ " " ++ show oct
 
--- //ANCHOR - LENSES
-
 makeLensesFor
   [ ("PitchClass", "_noteName"),
     ("PitchClass", "_accidental"),
@@ -174,8 +157,6 @@ instance HasOctave Octave where
 
 instance HasOctave Pitch where
   octave = lens _octave (\(Pitch nn acc _) o -> Pitch nn acc o)
-
--- //ANCHOR - OVERLOADED STRINGS
 
 instance IsString PitchClass where
   fromString :: String -> PitchClass
@@ -270,7 +251,9 @@ C Natural Octave 5
 C Natural Octave 5
 -}
 
--- //ANCHOR - QuickCheck
+------------------------------
+-------- ===TESTS=== ---------
+------------------------------
 
 instance Arbitrary NoteName where
   arbitrary = elements [C, D, E, F, G, A, B]

@@ -1,0 +1,39 @@
+- group: { name: future, enabled: true }
+- group: { name: extra, enabled: true }
+
+- arguments: [-cross]
+
+- ignore: { name: Avoid lambda }
+- ignore: { name: Redundant lambda }
+- ignore: { name: Redundant bracket }
+- ignore: { name: Unused LANGUAGE pragma }
+- ignore: { name: Eta reduce }
+
+- extensions:
+    - default: false
+    - name: [ImportQualifiedPost]
+    - name:
+        [
+          DeriveDataTypeable,
+          DeriveFunctor,
+          GeneralizedNewtypeDeriving,
+          NoMonomorphismRestriction,
+          OverloadedStrings,
+        ]
+    - name:
+        [
+          MultiWayIf,
+          PatternGuards,
+          RecordWildCards,
+          ViewPatterns,
+          PatternSynonyms,
+          TupleSections,
+          LambdaCase,
+        ]
+    - name: [Rank2Types, ScopedTypeVariables]
+    - name: [ExistentialQuantification, MultiParamTypeClasses, NamedFieldPuns]
+    - name: [FlexibleContexts, FlexibleInstances]
+    - name: [PackageImports]
+    - name: [ConstraintKinds, RankNTypes, TypeFamilies]
+    - name: [TemplateHaskell]
+    - name: [DerivingVia, DeriveGeneric, DataKinds]

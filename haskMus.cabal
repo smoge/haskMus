@@ -5,7 +5,7 @@ synopsis:      algorithm composition toolkit in haskell
 description:
   Algorithm composition toolkit library and DSL designed creation, manipulation, of music structures.
 
-homepage:      https://github.com/githubuser/haskMus#readme
+homepage:      https://github.com/smoge/haskMus#readme
 license:       GPL-3.0-or-later
 
 --license-file:        license
@@ -34,34 +34,35 @@ library
     Time.TimeSignature
 
   build-depends:
-    , base                               >=4.17.2    && <4.20
-    , containers                         
+    , base                               >=4.17.2 && <4.20
+    , containers
     , data-default
     , data-default-class
     , data-default-instances-containers
     , data-default-instances-dlist
     , data-default-instances-old-locale
-    , doctest                           
-    , fgl                                                 
-    , hspec                             
-    , HUnit                             
-    , lens                              
-    , linear                            
-    , parsec                            
-    , pretty-simple                     
-    , QuickCheck                        
-    , rando                             
-    , random-fu                         
+    , doctest
+    , fgl
+    , hspec
+    , HUnit
+    , lens
+    , linear
+    , parsec
+    , pretty-simple
+    , QuickCheck
+    , rando
+    , random-fu
     , random-shuffle
     , template-haskell
-    , text                               
-    , vector-space                    
+    , text
+    , vector-space
 
   --  , bimap >= 0.5.0 && < 0.6
   --  , markov-chain >= 0.0.3 && < 0.1
   --, witch
   default-language:   Haskell2010
   default-extensions:
+    AllowAmbiguousTypes
     DataKinds
     DefaultSignatures
     DeriveDataTypeable
@@ -70,12 +71,14 @@ library
     DeriveLift
     DeriveTraversable
     DisambiguateRecordFields
+    DuplicateRecordFields
     ExistentialQuantification
     FlexibleContexts
     FlexibleInstances
     GADTSyntax
     GADTs
     GeneralizedNewtypeDeriving
+    InstanceSigs
     LambdaCase
     OverloadedLists
     OverloadedStrings
@@ -99,13 +102,48 @@ library
     -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
 
 executable haskMus-exe
-  hs-source-dirs:   app
-  main-is:          Main.hs
+  hs-source-dirs:     app
+  main-is:            Main.hs
   build-depends:
     , base
     , haskMus
 
-  default-language: Haskell2010
+  default-language:   Haskell2010
+  default-extensions:
+    AllowAmbiguousTypes
+    DataKinds
+    DefaultSignatures
+    DeriveDataTypeable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    DisambiguateRecordFields
+    DuplicateRecordFields
+    ExistentialQuantification
+    FlexibleContexts
+    FlexibleInstances
+    GADTSyntax
+    GADTs
+    GeneralizedNewtypeDeriving
+    InstanceSigs
+    LambdaCase
+    OverloadedLists
+    OverloadedStrings
+    PolyKinds
+    PostfixOperators
+    QuasiQuotes
+    RankNTypes
+    ScopedTypeVariables
+    TemplateHaskell
+    TupleSections
+    TypeApplications
+    TypeFamilies
+    TypeOperators
+    TypeSynonymInstances
+    TypeSynonymInstances
+    UnicodeSyntax
+
   ghc-options:
     -Wall -Wcompat -Widentities -Wincomplete-record-updates
     -Wincomplete-uni-patterns -Wmissing-export-lists
@@ -113,9 +151,9 @@ executable haskMus-exe
     -threaded -rtsopts -with-rtsopts=-N
 
 test-suite haskMus-test
-  type:             exitcode-stdio-1.0
-  hs-source-dirs:   test
-  main-is:          Test.hs
+  type:               exitcode-stdio-1.0
+  hs-source-dirs:     test
+  main-is:            Test.hs
   other-modules:
     AccidentalProperties
     PitchProperties
@@ -132,7 +170,42 @@ test-suite haskMus-test
     , test-framework-hunit
     , test-framework-quickcheck2
 
-  default-language: Haskell2010
+  default-language:   Haskell2010
+  default-extensions:
+    AllowAmbiguousTypes
+    DataKinds
+    DefaultSignatures
+    DeriveDataTypeable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    DisambiguateRecordFields
+    DuplicateRecordFields
+    ExistentialQuantification
+    FlexibleContexts
+    FlexibleInstances
+    GADTSyntax
+    GADTs
+    GeneralizedNewtypeDeriving
+    InstanceSigs
+    LambdaCase
+    OverloadedLists
+    OverloadedStrings
+    PolyKinds
+    PostfixOperators
+    QuasiQuotes
+    RankNTypes
+    ScopedTypeVariables
+    TemplateHaskell
+    TupleSections
+    TypeApplications
+    TypeFamilies
+    TypeOperators
+    TypeSynonymInstances
+    TypeSynonymInstances
+    UnicodeSyntax
+
   ghc-options:
     -Wall -Wcompat -Widentities -Wincomplete-record-updates
     -Wincomplete-uni-patterns -Wmissing-export-lists
