@@ -1,8 +1,4 @@
--- :set -XDataKinds
-
 module Pitch.Pitch where
-
--- import Data.Map as Map
 
 import Control.Applicative (liftA2)
 import Control.Lens hiding (elements)
@@ -27,9 +23,6 @@ data SomeNote = forall notename. (IsNoteName notename) => SomeNote notename
 instance IsNoteName SomeNote where
   toNoteName :: SomeNote -> NoteName
   toNoteName (SomeNote nn) = toNoteName nn
-
--- newtype NotesSelection = NotesSelection
---   {getNotesSelection :: Map.Map String SomeNote}
 
 instance Show SomeNote where
   show = show . toNoteName
@@ -152,7 +145,6 @@ type EnharmonicMapping = [(Rational, [PitchClass])]
 -- | Creates an enharmonic mapping for a list of `Rational` values.
 enharmonicMapping :: [Rational] -> EnharmonicMapping
 enharmonicMapping = map (\r -> (r, snd <$> enharmonicPCEquivs r))
-
 
 class HasNoteName a where
   noteName :: Lens' a NoteName
