@@ -1,15 +1,16 @@
 module Time.SeqDur where
 
-import Data.Foldable (toList)
-import Data.List (intercalate)
-import Data.Sequence
+import           Data.Foldable (toList)
+import           Data.List     (intercalate)
+import           Data.Sequence
 import qualified Data.Sequence as S
-import Time.Dur
+import           Time.Dur
+
 
 type Durs = Seq Dur
 
 showDurs :: Seq Dur -> String
-showDurs durs = "Durs[ " ++ (intercalate ", " . map (show . unDur) . toList $ durs) ++ "]"
+showDurs durs = "Durs[ " <> (intercalate ", " . fmap (show . unDur) . toList $ durs) <> "]"
 
 frontAdd :: Dur -> Durs -> Durs
 frontAdd d ds = d <| ds

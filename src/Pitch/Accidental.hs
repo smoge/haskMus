@@ -262,7 +262,7 @@ instance Read Accidental where
       "semisharp"    -> [(QuarterSharp, "")]
       "quarterflat"  -> [(QuarterFlat, "")]
       "semiflat"     -> [(QuarterFlat, "")]
-      _              -> error $ "Invalid Accidental string: " ++ value
+      _              -> error $ "Invalid Accidental string: " <> value
 
 -- >>> map (fromString @Accidental) ["ff","tqf","f","qf","","qs","s","tqs","ss"]
 -- [DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp]
@@ -358,7 +358,7 @@ allAccidentals =
   ]
 
 allSemitones :: [Rational]
-allSemitones = map accidentalToSemitones allAccidentals
+allSemitones = fmap accidentalToSemitones allAccidentals
 
 {- -----------------------------------------------------------------------------
 

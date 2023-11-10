@@ -11,8 +11,8 @@ reportResults :: String -> IO Bool -> IO ()
 reportResults testName action = do
   passed <- action
   if passed
-    then putStrLn $ testName ++ ": All QuickCheck properties passed."
-    else putStrLn $ testName ++ ": Some QuickCheck properties failed."
+    then putStrLn $ testName <> ": All QuickCheck properties passed."
+    else putStrLn $ testName <> ": Some QuickCheck properties failed."
 
 main :: IO ()
 main = do

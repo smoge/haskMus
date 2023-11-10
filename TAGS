@@ -1,359 +1,5 @@
 
-./Setup.hs,15
-main main2,3
-
-./app/Main.hs,37
-module Main Main0,1
-main main3,4
-
-./test/AccidentalProperties.hs,389
-module AccidentalProperties AccidentalProperties4,5
-prop_accidentalToSemitones prop_accidentalToSemitones11,12
-prop_roundTripAccidental prop_roundTripAccidental16,17
-prop_consistencyOrder prop_consistencyOrder21,22
-prop_addition prop_addition27,28
-prop_multiplication prop_multiplication36,37
-prop_addAccidentalInverse prop_addAccidentalInverse45,46
-runTests runTests72,73
-
-./test/PitchProperties.hs,246
-module PitchProperties PitchProperties7,8
-prop_setAccidental prop_setAccidental20,21
-prop_setAccidentalPitch prop_setAccidentalPitch24,25
-prop_identityAccidentalIsUnchanged prop_identityAccidentalIsUnchanged57,58
-runTests runTests71,72
-
-./test/PitchSpec.hs,66
-module PitchSpec PitchSpec2,3
-spec spec10,11
-main main74,75
-
-./test/Test.hs,73
-module Main Main0,1
-reportResults reportResults9,10
-main main16,17
-
-./old/RtmProperties.hs,104
-module RtmProperties RtmProperties3,4
-prop_toFromRtmArray prop_toFromRtmArray10,11
-main main20,21
-
-./old/TSSpec.hs,63
-module TSSpecTSSpec0,1
-specTS specTS11,12
-main main61,62
-
-./old/src/Music/Pitch/Accidental.hs,2570
-module Music.Pitch.AccidentalMusic.Pitch.Accidental14,15
-data AccidentalAccidental39,40
-  = DoubleFlatDoubleFlat40,41
-  | ThreeQuartersFlatThreeQuartersFlat41,42
-  | FlatFlat42,43
-  | QuarterFlatQuarterFlat43,44
-  | NaturalNatural44,45
-  | QuarterSharpQuarterSharp45,46
-  | SharpSharp46,47
-  | ThreeQuartersSharpThreeQuartersSharp47,48
-  | DoubleSharpDoubleSharp48,49
-  | Custom Custom49,50
-class IsAccidental IsAccidental52,53
-  toAccidental toAccidental53,54
-data SomeAccidental SomeAccidental55,56
-  forall forall56,57
-instance IsAccidental IsAccidental SomeAccidental59,60
-  toAccidental toAccidental60,61
-newtype AccidentalSelection AccidentalSelection63,64
-  { getAccidentalSelection getAccidentalSelection64,65
-class AccClass AccClass67,68
-  sayAccidental sayAccidental68,69
-instance Show Show SomeAccidental71,72
-  show show72,73
-instance AccClass AccClass DoubleFlat74,75
-  sayAccidental sayAccidental75,76
-instance AccClass AccClass Flat77,78
-  sayAccidental sayAccidental78,79
-instance AccClass AccClass Natural80,81
-  sayAccidental sayAccidental81,82
-instance AccClass AccClass QuarterFlat83,84
-  sayAccidental sayAccidental84,85
-instance AccClass AccClass QuarterSharp86,87
-  sayAccidental sayAccidental87,88
-instance AccClass AccClass Sharp89,90
-  sayAccidental sayAccidental90,91
-instance AccClass AccClass ThreeQuartersSharp92,93
-  sayAccidental sayAccidental93,94
-instance AccClass AccClass ThreeQuartersFlat95,96
-  sayAccidental sayAccidental96,97
-instance AccClass AccClass DoubleSharp98,99
-  sayAccidental sayAccidental99,100
-acidente1 acidente1101,102
-type AccSelection AccSelection106,107
-instance Enum Enum Accidental131,132
-  toEnum toEnum132,133
-  fromEnum fromEnum144,145
-instance Bounded Bounded Accidental158,159
-  minBound minBound159,160
-  maxBound maxBound160,161
-accidentalToSemitones accidentalToSemitones177,178
-semitonesToAccidental semitonesToAccidental190,191
-accToLily accToLily207,208
-instance IsString IsString Accidental220,221
-  fromString fromString221,222
-    | "custom " `isPrefixOf`isPrefixOf246,247
-modifyAccidental modifyAccidental288,289
-checkAccidental checkAccidental305,306
-addAccidental addAccidental323,324
-allAccidentals allAccidentals347,348
-allSemitones allSemitones360,361
-instance Arbitrary Arbitrary Accidental364,365
-  arbitrary arbitrary365,366
-newtype AccidentalString AccidentalString372,373
-instance Arbitrary Arbitrary AccidentalString377,378
-  arbitrary arbitrary378,379
-
-./old/src/Music/Pitch/Pitch.hs,3299
-module Music.Pitch.Pitch Music.Pitch.Pitch15,16
-data NoteName NoteName29,30
-data NoteName = C C29,30
-data NoteName = C | D D29,30
-data NoteName = C | D | E E29,30
-data NoteName = C | D | E | F F29,30
-data NoteName = C | D | E | F | G G29,30
-data NoteName = C | D | E | F | G | A A29,30
-data NoteName = C | D | E | F | G | A | BB29,30
-class NoteClass NoteClass33,34
-  sayNote sayNote34,35
-class IsNoteName IsNoteName36,37
-  toNoteName toNoteName37,38
-data SomeNote SomeNote39,40
-data SomeNote = forall forall39,40
-instance IsNoteName IsNoteName SomeNote41,42
-  toNoteName toNoteName42,43
-newtype NotesSelection NotesSelection47,48
-  { getNotesSelection getNotesSelection48,49
-instance Show Show SomeNote51,52
-  show show52,53
-instance NoteClass NoteClass C54,55
-  sayNote sayNote55,56
-instance NoteClass NoteClass D56,57
-  sayNote sayNote57,58
-instance NoteClass NoteClass E58,59
-  sayNote sayNote59,60
-instance NoteClass NoteClass F60,61
-  sayNote sayNote61,62
-instance NoteClass NoteClass G62,63
-  sayNote sayNote63,64
-instance NoteClass NoteClass A64,65
-  sayNote sayNote65,66
-instance NoteClass NoteClass B66,67
-  sayNote sayNote67,68
-instance IsString IsString NoteName85,86
-  fromString fromString86,87
-data IntervalBasis IntervalBasis96,97
-data IntervalBasis = Chromatic Chromatic96,97
-data IntervalBasis = Chromatic | DiatonicDiatonic96,97
-data PitchClass PitchClass99,100
-  PitchClass PitchClass100,101
-    { _noteName _noteName101,102
-      _accidental _accidental102,103
-  PitchClass PitchClass100,101
-instance Show Show PitchClass107,108
-  show show108,109
-newtype Octave Octave111,112
-newtype Octave = Octave {getOctaves getOctaves111,112
-instance Show Show Octave114,115
-  show show115,116
-data Pitch Pitch117,118
-  Pitch Pitch118,119
-      _noteName _noteName120,121
-      _accidental _accidental121,122
-      _octave _octave122,123
-  Pitch Pitch118,119
-class HasNoteName HasNoteName143,144
-  noteName noteName144,145
-class HasAccidental HasAccidental146,147
-  accidental accidental147,148
-class HasPitchClass HasPitchClass149,150
-  pitchClass pitchClass150,151
-class HasOctave HasOctave152,153
-  octave octave153,154
-instance HasNoteName HasNoteName Pitch155,156
-  noteName noteName156,157
-instance HasAccidental HasAccidental Pitch158,159
-  accidental accidental159,160
-instance HasPitchClass HasPitchClass Pitch161,162
-  pitchClass pitchClass162,163
-instance HasNoteName HasNoteName PitchClass165,166
-  noteName noteName166,167
-instance HasAccidental HasAccidental PitchClass168,169
-  accidental accidental169,170
-instance HasAccidental HasAccidental Accidental171,172
-  accidental accidental172,173
-instance HasOctave HasOctave Octave174,175
-  octave octave175,176
-instance HasOctave HasOctave Pitch177,178
-  octave octave178,179
-instance IsString IsString PitchClass183,184
-  fromString fromString184,185
-instance Arbitrary Arbitrary NoteName279,280
-  arbitrary arbitrary280,281
-instance Arbitrary Arbitrary PitchClass282,283
-  arbitrary arbitrary283,284
-instance Arbitrary Arbitrary Octave285,286
-  arbitrary arbitrary286,287
-instance Arbitrary Arbitrary Pitch289,290
-  arbitrary arbitrary290,291
-
-./old/src/Music/Time/TS.hs,1942
-module Music.Time.TS Music.Time.TS13,14
-import import18,19
-newtype Duration Duration23,24
-  { unDuration unDuration24,25
-instance Show Show Duration27,28
-  show show28,29
-instance Fractional Fractional Duration30,31
-    (D(Durationa)31,32
-    fromRational fromRational34,35
-class HasDuration HasDuration36,37
-  toDuration toDuration37,38
-  fromDuration fromDuration38,39
-instance HasDuration HasDuration Duration42,43
-  toDuration toDuration43,44
-  fromDuration fromDuration44,45
-instance HasDuration HasDuration Rational46,47
-  toDuration toDuration47,48
-  fromDuration fromDuration48,49
-dur dur51,52
-multiplyDurations multiplyDurations57,58
-(%(%/)70,71
-n n71,72
-(|(|/)79,80
-durations durations80,81
-(|(|*)90,91
-durations durations91,92
-durationToRational durationToRational99,100
-data TimeSignature TimeSignature103,104
-data TimeSignature = TimeSignatureTimeSignature103,104
-  { _upper _upper104,105
-  , _lower _lower105,106
-time time110,111
-instance Show Show TimeSignature113,114
-  show show114,115
-(/(//)119,120
-n n120,121
-toDur toDur126,127
-fromDur fromDur133,134
-timeSigToDur timeSigToDur142,143
-durToTimeSig durToTimeSig146,147
-fromDur' fromDur'160,161
-fromDur'' fromDur''174,175
-applyFunctionToTS applyFunctionToTS191,192
-applyFunctionToTS' applyFunctionToTS'201,202
-findBestDenominator findBestDenominator212,213
-isValid isValid227,228
-isPowOfTwo isPowOfTwo231,232
-tsLowerPowerOfTwo tsLowerPowerOfTwo235,236
-instance Arbitrary Arbitrary TimeSignature241,242
-  arbitrary arbitrary242,243
-instance Arbitrary Arbitrary Duration247,248
-  arbitrary arbitrary248,249
-prop_toDur_fromDur_identity prop_toDur_fromDur_identity256,257
-prop_fromDur_fromDur' prop_fromDur_fromDur'264,265
-prop_fromDur''_zero_duration prop_fromDur''_zero_duration269,270
-prop_valid_ts_power_of_two prop_valid_ts_power_of_two275,276
-main main278,279
-
-./old/src/Music/Time/Tree.hs,1724
-module Music.Time.Tree Music.Time.Tree5,6
-data ComponentLabelComponentLabel15,16
-  = Scalar Scalar16,17
-  | Gap Gap17,18
-  | Vector Vector18,19
-type Component Component21,22
-scalar scalar23,24
-gap gap26,27
-vector vector29,30
-printTree printTree32,33
-printTree' printTree'35,36
-createComponent createComponent39,40
-isValidComponent isValidComponent42,43
-changeRootVectorValue changeRootVectorValue48,49
-setRootVectorTo1 setRootVectorTo152,53
-shape shape123,124
-values values129,130
-reconstructComponent reconstructComponent138,139
-reconstructComponentHelper reconstructComponentHelper143,144
-extractComponents extractComponents160,161
-doubleScalars doubleScalars171,172
-depthOfTree depthOfTree177,178
-sumOfScalars sumOfScalars181,182
-sumAtRank sumAtRank187,188
-sumAtRankHelper sumAtRankHelper190,191
-partitionRational partitionRational231,232
-flattenTree flattenTree238,239
-filterOutGaps filterOutGaps241,242
-maxScalar maxScalar249,250
-replaceScalar replaceScalar255,256
-mapMaybe mapMaybe264,265
-filterComponents filterComponents272,273
-multiplyScalars multiplyScalars305,306
-findNodeByValue findNodeByValue329,330
-reverseScalars reverseScalars340,341
-countVectors countVectors348,349
-transformGaps transformGaps353,354
-countLeaves countLeaves372,373
-allScalars allScalars377,378
-mapToNewType mapToNewType385,386
-replaceSubtree replaceSubtree406,407
-breadthFirstTraversal breadthFirstTraversal430,431
-replaceScalar2 replaceScalar2448,449
-levels levels457,458
-exampleComponent1 exampleComponent1466,467
-shapeExample1 shapeExample1475,476
-valuesExample1 valuesExample1479,480
-reconstructedComponent1 reconstructedComponent1483,484
-
-./old/src/Parsers/RtmParser.hs,1370
-module Parsers.RtmParser Parsers.RtmParser5,6
-data ComponentLabelComponentLabel18,19
-  = Scalar Scalar19,20
-  | Gap Gap20,21
-  | Vector Vector21,22
-type Component Component24,25
-scalar scalar26,27
-gap gap29,30
-vector vector32,33
-printTree printTree35,36
-printTree' printTree'38,39
-componentToString componentToString50,51
-isValidComponent isValidComponent64,65
-componentParser componentParser79,80
-parseComponentString parseComponentString95,96
-main2 main298,99
-testComponentToString testComponentToString118,119
-testParseComponentString testParseComponentString127,128
-testIsValidComponent testIsValidComponent138,139
-instance Arbitrary Arbitrary ComponentLabel149,150
-  arbitrary arbitrary150,151
-arbitraryComponent arbitraryComponent153,154
-genComponent genComponent156,157
-vectorWithChildren vectorWithChildren163,164
-arbitraryLeaf arbitraryLeaf170,171
-positiveInt positiveInt173,174
-prop_isValidComponent prop_isValidComponent176,177
-testRoundTrip testRoundTrip182,183
-prop_roundTrip prop_roundTrip191,192
-prop_parseComponent prop_parseComponent200,201
-prop_structureValidity prop_structureValidity209,210
-isRight isRight218,219
-main3 main3231,232
-tests tests237,238
-main4 main4247,248
-buildComplexComponent buildComplexComponent513,514
-componentTree componentTree524,525
-main main532,533
-
-./src/Pitch/Accidental.hs,3073
+src/Pitch/Accidental.hs,3073
 module Pitch.AccidentalPitch.Accidental0,1
 data AccidentalAccidental27,28
   = DoubleFlatDoubleFlat28,29
@@ -439,159 +85,163 @@ newtype AccidentalStringAccidentalString382,383
 instance Arbitrary Arbitrary AccidentalString387,388
   arbitrary arbitrary388,389
 
-./src/Pitch/Pitch.hs,3288
+src/Pitch/Pitch.hs,3476
 module Pitch.Pitch Pitch.Pitch0,1
-data NoteName NoteName11,12
-data NoteName = C C11,12
-data NoteName = C | D D11,12
-data NoteName = C | D | E E11,12
-data NoteName = C | D | E | F F11,12
-data NoteName = C | D | E | F | G G11,12
-data NoteName = C | D | E | F | G | A A11,12
-data NoteName = C | D | E | F | G | A | BB11,12
-class NoteClass NoteClass14,15
-  sayNote sayNote15,16
-class IsNoteName IsNoteName17,18
-  toNoteName toNoteName18,19
-data SomeNote SomeNote20,21
-data SomeNote = forall forall20,21
-instance IsNoteName IsNoteName SomeNote22,23
-  toNoteName toNoteName23,24
-instance Show Show SomeNote26,27
-  show show27,28
-instance NoteClass NoteClass C29,30
-  sayNote sayNote30,31
-instance NoteClass NoteClass D32,33
-  sayNote sayNote33,34
-instance NoteClass NoteClass E35,36
-  sayNote sayNote36,37
-instance NoteClass NoteClass F38,39
-  sayNote sayNote39,40
-instance NoteClass NoteClass G41,42
-  sayNote sayNote42,43
-instance NoteClass NoteClass A44,45
-  sayNote sayNote45,46
-instance NoteClass NoteClass B47,48
-  sayNote sayNote48,49
-instance IsString IsString NoteName50,51
-  fromString fromString51,52
-data IntervalBasis IntervalBasis61,62
-data IntervalBasis = Chromatic Chromatic61,62
-data IntervalBasis = Chromatic | DiatonicDiatonic61,62
-data PitchClass PitchClass64,65
-  PitchClass PitchClass65,66
-    { _noteName _noteName66,67
-      _accidental _accidental67,68
-  PitchClass PitchClass65,66
-instance Show Show PitchClass71,72
-  show show72,73
-newtype Octave Octave74,75
-newtype Octave = Octave {getOctaves getOctaves74,75
-instance Show Show Octave77,78
-  show show78,79
-data Pitch Pitch80,81
-  Pitch Pitch81,82
-    { _noteName _noteName82,83
-      _accidental _accidental83,84
-      _octave _octave84,85
-  Pitch Pitch81,82
-instance Show Show Pitch88,89
-  show show89,90
-pcToRational pcToRational102,103
-(=(=~)114,115
-pc1 pc1115,116
-noteNameToRational' noteNameToRational'118,119
-noteNameToRational noteNameToRational122,123
-allPitchClasses allPitchClasses128,129
-allPCRationals allPCRationals132,133
-enharmonicPCEquivs enharmonicPCEquivs139,140
-type EnharmonicMapping EnharmonicMapping144,145
-enharmonicMapping enharmonicMapping147,148
-class HasNoteName HasNoteName150,151
-  noteName noteName151,152
-class HasAccidental HasAccidental153,154
-  accidental accidental154,155
-class HasPitchClass HasPitchClass156,157
-  pitchClass pitchClass157,158
-class HasOctave HasOctave159,160
-  octave octave160,161
-instance HasNoteName HasNoteName Pitch162,163
-  noteName noteName163,164
-instance HasAccidental HasAccidental Pitch165,166
-  accidental accidental166,167
-instance HasPitchClass HasPitchClass Pitch168,169
-  pitchClass pitchClass169,170
-instance HasNoteName HasNoteName PitchClass172,173
-  noteName noteName173,174
-instance HasAccidental HasAccidental PitchClass175,176
-  accidental accidental176,177
-instance Arbitrary Arbitrary NoteName264,265
-  arbitrary arbitrary265,266
-instance Arbitrary Arbitrary PitchClass267,268
-  arbitrary arbitrary268,269
-instance Arbitrary Arbitrary Octave270,271
-  arbitrary arbitrary271,272
-instance Arbitrary Arbitrary Pitch274,275
-  arbitrary arbitrary275,276
+data NoteName NoteName13,14
+data NoteName = C C13,14
+data NoteName = C | D D13,14
+data NoteName = C | D | E E13,14
+data NoteName = C | D | E | F F13,14
+data NoteName = C | D | E | F | G G13,14
+data NoteName = C | D | E | F | G | A A13,14
+data NoteName = C | D | E | F | G | A | BB13,14
+data IntervalBasis IntervalBasis17,18
+data IntervalBasis = Chromatic Chromatic17,18
+data IntervalBasis = Chromatic | DiatonicDiatonic17,18
+data PitchClass PitchClass21,22
+  PitchClass PitchClass23,24
+    { _noteName _noteName24,25
+      _accidental _accidental25,26
+  PitchClass PitchClass23,24
+data Pitch Pitch30,31
+  Pitch Pitch32,33
+    { _noteName _noteName33,34
+      _accidental _accidental34,35
+      _octave _octave35,36
+  Pitch Pitch32,33
+newtype Octave Octave40,41
+newtype Octave = Octave {getOctaves getOctaves40,41
+data SomeNote SomeNote43,44
+data SomeNote = forall forall43,44
+class NoteClass NoteClass49,50
+  sayNote sayNote50,51
+class IsNoteName IsNoteName52,53
+  toNoteName toNoteName53,54
+class HasNoteName HasNoteName55,56
+  noteName noteName56,57
+class HasAccidental HasAccidental58,59
+  accidental accidental59,60
+class HasPitchClass HasPitchClass61,62
+  pitchClass pitchClass62,63
+class HasOctave HasOctave64,65
+  octave octave65,66
+instance HasNoteName HasNoteName Pitch72,73
+  noteName noteName74,75
+instance HasAccidental HasAccidental Pitch77,78
+  accidental accidental79,80
+instance HasPitchClass HasPitchClass Pitch82,83
+  pitchClass pitchClass84,85
+instance HasNoteName HasNoteName PitchClass88,89
+  noteName noteName90,91
+instance HasAccidental HasAccidental PitchClass93,94
+  accidental accidental95,96
+instance IsNoteName IsNoteName SomeNote98,99
+  toNoteName toNoteName100,101
+instance Show Show SomeNote103,104
+  show show104,105
+instance NoteClass NoteClass C106,107
+  sayNote sayNote107,108
+instance NoteClass NoteClass D109,110
+  sayNote sayNote110,111
+instance NoteClass NoteClass E112,113
+  sayNote sayNote113,114
+instance NoteClass NoteClass F115,116
+  sayNote sayNote116,117
+instance NoteClass NoteClass G118,119
+  sayNote sayNote119,120
+instance NoteClass NoteClass A121,122
+  sayNote sayNote122,123
+instance NoteClass NoteClass B124,125
+  sayNote sayNote125,126
+instance IsString IsString NoteName127,128
+  fromString fromString128,129
+instance Show Show PitchClass138,139
+  show show139,140
+instance Show Show Octave141,142
+  show show142,143
+instance Show Show Pitch144,145
+  show show145,146
+pcToRational pcToRational158,159
+(=(=~)168,169
+pc1 pc1169,170
+noteNameToRational' noteNameToRational'171,172
+noteNameToRational noteNameToRational174,175
+allPitchClasses allPitchClasses179,180
+allPCRationals allPCRationals182,183
+enharmonicPCEquivs enharmonicPCEquivs185,186
+enharmonicPCEquivs' enharmonicPCEquivs'189,190
+type EnharmonicMapping EnharmonicMapping193,194
+enharmonicMapping enharmonicMapping195,196
+enharmonics enharmonics198,199
+allEnharmonics allEnharmonics203,204
+allEnharmonicsMapping allEnharmonicsMapping206,207
+instance Arbitrary Arbitrary NoteName276,277
+  arbitrary arbitrary277,278
+instance Arbitrary Arbitrary PitchClass279,280
+  arbitrary arbitrary280,281
+instance Arbitrary Arbitrary Octave282,283
+  arbitrary arbitrary283,284
+instance Arbitrary Arbitrary Pitch286,287
+  arbitrary arbitrary287,288
 
-./src/Rtm/Common.hs,902
-module Rtm.CommonRtm.Common12,13
-data RtmLabelRtmLabel39,40
-  = RtmScalar RtmScalar40,41
-  | RtmGap RtmGap41,42
-  | RtmVector RtmVector42,43
-  | RtmConsRtmCons43,44
-type Rtm Rtm47,48
-showRtm showRtm53,54
-scalar, s s61,62
-scalar,scalar61,62
-s s63,64
-gap, g g66,67
-gap,gap66,67
-g g68,69
-vector, v v71,72
-vector,vector71,72
-v v73,74
-rtm' rtm'78,79
-(|(|:)84,85
-num num85,86
-isValidScalar isValidScalar88,89
-isValidGap isValidGap93,94
-isValidVector isValidVector98,99
-isValidRtm isValidRtm106,107
-printRtm printRtm117,118
-rtmDepth rtmDepth121,122
-collapseRtmGaps collapseRtmGaps126,127
-noRtmGaps noRtmGaps143,144
-countRtmScalars countRtmScalars150,151
-extractIntsFromLabels extractIntsFromLabels156,157
-setRtmLabelInt setRtmLabelInt166,167
-reconstructLabelsFromInts reconstructLabelsFromInts173,174
-example example183,184
-main main186,187
+src/Rtm/Common.hs,904
+module Rtm.CommonRtm.Common10,11
+data RtmLabelRtmLabel38,39
+  = RtmScalar RtmScalar39,40
+  | RtmGap RtmGap40,41
+  | RtmVector RtmVector41,42
+  | RtmCons RtmCons42,43
+type Rtm Rtm48,49
+showRtm showRtm54,55
+scalar, s s62,63
+scalar,scalar62,63
+s s64,65
+gap, g g67,68
+gap,gap67,68
+g g69,70
+vector, v v72,73
+vector,vector72,73
+v v74,75
+rtm' rtm'79,80
+(|(|:)85,86
+num num86,87
+isValidScalar isValidScalar89,90
+isValidGap isValidGap94,95
+isValidVector isValidVector99,100
+isValidRtm isValidRtm107,108
+printRtm printRtm118,119
+rtmDepth rtmDepth122,123
+collapseRtmGaps collapseRtmGaps128,129
+noRtmGaps noRtmGaps145,146
+countRtmScalars countRtmScalars152,153
+extractIntsFromLabels extractIntsFromLabels160,161
+setRtmLabelInt setRtmLabelInt170,171
+reconstructLabelsFromInts reconstructLabelsFromInts177,178
+example example187,188
+main main190,191
 
-./src/Rtm/Parser.hs,276
+src/Rtm/Parser.hs,276
 module Rtm.ParserRtm.Parser0,1
-spaced spaced25,26
-signedNumber signedNumber28,29
-elemParser elemParser36,37
-divParser divParser39,40
-noteParser noteParser50,51
-restParser restParser57,58
-rtmParser rtmParser64,65
-spaces_ spaces_71,72
-parseRtm parseRtm74,75
+spaced spaced13,14
+signedNumber signedNumber16,17
+elemParser elemParser24,25
+divParser divParser27,28
+noteParser noteParser38,39
+restParser restParser45,46
+rtmParser rtmParser52,53
+spaces_ spaces_59,60
+parseRtm parseRtm62,63
 
-./src/Rtm/QuasiQuoter.hs,84
+src/Rtm/QuasiQuoter.hs,84
 module Rtm.QuasiQuoter Rtm.QuasiQuoter1,2
 rtm rtm12,13
 rtmToExp rtmToExp21,22
 
-./src/Rtm/Rtm.hs,50
+src/Rtm/Rtm.hs,50
 module Rtm.Rtm Rtm.Rtm3,4
 example example9,10
 
-./src/Rtm/Shape.hs,521
+src/Rtm/Shape.hs,521
 module Rtm.Shape Rtm.Shape2,3
 data ShapeTree ShapeTree9,10
 data ShapeTree a = ShapeLeaf ShapeLeaf9,10
@@ -610,7 +260,7 @@ originalLabels originalLabels59,60
 newInts newInts63,64
 reconstructedLabels reconstructedLabels67,68
 
-./src/Time/Dur.hs,740
+src/Time/Dur.hs,740
 module Time.DurTime.Dur0,1
 newtype Dur Dur16,17
   { unDur unDur17,18
@@ -641,7 +291,7 @@ durations durations146,147
 from_dur_1 from_dur_1162,163
 from_dur_2 from_dur_2165,166
 
-./src/Time/SeqDur.hs,413
+src/Time/SeqDur.hs,413
 module Time.SeqDur Time.SeqDur0,1
 type Durs Durs8,9
 showDurs showDurs10,11
@@ -658,29 +308,29 @@ deleteElemAt deleteElemAt44,45
 seqDurs seqDurs49,50
 seqDurs' seqDurs'52,53
 
-./src/Time/TimeSignature.hs,650
+src/Time/TimeSignature.hs,650
 module Time.TimeSignatureTime.TimeSignature7,8
-data TimeSignature TimeSignature26,27
-data TimeSignature = TimeSignatureTimeSignature26,27
-    upper upper28,29
-    lower lower30,31
-instance Show Show TimeSignature34,35
-  show show35,36
-(/(//)49,50
-n n50,51
-time time58,59
-instance Default Default TimeSignature64,65
-instance Default TimeSignature where def def64,65
-instance HasDur HasDur TimeSignature67,68
-  toDur toDur68,69
-  fromDur fromDur71,72
-timeSigToDur timeSigToDur83,84
-durToTimeSig durToTimeSig95,96
-durToTimeSig8 durToTimeSig8115,116
-powersOfTwo powersOfTwo122,123
-isPowerOfTwo isPowerOfTwo125,126
+data TimeSignature TimeSignature27,28
+data TimeSignature = TimeSignatureTimeSignature27,28
+    upper upper29,30
+    lower lower31,32
+instance Show Show TimeSignature35,36
+  show show36,37
+(/(//)50,51
+n n51,52
+time time59,60
+instance Default Default TimeSignature65,66
+instance Default TimeSignature where def def65,66
+instance HasDur HasDur TimeSignature68,69
+  toDur toDur69,70
+  fromDur fromDur72,73
+timeSigToDur timeSigToDur84,85
+durToTimeSig durToTimeSig96,97
+durToTimeSig8 durToTimeSig8116,117
+powersOfTwo powersOfTwo123,124
+isPowerOfTwo isPowerOfTwo126,127
 
-./src/Util/Fraction.hs,111
+src/Util/Fraction.hs,111
 module Util.FractionUtil.Fraction0,1
 splitFraction splitFraction8,9
 unsplitFraction unsplitFraction13,14

@@ -21,7 +21,7 @@ prop_roundTripAccidental acc =
 -- Consistency Test
 prop_consistencyOrder :: Bool
 prop_consistencyOrder =
-  allSemitones == map accidentalToSemitones (sort allAccidentals)
+  allSemitones == fmap accidentalToSemitones (sort allAccidentals)
 
 -- prop_consistencyOrder = allSemitones == map accidentalToSemitones (fromList allAccidentals)
 -- Addition Property
