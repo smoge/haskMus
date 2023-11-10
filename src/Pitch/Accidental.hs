@@ -5,12 +5,12 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE UnicodeSyntax #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant bracket" #-}
 
 module Pitch.Accidental
   ( Accidental (..),
@@ -26,18 +26,13 @@ module Pitch.Accidental
   )
 where
 
-import Data.Kind
 import Data.List (isPrefixOf)
 import qualified Data.Map.Strict as Map
-import Data.Proxy
 import Data.Ratio
 import Data.String
 import qualified Data.Text as T
-import GHC.TypeLits hiding (Natural)
 import Test.QuickCheck
-import Text.Printf
 
--- // SECTION   ACCIDENTAL
 data Accidental
   = DoubleFlat
   | ThreeQuartersFlat
@@ -70,8 +65,6 @@ newtype AccidentalSelection selection = AccidentalSelection
 class AccClass (notename :: Accidental) where
   sayAccidental :: String
 
--- unicodeAcc :: String
-
 instance Show SomeAccidental where
   show = show . toAccidental
 
@@ -102,11 +95,12 @@ instance AccClass ThreeQuartersFlat where
 instance AccClass DoubleSharp where
   sayAccidental = "ss"
 
-acidente1 :: Accidental
-acidente1 = "ff"
+-- acidente1 :: Accidental
+-- acidente1 = "ff"
 
 -- ex1 :: (String, String, String)
 -- ex1 = (sayAccidental @Flat, sayAccidental @QuarterSharp, sayAccidental  @DoubleSharp)
+
 type AccSelection = [String]
 
 -- >>> read @Accidental "f"
@@ -253,42 +247,7 @@ instance IsString Accidental where
     | "custom " `isPrefixOf` str = Custom (read (drop 7 str) :: Rational)
     | otherwise = error $ "Invalid Accidental string: " ++ str
 
-{-
->>> accStr1 :: Accidental
->>> accStr1 = "♭"
->>> accStr2 :: Accidental
->>> accStr2 = "♯"
->>> accStr3 :: Accidental
->>> accStr3 = "♮"
->>> accStr4 :: Accidental
->>> accStr4 = "𝄫"
->>> accStr5 :: Accidental
->>> accStr5 = "𝄪"
->>> accStr6 :: Accidental
->>> accStr6 = "𝄳"
->>> accStr7 :: Accidental
->>> accStr7 = "𝄲"
 
->>> accStr1 == Flat
-True
->>> accStr2 == Sharp
-True
->>> accStr3 == Natural
-True
->>> accStr4 == DoubleFlat
-True
->>> accStr5 == DoubleSharp
-True
->>> accStr6 == QuarterFlat
-True
->>> accStr7 == QuarterSharp
-True
--}
--- "𝄱" :: Accidental
--- "𝄰" :: Accidental
--- "𝄭" :: Accidental
--- "𝄬" :: Accidental
--- //ANCHOR - modifyAccidental
 
 -- | Modify the accidental by applying a function to its semitone value. Returns the modified accidental.
 -- >>> modifyAccidental Sharp (*2) == DoubleSharp

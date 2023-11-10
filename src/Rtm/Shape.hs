@@ -70,7 +70,8 @@ reconstructedLabels = reconstructLabelsFromInts newInts originalLabels
 
 -- [RtmCons,RtmScalar 10,RtmGap 20,RtmVector 30,RtmScalar 40,RtmScalar 50]
 
-{-
+
+{- ---------------------------------------------------------------------------------------------
 (shape, values) =  extractShape example
 
 shape
@@ -94,4 +95,4 @@ showRtm example
 showRtm reconstructedRtm
 -- "(1 -3 (2 (1 -1 1)) 1)"
 
- -}
+--------------------------------------------------------------------------------------------- -}
