@@ -31,16 +31,20 @@ module Rtm.Common
   )
 where
 
-import           Data.Data
-import           Data.Maybe (mapMaybe)
-import           Data.Tree
+import Data.Data
+import Data.Maybe (mapMaybe)
+import Data.Tree
 
 -- | Data type representing different types of Rtm labels.
 data RtmLabel
-  = RtmScalar Int -- ^ A scalar label with an integer value.
-  | RtmGap Int -- ^ A gap label with an integer value.
-  | RtmVector Int -- ^ A vector label with an integer value.
-  | RtmCons -- ^ A cons label.
+  = -- | A scalar label with an integer value.
+    RtmScalar Int
+  | -- | A gap label with an integer value.
+    RtmGap Int
+  | -- | A vector label with an integer value.
+    RtmVector Int
+  | -- | A cons label.
+    RtmCons
   deriving (Eq, Show, Data)
 
 -- | The Rtm data type represents an RTM (Rose Tree Model).
@@ -125,7 +129,7 @@ rtmDepth (Node _ []) = 1
 rtmDepth (Node _ subs) = 1 + maximum (fmap rtmDepth subs)
 
 -- | Given an Rtm, collapses all gaps in the tree by summing consecutive gaps
--- and returning a new Rtm with the gaps collapsed. 
+-- and returning a new Rtm with the gaps collapsed.
 collapseRtmGaps :: Rtm -> Rtm
 collapseRtmGaps (Node z children) = Node z (processChildren children)
   where
@@ -153,7 +157,6 @@ noRtmGaps = fmap noGap
 countRtmScalars :: Rtm -> Int
 countRtmScalars (Node (RtmScalar _) children) = 1 + sum (fmap countRtmScalars children)
 countRtmScalars (Node _ children) = sum (fmap countRtmScalars children)
-
 
 -- | Given a list of RtmLabels, returns a list of Ints extracted from the labels
 --   that carry an Int. RtmScalar, RtmGap and RtmVector carry an Int, while

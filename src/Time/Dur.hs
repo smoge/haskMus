@@ -145,7 +145,7 @@ durations |/ divisorValue =
 -- NOW [Dur (2 % 1),Dur (1 % 1),Dur (2 % 3)]
 (|*) :: (HasDur a, Real b) => [a] -> b -> [a]
 durations |* multiplierValue =
-   fmap
+  fmap
     ( \durVal ->
         let durRational = toRational (toDur durVal)
             multiplier = toRational multiplierValue

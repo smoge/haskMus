@@ -8,7 +8,6 @@ module Pitch.Accidental
     addAccidental,
     allAccidentals,
     allSemitones,
-    AccidentalString (..),
     sharpenQ,
     sharpenS,
     flattenQ,
@@ -18,12 +17,11 @@ module Pitch.Accidental
   )
 where
 
-import           Data.List       (isPrefixOf)
-import           Data.Ord        (comparing)
-import           Data.Ratio
-import           Data.String
-import qualified Data.Text       as T
-import           Test.QuickCheck
+import Data.List (isPrefixOf)
+import Data.Ord (comparing)
+import Data.Ratio
+import Data.String
+import qualified Data.Text as T
 
 data Accidental
   = DoubleFlat
@@ -159,7 +157,7 @@ instance Num Accidental where
       LT -> Flat
   fromInteger n = toAccidental (n % 1)
   negate (Custom r) = (Custom (-r))
-  negate a          = toAccidental $ negate (accidentalToSemitones a)
+  negate a = toAccidental $ negate (accidentalToSemitones a)
 
 instance Enum Accidental where
   toEnum n = case n of
@@ -202,16 +200,16 @@ instance Bounded Accidental where
 
 -- | Converts an accidental to its corresponding semitone offset as a rational number.
 accidentalToSemitones :: Accidental -> Rational
-accidentalToSemitones DoubleFlat         = -2
-accidentalToSemitones ThreeQuartersFlat  = (-3) % 2
-accidentalToSemitones Flat               = -1
-accidentalToSemitones QuarterFlat        = (-1) % 2
-accidentalToSemitones Natural            = 0
-accidentalToSemitones QuarterSharp       = 1 % 2
-accidentalToSemitones Sharp              = 1
+accidentalToSemitones DoubleFlat = -2
+accidentalToSemitones ThreeQuartersFlat = (-3) % 2
+accidentalToSemitones Flat = -1
+accidentalToSemitones QuarterFlat = (-1) % 2
+accidentalToSemitones Natural = 0
+accidentalToSemitones QuarterSharp = 1 % 2
+accidentalToSemitones Sharp = 1
 accidentalToSemitones ThreeQuartersSharp = 3 % 2
-accidentalToSemitones DoubleSharp        = 2
-accidentalToSemitones (Custom r)         = r
+accidentalToSemitones DoubleSharp = 2
+accidentalToSemitones (Custom r) = r
 
 -- | Converts a semitone offset to the corresponding accidental.
 semitonesToAccidental :: Rational -> Accidental
@@ -231,38 +229,38 @@ semitonesToAccidental r
 -- >>>  map accToLily allAccidentals == map  T.pack ["ff","tqf","f","qf","","qs","s","tqs","ss"]
 -- True
 accToLily :: Accidental -> T.Text
-accToLily DoubleFlat         = T.pack "ff"
-accToLily ThreeQuartersFlat  = T.pack "tqf"
-accToLily Flat               = T.pack "f"
-accToLily QuarterFlat        = T.pack "qf"
-accToLily Natural            = T.pack ""
-accToLily QuarterSharp       = T.pack "qs"
-accToLily Sharp              = T.pack "s"
+accToLily DoubleFlat = T.pack "ff"
+accToLily ThreeQuartersFlat = T.pack "tqf"
+accToLily Flat = T.pack "f"
+accToLily QuarterFlat = T.pack "qf"
+accToLily Natural = T.pack ""
+accToLily QuarterSharp = T.pack "qs"
+accToLily Sharp = T.pack "s"
 accToLily ThreeQuartersSharp = T.pack "tqs"
-accToLily DoubleSharp        = T.pack "ss"
-accToLily (Custom r)         = T.pack $ show r
+accToLily DoubleSharp = T.pack "ss"
+accToLily (Custom r) = T.pack $ show r
 
 instance Read Accidental where
   readsPrec _ value =
     case value of
-      "ff"           -> [(DoubleFlat, "")]
-      "tqf"          -> [(ThreeQuartersFlat, "")]
-      "f"            -> [(Flat, "")]
-      "qf"           -> [(QuarterFlat, "")]
-      ""             -> [(Natural, "")]
-      "n"            -> [(Natural, "")]
-      "qs"           -> [(QuarterSharp, "")]
-      "s"            -> [(Sharp, "")]
-      "tqs"          -> [(ThreeQuartersSharp, "")]
-      "ss"           -> [(DoubleSharp, "")]
-      "sharp"        -> [(Sharp, "")]
-      "flat"         -> [(Flat, "")]
-      "natural"      -> [(Natural, "")]
+      "ff" -> [(DoubleFlat, "")]
+      "tqf" -> [(ThreeQuartersFlat, "")]
+      "f" -> [(Flat, "")]
+      "qf" -> [(QuarterFlat, "")]
+      "" -> [(Natural, "")]
+      "n" -> [(Natural, "")]
+      "qs" -> [(QuarterSharp, "")]
+      "s" -> [(Sharp, "")]
+      "tqs" -> [(ThreeQuartersSharp, "")]
+      "ss" -> [(DoubleSharp, "")]
+      "sharp" -> [(Sharp, "")]
+      "flat" -> [(Flat, "")]
+      "natural" -> [(Natural, "")]
       "quartersharp" -> [(QuarterSharp, "")]
-      "semisharp"    -> [(QuarterSharp, "")]
-      "quarterflat"  -> [(QuarterFlat, "")]
-      "semiflat"     -> [(QuarterFlat, "")]
-      _              -> error $ "Invalid Accidental string: " <> value
+      "semisharp" -> [(QuarterSharp, "")]
+      "quarterflat" -> [(QuarterFlat, "")]
+      "semiflat" -> [(QuarterFlat, "")]
+      _ -> error $ "Invalid Accidental string: " <> value
 
 -- >>> map (fromString @Accidental) ["ff","tqf","f","qf","","qs","s","tqs","ss"]
 -- [DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp]
@@ -368,49 +366,11 @@ shuffled1 = [QuarterFlat, DoubleSharp, ThreeQuartersSharp, Sharp, Natural, Quart
 shuffled2 :: [Accidental]
 shuffled2 = [Natural, ThreeQuartersSharp, Flat, Sharp, DoubleSharp, DoubleFlat, QuarterFlat, ThreeQuartersFlat, QuarterSharp]
 
------------------------------------------------------------------------------ -}
+pc1 = PitchClass C Flat
 
--- QuickCheck MOVE ------------------------------------------------------------
+pc1 ^. noteName
+pc1 ^. accidental
 
-instance Arbitrary Accidental where
-  arbitrary =
-    frequency
-      [ (10, elements allAccidentals), -- Picking from the predefined list
-        (1, Custom <$> arbitrary) -- Picking a custom accidental
-      ]
+succ pc1
 
--- Newtype wrapper for specific accidental strings
-newtype AccidentalString
-  = AccidentalString String
-  deriving (Show)
-
--- Arbitrary instance for AccidentalString (QuickCheck)
-instance Arbitrary AccidentalString where
-  arbitrary =
-    AccidentalString
-      <$> elements
-        [ "ff",
-          "tqf",
-          "f",
-          "qf",
-          "",
-          "n",
-          "qs",
-          "s",
-          "tqs",
-          "ss",
-          "sharp",
-          "flat",
-          "natural",
-          "quartersharp",
-          "semisharp",
-          "quarterflat",
-          "semiflat",
-          "♭",
-          "♯",
-          "♮",
-          "𝄫",
-          "𝄪",
-          "𝄳",
-          "𝄲"
-        ]
+--------------------------------------------------------------------------------------- -}
