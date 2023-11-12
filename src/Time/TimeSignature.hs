@@ -1,6 +1,6 @@
-{-# LANGUAGE InstanceSigs        #-}
+{-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell     #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 -- | This module defines a representation of musical time signatures and
 -- provides functionality to convert between 'TimeSignature' and 'Dur'
@@ -16,11 +16,10 @@ module Time.TimeSignature
   )
 where
 
-import           Data.Bits    ((.&.))
-import           Data.Default
-import           Data.Ratio
-import           Time.Dur
-
+import Data.Bits ((.&.))
+import Data.Default
+import Data.Ratio
+import Time.Dur
 
 -- | A data type representing a time signature in music, which specifies the
 -- number of beats in a measure ('upper') and the note value that constitutes

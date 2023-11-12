@@ -1,15 +1,20 @@
 {-# OPTIONS_GHC -Wno-unused-imports #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveLift #-}
+{-# LANGUAGE StandaloneDeriving #-}
 module Pitch.Pitch where
 
-import           Control.Applicative (liftA2)
-import           Control.Lens        hiding (elements)
-import           Data.Fixed          (mod')
-import           Data.Maybe          (fromMaybe)
-import           Data.Ratio          ((%))
-import           Data.String
-import           Pitch.Accidental
-import           Test.QuickCheck     (Arbitrary (arbitrary), Gen, elements)
-import           Util.Fraction       (splitFraction)
+import Language.Haskell.TH.Syntax 
+import Control.Applicative 
+import Control.Lens hiding (elements)
+import Data.Fixed (mod')
+import Data.Maybe (fromMaybe)
+import Data.Ratio ((%))
+import Data.String
+import Pitch.Accidental
+import Test.QuickCheck (Arbitrary (arbitrary), Gen, elements)
+import Util.Fraction (splitFraction)
+
 
 -- Data types and their instances
 data NoteName = C | D | E | F | G | A | B
@@ -23,24 +28,49 @@ data IntervalBasis = Chromatic | Diatonic
 data PitchClass where
   -- | Construct a pitch class with a given note name and accidental.
   PitchClass ::
-    { _noteName :: NoteName, -- ^ The name of the note.
-      _accidental :: Accidental -- ^ The accidental of the note.
+    { -- | The name of the note.
+      _noteName :: NoteName,
+      -- | The accidental of the note.
+      _accidental :: Accidental
     } ->
-    PitchClass
+    PitchClass 
+    deriving (Eq)
 
 -- | A pitch represents a specific note with its accidental and octave.
 data Pitch where
   -- | Construct a pitch with a given note name, accidental, and octave.
   Pitch ::
-    { _noteName :: NoteName, -- ^ The name of the note.
-      _accidental :: Accidental, -- ^ The accidental of the note.
-      _octave :: Octave -- ^ The octave of the note.
+    { -- | The name of the note.
+      _noteName :: NoteName,
+      -- | The accidental of the note.
+      _accidental :: Accidental,
+      -- | The octave of the note.
+      _octave :: Octave
     } ->
-    Pitch
+    Pitch deriving (Eq)
+
 
 -- | A newtype wrapper for representing octaves.
 newtype Octave = Octave {getOctaves :: Int}
   deriving (Eq, Ord)
+
+
+
+
+-- instance Lift Pitch where
+--   lift (Pitch nn acc oct) = [| Pitch $(lift nn) $(lift acc) $(lift oct) |]
+
+instance Lift NoteName
+instance Lift Accidental
+instance Lift Octave
+instance Lift PitchClass
+instance Lift Pitch
+
+mkPitch :: NoteName -> Accidental -> Octave -> Pitch
+mkPitch nn acc o = Pitch nn acc o
+
+
+
 
 data SomeNote = forall notename. (IsNoteName notename) => SomeNote notename
 
@@ -72,36 +102,36 @@ class HasOctave a where
 
 -- | Typeclass instance for retrieving the note name of a Pitch.
 instance HasNoteName Pitch where
-  -- | Extracts the note name from a Pitch and applies a function to it.
+  -- \| Extracts the note name from a Pitch and applies a function to it.
   noteName f (Pitch nn acc o) = (\nn' -> Pitch nn' acc o) <$> f nn
 
 -- | Typeclass that represents a type with an accidental.
 instance HasAccidental Pitch where
-  -- | Modifies the accidental of a Pitch using the provided function.
+  -- \| Modifies the accidental of a Pitch using the provided function.
   accidental f (Pitch nn acc o) = (\acc' -> Pitch nn acc' o) <$> f acc
 
 -- | Typeclass that represents a type with a pitch class.
 instance HasPitchClass Pitch where
-  -- | Lens that focuses on the pitch class of a Pitch.
+  -- \| Lens that focuses on the pitch class of a Pitch.
   pitchClass :: Lens' Pitch PitchClass
   pitchClass f (Pitch nn acc o) = (\(PitchClass nn' acc') -> Pitch nn' acc' o) <$> f (PitchClass nn acc)
 
 -- | Typeclass that represents a type with a note name.
 instance HasNoteName PitchClass where
-  -- | Modifies the note name of a PitchClass using the provided function.
+  -- \| Modifies the note name of a PitchClass using the provided function.
   noteName f (PitchClass nn acc) = (`PitchClass` acc) <$> f nn
 
 -- | Typeclass that represents a type with an accidental.
 instance HasAccidental PitchClass where
-  -- | Modifies the accidental of a PitchClass using the provided function.
+  -- \| Modifies the accidental of a PitchClass using the provided function.
   accidental f (PitchClass nn acc) = PitchClass nn <$> f acc
 
 -- | Typeclass that represents a type that can be converted to a NoteName.
 instance IsNoteName SomeNote where
-  -- | Converts a SomeNote to a NoteName.
+  -- \| Converts a SomeNote to a NoteName.
   toNoteName :: SomeNote -> NoteName
   toNoteName (SomeNote nn) = toNoteName nn
-  
+
 instance Show SomeNote where
   show = show . toNoteName
 
@@ -271,19 +301,21 @@ C Natural Octave 5
 
 ------------------------------
 -------- ===TESTS=== ---------
-------------------------------
+-- ------------------------------
 
--- !FIXME: MOVE TO TESTS
+-- -- !FIXME: MOVE TO TESTS
 
-instance Arbitrary NoteName where
-  arbitrary = elements [C, D, E, F, G, A, B]
+-- instance Arbitrary NoteName where
+--   arbitrary = elements [C, D, E, F, G, A, B]
 
-instance Arbitrary PitchClass where
-  arbitrary = PitchClass <$> arbitrary <*> arbitrary
+-- instance Arbitrary PitchClass where
+--   arbitrary = PitchClass <$> arbitrary <*> arbitrary
 
-instance Arbitrary Octave where
-  arbitrary :: Gen Octave
-  arbitrary = Octave <$> arbitrary
+-- instance Arbitrary Octave where
+--   arbitrary :: Gen Octave
+--   arbitrary = Octave <$> arbitrary
 
-instance Arbitrary Pitch where
-  arbitrary = Pitch <$> arbitrary <*> arbitrary <*> arbitrary
+-- instance Arbitrary Pitch where
+--   arbitrary = Pitch <$> arbitrary <*> arbitrary <*> arbitrary
+
+-- -- PitchClass C Flat
