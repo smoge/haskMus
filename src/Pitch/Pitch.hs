@@ -256,33 +256,41 @@ p ^. accidental
 p ^. octave
 -- Octave 4
 
->>> p & accidental .~ Sharp  -- Changes the accidental of 'p' to Sharp
-C Sharp Octave 4
+p & accidental .~ Sharp  -- Changes the accidental of 'p' to Sharp
+-- C Sharp Octave 4
 
->>> p & accidental %~ (\x -> addAccidental x (1%2))
-C QuarterSharp Octave 4
+p & accidental %~ (\x -> addAccidental x (1%2))
+-- C QuarterSharp Octave 4
 
->>> pitches = map (\x -> Pitch x Natural (Octave 4)) [C .. B]
->>> pitches & each . accidental .~ Flat  -- Changes the accidental of every Pitch in the list to Flat
-[C Flat Octave 4,D Flat Octave 4,E Flat Octave 4,F Flat Octave 4,G Flat Octave 4,A Flat Octave 4,B Flat Octave 4]
+pitches = map (\x -> Pitch x Natural (Octave 4)) [C .. B]
+pitches & each . accidental .~ Flat  -- Changes the accidental of every Pitch in the list to Flat
 
->>> has (accidental . only Natural) p  -- Checks if 'p' has an accidental of Natural
-True
+-- [C Flat Octave 4,D Flat Octave 4,E Flat Octave 4,F Flat Octave 4,G Flat Octave 4,A Flat Octave 4,B Flat Octave 4]
 
->>> p & accidental . filtered (== Natural) .~ Flat  -- If the accidental is Natural, change it to Flat.
-C Flat Octave 4
+has (accidental . only Natural) p  -- Checks if 'p' has an accidental of Natural
 
->>> p & octave .~ Octave 5  -- Change the octave of 'p' to 5
-C Natural Octave 5
+-- True
 
->>> p & octave %~ (\(Octave o) -> Octave (o + 1))  -- Increment the octave by 1
-C Natural Octave 5
+p & accidental . filtered (== Natural) .~ Flat  -- If the accidental is Natural, change it to Flat.
+
+-- C Flat Octave 4
+
+p & octave .~ Octave 5  -- Change the octave of 'p' to 5
+
+-- C Natural Octave 5
+
+p & octave %~ (\(Octave o) -> Octave (o + 1))  -- Increment the octave by 1
+
+-- C Natural Octave 5
 
 -------------------------------------------------------------------------------- -}
 
-------------------------------
--------- ===TESTS=== ---------
--- ------------------------------
+
+
+
+
+
+
 
 -- -- !FIXME: MOVE TO TESTS
 

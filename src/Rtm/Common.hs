@@ -1,13 +1,3 @@
--- |
--- Module      : Rtm.Common
--- Description : Common functions and types for RTMs (Rhythm Trees)
---
--- This module provides common functions and types for RTMs (Rhythmic Trees).
--- An RTM is a tree-like data structure that represents a musical pattern.
---
--- ``A rhythm tree is a list representing a rhythmic structure. This list is
--- organized hierarchically in sub lists , just as time is organized in measures,
--- time signatures, pulses and rhythmic elements in the traditional notation.''
 module Rtm.Common
   ( RtmLabel (..),
     Rtm,
@@ -28,6 +18,7 @@ module Rtm.Common
     collapseRtmGaps,
     extractIntsFromLabels,
     reconstructLabelsFromInts,
+    setRtmLabelInt
   )
 where
 
@@ -35,27 +26,28 @@ import Data.Data
 import Data.Maybe (mapMaybe)
 import Data.Tree
 
--- | Data type representing different types of Rtm labels.
+{- ----------------------------------- tests -----------------------------------------------------
+showRtm $ rtm' [s 1, g 3, 2 |: [s 1, g 1, s 1], s 1]
+
+-- "(1 -3 (2 (1 -1 1)) 1)"
+
+rtm' [s 1, g 3, 2 |: [s 1, g 1, s 1], s 1]
+
+isValidRtm $ rtm' [s 1, g 3, 2 |: [s 1, g 1, s 1], s 1]
+
+------------------------------------------------------------------------------------------------} 
+
+
 data RtmLabel
-  = -- | A scalar label with an integer value.
-    RtmScalar Int
-  | -- | A gap label with an integer value.
-    RtmGap Int
-  | -- | A vector label with an integer value.
-    RtmVector Int
-  | -- | A cons label.
-    RtmCons
+  = RtmScalar Int
+  | RtmGap Int
+  | RtmVector Int
+  | RtmCons
   deriving (Eq, Show, Data)
 
--- | The Rtm data type represents an RTM (Rose Tree Model).
--- Scalar and Gap are Leafs (with a value but no children).
--- RtmVectors are Branches (with a value and children).
 type Rtm = Tree RtmLabel
 
--- | Convert an RTM to a string representation.
---
--- >>> showRtm $ rtm' [s 1, g 3, 2 |: [s 1, g 1, s 1], s 1]
--- "(1 -3 (2 (1 -1 1)) 1)"
+
 showRtm :: Rtm -> String
 showRtm (Node (RtmScalar num) []) = show num
 showRtm (Node (RtmGap num) []) = "-" <> show num
@@ -80,7 +72,6 @@ v = vector
 
 -- | RtmCons constructor.
 --
--- >>>  rtm' [s 1, g 3, 2 |: [s 1, g 1, s 1], s 1]
 rtm' :: [Rtm] -> Rtm
 rtm' = Node RtmCons
 
@@ -106,9 +97,6 @@ isValidVector (Node (RtmVector num) xss) = num >= 1 && num <= 20 && length xss >
 isValidVector _ = False
 
 -- | Check if an Rtm is valid.
---
--- >>> isValidRtm $ rtm' [s 1, g 3, 2 |: [s 1, g 1, s 1], s 1]
--- True
 isValidRtm :: Rtm -> Bool
 isValidRtm = isValidRtm' True
   where
@@ -193,3 +181,23 @@ example = rtm' [s 1, g 3, 2 |: [s 1, g 1, s 1], s 1]
 
 main :: IO ()
 main = printRtm example
+
+{-
+ghci> main
+RtmCons
+|
++- RtmScalar 1
+|
++- RtmGap 3
+|
++- RtmVector 2
+|  |
+|  +- RtmScalar 1
+|  |
+|  +- RtmGap 1
+|  |
+|  `- RtmScalar 1
+|
+`- RtmScalar 1
+
+-}
