@@ -1,24 +1,24 @@
-{-# OPTIONS_GHC -Wno-unused-imports #-}
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DeriveLift #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
+
 module Pitch.Pitch where
 
-import Language.Haskell.TH.Syntax 
-import Control.Applicative 
+import Control.Applicative
 import Control.Lens hiding (elements)
 import Data.Fixed (mod')
 import Data.Maybe (fromMaybe)
 import Data.Ratio ((%))
 import Data.String
+import Language.Haskell.TH.Syntax
 import Pitch.Accidental
 import Test.QuickCheck (Arbitrary (arbitrary), Gen, elements)
 import Util.Fraction (splitFraction)
 
-
 -- Data types and their instances
 data NoteName = C | D | E | F | G | A | B
-  deriving (Eq, Ord, Show, Enum, Bounded)
+  deriving (Eq, Ord, Show, Enum, Bounded, Lift)
 
 -- | The basis for representing intervals.
 data IntervalBasis = Chromatic | Diatonic
@@ -33,8 +33,8 @@ data PitchClass where
       -- | The accidental of the note.
       _accidental :: Accidental
     } ->
-    PitchClass 
-    deriving (Eq)
+    PitchClass
+  deriving (Eq, Lift)
 
 -- | A pitch represents a specific note with its accidental and octave.
 data Pitch where
@@ -47,30 +47,28 @@ data Pitch where
       -- | The octave of the note.
       _octave :: Octave
     } ->
-    Pitch deriving (Eq)
-
+    Pitch
+  deriving (Eq, Lift)
 
 -- | A newtype wrapper for representing octaves.
 newtype Octave = Octave {getOctaves :: Int}
-  deriving (Eq, Ord)
-
-
-
+  deriving (Eq, Ord, Lift)
 
 -- instance Lift Pitch where
 --   lift (Pitch nn acc oct) = [| Pitch $(lift nn) $(lift acc) $(lift oct) |]
 
-instance Lift NoteName
+-- instance Lift NoteName
+
 instance Lift Accidental
-instance Lift Octave
-instance Lift PitchClass
-instance Lift Pitch
+
+-- instance Lift Octave
+
+-- instance Lift PitchClass
+
+-- instance Lift Pitch
 
 mkPitch :: NoteName -> Accidental -> Octave -> Pitch
 mkPitch nn acc o = Pitch nn acc o
-
-
-
 
 data SomeNote = forall notename. (IsNoteName notename) => SomeNote notename
 

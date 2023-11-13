@@ -1,3 +1,7 @@
+{-# LANGUAGE DeriveLift #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell #-}
+
 module Pitch.Accidental
   ( Accidental (..),
     accidentalToSemitones,
@@ -35,6 +39,9 @@ data Accidental
   | DoubleSharp
   | Custom Rational
   deriving (Eq, Ord, Show)
+
+
+-- instance Lift Accidental
 
 -- |
 -- >>> map sharpenQ allAccidentals
@@ -241,7 +248,7 @@ accToLily DoubleSharp = T.pack "ss"
 accToLily (Custom r) = T.pack $ show r
 
 instance Read Accidental where
-  readsPrec _ value =
+readsPrec _ value =
     case value of
       "ff" -> [(DoubleFlat, "")]
       "tqf" -> [(ThreeQuartersFlat, "")]

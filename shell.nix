@@ -8,9 +8,9 @@ let
       , data-default-class, data-default-instances-containers
       , data-default-instances-dlist, data-default-instances-old-locale
       , doctest, fgl, hspec, HUnit, lens, lib, linear, parsec
-      , pretty-simple, QuickCheck, rando, random-fu, random-shuffle
-      , template-haskell, test-framework, test-framework-hunit
-      , test-framework-quickcheck2, text, vector-space
+      , pretty-simple, QuickCheck, random-shuffle, template-haskell
+      , test-framework, test-framework-hunit, test-framework-quickcheck2
+      , text, vector-space
       }:
       mkDerivation {
         pname = "haskMus";
@@ -22,8 +22,8 @@ let
           base containers data-default data-default-class
           data-default-instances-containers data-default-instances-dlist
           data-default-instances-old-locale doctest fgl hspec HUnit lens
-          linear parsec pretty-simple QuickCheck rando random-fu
-          random-shuffle template-haskell text vector-space
+          linear parsec pretty-simple QuickCheck random-shuffle
+          template-haskell text vector-space
         ];
         executableHaskellDepends = [ base ];
         testHaskellDepends = [

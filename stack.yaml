@@ -1,5 +1,5 @@
 #resolver: nightly-2023-11-10
-resolver: lts-21.19
+resolver: lts-21.20
 
 packages:
   - "."

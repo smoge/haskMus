@@ -1,25 +1,21 @@
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE QuasiQuotes #-}
-
+{-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Pitch.Parser where
 
-import Language.Haskell.TH.Quote (QuasiQuoter(..))
-
-
+import Control.Lens
 import Language.Haskell.TH
+import Language.Haskell.TH.Quote (QuasiQuoter (..))
 import Language.Haskell.TH.Syntax
 import Pitch.Accidental
 import Pitch.Pitch
 import Text.Parsec
 import Text.Parsec.String
-import Control.Lens
-
 
 -- Consume spaces before and after the parser.
 spaced :: Parser a -> Parser a
 spaced p = spaces *> p <* spaces
-
 
 pitchClassParser :: Parser PitchClass
 pitchClassParser =
@@ -53,8 +49,6 @@ pitchClassParser =
     <|> try (string "a" >> pure (PitchClass A Natural))
     <|> try (string "b" >> pure (PitchClass B Natural))
 
-
-
 octaveParser :: Parser Octave
 octaveParser = do
   _ <- spaces
@@ -64,11 +58,8 @@ octaveParser = do
   let octs = length upOctaves - length downOctaves
   pure (Octave (octs + 4))
 
-
-
 mkPitch' :: PitchClass -> Octave -> Pitch
 mkPitch' pc o = Pitch (pc ^. noteName) (pc ^. accidental) o
-
 
 -- Parser for pitches
 pitchParser :: Parser Pitch
@@ -80,54 +71,15 @@ pitchParser = do
   _ <- spaces
   pure $ mkPitch' pc oct
 
-
-
-
 -- Define the pitch QuasiQuoter
 pitch :: QuasiQuoter
-pitch = QuasiQuoter
-  { quoteExp = \str -> case parse pitchParser "" str of
-      Left err -> error (show err)
-      Right pit -> [| pit |]
-  , quotePat = undefined
-  , quoteType = undefined
-  , quoteDec = undefined
-  }
+pitch =
+  QuasiQuoter
+    { quoteExp = \str -> case parse pitchParser "" str of
+        Left err -> error (show err)
+        Right pit -> [|pit|],
+      quotePat = undefined,
+      quoteType = undefined,
+      quoteDec = undefined
+    }
 
-
--- pitch :: QuasiQuoter
--- pitch = QuasiQuoter
---   { quoteExp = \str -> case parse pitchParser "" str of
---       Left err -> error (show err)
---       Right pit -> [| pit |]
---   , quotePat = undefined
---   , quoteType = undefined
---   , quoteDec = undefined
---   }
-
-
-
--- pitch :: QuasiQuoter
--- pitch =
---   QuasiQuoter
---     { quoteExp = \s -> case parse pitchParser "" s of
---         Left err -> [| Left ("Parsing error: " <> show err) |]
---         Right pit -> [| Right $(lift pit) |],
---       quotePat = undefined,
---       quoteType = undefined,
---       quoteDec = undefined
---     }
-
-
-
--- main :: IO ()
--- main = do
---   let pitch1 = [pitch|c|]
---   -- Middle C
---   let pitch2 = [pitch|c'|]
---   -- C one octave above
---   let pitch3 = [pitch|c,|]
---   -- C one octave below
---   print pitch1
---   print pitch2
---   print pitch3
