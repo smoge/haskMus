@@ -26,6 +26,7 @@ import Data.Ord (comparing)
 import Data.Ratio
 import Data.String
 import qualified Data.Text as T
+import Language.Haskell.TH.Syntax (Lift)
 
 data Accidental
   = DoubleFlat
@@ -38,7 +39,7 @@ data Accidental
   | ThreeQuartersSharp
   | DoubleSharp
   | Custom Rational
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Lift)
 
 -- instance Lift Accidental
 

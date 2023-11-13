@@ -16,11 +16,9 @@ import Pitch.Accidental
 import Test.QuickCheck (Arbitrary (arbitrary), Gen, elements)
 import Util.Fraction (splitFraction)
 
--- Data types and their instances
 data NoteName = C | D | E | F | G | A | B
   deriving (Eq, Ord, Show, Enum, Bounded, Lift)
 
--- | The basis for representing intervals.
 data IntervalBasis = Chromatic | Diatonic
   deriving (Eq, Ord, Show, Enum)
 
@@ -32,29 +30,22 @@ data PitchClass where
     PitchClass
   deriving (Eq, Lift)
 
--- | A pitch represents a specific note with its accidental and octave.
 data Pitch where
   Pitch ::
-    { -- | The name of the note.
+    { 
       _noteName :: NoteName,
-      -- | The accidental of the note.
       _accidental :: Accidental,
-      -- | The octave of the note.
       _octave :: Octave
     } ->
     Pitch
   deriving (Eq, Lift)
 
--- | A newtype wrapper for representing octaves.
 newtype Octave = Octave {getOctaves :: Int}
   deriving (Eq, Ord, Lift)
 
 
-instance Lift Accidental
-
 mkPitch :: NoteName -> Accidental -> Octave -> Pitch
 mkPitch nn acc o = Pitch nn acc o
-
 
 data SomeNote = forall notename. (IsNoteName notename) => SomeNote notename
 
@@ -199,7 +190,7 @@ allPitchClasses :: [PitchClass]
 allPitchClasses = liftA2 PitchClass [C, D, E, F, G, A, B] allAccidentals
 
 allPCRationals :: [Rational]
-allPCRationals = map pcToRational allPitchClasses
+allPCRationals = fmap pcToRational allPitchClasses
 
 enharmonicPCEquivs :: Rational -> [(Rational, PitchClass)]
 enharmonicPCEquivs val =
@@ -212,7 +203,7 @@ enharmonicPCEquivs' pc =
 type EnharmonicMapping = [(Rational, [PitchClass])]
 
 enharmonicMapping :: [Rational] -> EnharmonicMapping
-enharmonicMapping = map (\r -> (r, snd <$> enharmonicPCEquivs r))
+enharmonicMapping = fmap (\r -> (r, snd <$> enharmonicPCEquivs r))
 
 enharmonics :: PitchClass -> [PitchClass]
 enharmonics pc = fromMaybe [pc] (lookup (pcToRational pc) out)
@@ -220,7 +211,7 @@ enharmonics pc = fromMaybe [pc] (lookup (pcToRational pc) out)
     out = enharmonicMapping [pcToRational pc]
 
 allEnharmonics :: [[PitchClass]]
-allEnharmonics = map enharmonics allPitchClasses
+allEnharmonics = fmap enharmonics allPitchClasses
 
 allEnharmonicsMapping :: [(PitchClass, [PitchClass])]
 allEnharmonicsMapping = zip allPitchClasses allEnharmonics
