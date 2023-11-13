@@ -40,7 +40,6 @@ data Accidental
   | Custom Rational
   deriving (Eq, Ord, Show)
 
-
 -- instance Lift Accidental
 
 -- |
@@ -247,27 +246,28 @@ accToLily ThreeQuartersSharp = T.pack "tqs"
 accToLily DoubleSharp = T.pack "ss"
 accToLily (Custom r) = T.pack $ show r
 
-instance Read Accidental where
+instance Read Accidental
+
 readsPrec _ value =
-    case value of
-      "ff" -> [(DoubleFlat, "")]
-      "tqf" -> [(ThreeQuartersFlat, "")]
-      "f" -> [(Flat, "")]
-      "qf" -> [(QuarterFlat, "")]
-      "" -> [(Natural, "")]
-      "n" -> [(Natural, "")]
-      "qs" -> [(QuarterSharp, "")]
-      "s" -> [(Sharp, "")]
-      "tqs" -> [(ThreeQuartersSharp, "")]
-      "ss" -> [(DoubleSharp, "")]
-      "sharp" -> [(Sharp, "")]
-      "flat" -> [(Flat, "")]
-      "natural" -> [(Natural, "")]
-      "quartersharp" -> [(QuarterSharp, "")]
-      "semisharp" -> [(QuarterSharp, "")]
-      "quarterflat" -> [(QuarterFlat, "")]
-      "semiflat" -> [(QuarterFlat, "")]
-      _ -> error $ "Invalid Accidental string: " <> value
+  case value of
+    "ff" -> [(DoubleFlat, "")]
+    "tqf" -> [(ThreeQuartersFlat, "")]
+    "f" -> [(Flat, "")]
+    "qf" -> [(QuarterFlat, "")]
+    "" -> [(Natural, "")]
+    "n" -> [(Natural, "")]
+    "qs" -> [(QuarterSharp, "")]
+    "s" -> [(Sharp, "")]
+    "tqs" -> [(ThreeQuartersSharp, "")]
+    "ss" -> [(DoubleSharp, "")]
+    "sharp" -> [(Sharp, "")]
+    "flat" -> [(Flat, "")]
+    "natural" -> [(Natural, "")]
+    "quartersharp" -> [(QuarterSharp, "")]
+    "semisharp" -> [(QuarterSharp, "")]
+    "quarterflat" -> [(QuarterFlat, "")]
+    "semiflat" -> [(QuarterFlat, "")]
+    _ -> error $ "Invalid Accidental string: " <> value
 
 -- >>> map (fromString @Accidental) ["ff","tqf","f","qf","","qs","s","tqs","ss"]
 -- [DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp]

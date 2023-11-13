@@ -88,6 +88,7 @@ library
     QuasiQuotes
     RankNTypes
     ScopedTypeVariables
+    StandaloneDeriving
     TemplateHaskell
     TupleSections
     TypeApplications

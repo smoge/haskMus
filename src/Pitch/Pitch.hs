@@ -24,13 +24,9 @@ data NoteName = C | D | E | F | G | A | B
 data IntervalBasis = Chromatic | Diatonic
   deriving (Eq, Ord, Show, Enum)
 
--- | A pitch class represents a specific note with its accidental.
 data PitchClass where
-  -- | Construct a pitch class with a given note name and accidental.
   PitchClass ::
-    { -- | The name of the note.
-      _noteName :: NoteName,
-      -- | The accidental of the note.
+    { _noteName :: NoteName,
       _accidental :: Accidental
     } ->
     PitchClass
@@ -38,7 +34,6 @@ data PitchClass where
 
 -- | A pitch represents a specific note with its accidental and octave.
 data Pitch where
-  -- | Construct a pitch with a given note name, accidental, and octave.
   Pitch ::
     { -- | The name of the note.
       _noteName :: NoteName,
@@ -54,21 +49,12 @@ data Pitch where
 newtype Octave = Octave {getOctaves :: Int}
   deriving (Eq, Ord, Lift)
 
--- instance Lift Pitch where
---   lift (Pitch nn acc oct) = [| Pitch $(lift nn) $(lift acc) $(lift oct) |]
-
--- instance Lift NoteName
 
 instance Lift Accidental
 
--- instance Lift Octave
-
--- instance Lift PitchClass
-
--- instance Lift Pitch
-
 mkPitch :: NoteName -> Accidental -> Octave -> Pitch
 mkPitch nn acc o = Pitch nn acc o
+
 
 data SomeNote = forall notename. (IsNoteName notename) => SomeNote notename
 
@@ -102,6 +88,9 @@ class HasOctave a where
 instance HasNoteName Pitch where
   -- \| Extracts the note name from a Pitch and applies a function to it.
   noteName f (Pitch nn acc o) = (\nn' -> Pitch nn' acc o) <$> f nn
+
+instance HasOctave Pitch where
+  octave f (Pitch nn acc o) = (\o' -> Pitch nn acc o') <$> f o
 
 -- | Typeclass that represents a type with an accidental.
 instance HasAccidental Pitch where
@@ -241,21 +230,21 @@ allEnharmonicsMapping = zip allPitchClasses allEnharmonics
 c = PitchClass C Natural
 c ^. noteName
 c ^. accidental
-C
-Natural
+
 
 -- Changes the accidental of 'c' to Sharp
->>> c & accidental .~ Sharp
-C Sharp
+c & accidental .~ Sharp
+--C Sharp
 
->>> c = PitchClass C Natural
->>> c & accidental %~ (\x -> addAccidental x (1%2))
-C QuarterSharp
+c & accidental %~ (\x -> addAccidental x (1%2))
+-- C QuarterSharp
 
 pitchClasses = map (\x -> PitchClass x Natural) [C .. B]
+
 -- Changes the accidental of every PitchClass in the list to Flat
+
 pitchClasses & each . accidental .~ Flat
-[C Flat,D Flat,E Flat,F Flat,G Flat,A Flat,B Flat]
+--[C Flat,D Flat,E Flat,F Flat,G Flat,A Flat,B Flat]
 
 -- Checks if 'c' has an accidental of Natural
 has (accidental . only Natural) c
@@ -265,13 +254,16 @@ has (accidental . only Natural) c
 c & accidental . filtered (== Natural) .~ Flat
 C Flat
 
->>> p = Pitch C Natural (Octave 4)
->>> p ^. noteName
-C
->>> p ^. accidental
-Natural
->>> p ^. octave
-Octave 4
+p = Pitch C Natural (Octave 4)
+
+p ^. noteName
+-- C
+
+p ^. accidental
+-- Natural
+
+p ^. octave
+-- Octave 4
 
 >>> p & accidental .~ Sharp  -- Changes the accidental of 'p' to Sharp
 C Sharp Octave 4
