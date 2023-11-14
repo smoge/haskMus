@@ -1,13 +1,27 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveLift #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE DeriveDataTypeable #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 
+-- | The Pitch module defines core types for representing musical pitch:
+--
+-- * 'NoteName' - The letter names of the musical scale (C, D, E etc.)
+-- * 'Accidental' - Alterations to the pitch like sharps/flats
+-- * 'PitchClass' - Combination of a 'NoteName' and 'Accidental'
+-- * 'Octave' - The octave number
+-- * 'Pitch' - Combination of 'PitchClass' and 'Octave'
+--
+-- This module also provides:
+--
+-- * Lenses for accessing the components of pitch-related types
+-- * Typeclass instances for common pitch operations
+-- * Utility functions for converting between pitch representations
 module Pitch.Pitch where
 
 import Control.Applicative
 import Control.Lens hiding (elements)
+import Data.Data
 import Data.Fixed (mod')
 import Data.Maybe (fromMaybe)
 import Data.Ratio ((%))
@@ -16,7 +30,6 @@ import Language.Haskell.TH.Syntax
 import Pitch.Accidental
 import Test.QuickCheck (Arbitrary (arbitrary), Gen, elements)
 import Util.Fraction (splitFraction)
-import Data.Data
 
 data NoteName = C | D | E | F | G | A | B
   deriving (Eq, Ord, Show, Enum, Bounded, Lift, Data)
@@ -34,8 +47,7 @@ data PitchClass where
 
 data Pitch where
   Pitch ::
-    { 
-      _noteName :: NoteName,
+    { _noteName :: NoteName,
       _accidental :: Accidental,
       _octave :: Octave
     } ->
@@ -199,7 +211,7 @@ rationalToFloat :: Rational -> Float
 rationalToFloat = fromRational
 
 pitchToFloat :: Pitch -> Float
-pitchToFloat = rationalToFloat. pitchToRational
+pitchToFloat = rationalToFloat . pitchToRational
 
 allPitchClasses :: [PitchClass]
 allPitchClasses = liftA2 PitchClass [C, D, E, F, G, A, B] allAccidentals
@@ -237,7 +249,6 @@ c = PitchClass C Natural
 c ^. noteName
 c ^. accidental
 
-
 c4 = Pitch C Natural (Octave 4)
 
 pitchToRational c4
@@ -245,7 +256,6 @@ pitchToRational c4
 splitFraction $ pitchToRational $  Pitch G QuarterSharp (Octave 5)
 
 fromRational $ pitchToRational $  Pitch E QuarterSharp (Octave 3)
-
 
 -- Changes the accidental of 'c' to Sharp
 c & accidental .~ Sharp
@@ -308,13 +318,6 @@ p & octave %~ (\(Octave o) -> Octave (o + 1))  -- Increment the octave by 1
 -- C Natural Octave 5
 
 -------------------------------------------------------------------------------- -}
-
-
-
-
-
-
-
 
 -- -- !FIXME: MOVE TO TESTS
 

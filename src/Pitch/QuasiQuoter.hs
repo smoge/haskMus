@@ -22,8 +22,6 @@ parsePitchesToExp s = case parsePitches s of
   Left err -> fail $ "Parse error: " <> show err
   Right pitches -> dataToExpQ (const Nothing) pitches
 
-
-
 {- -----------------------------------------------------------------------------
 
 p = [pitch|cs' gf,|]

@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 module Rtm.Common
   ( RtmLabel (..),
     Rtm,
@@ -18,7 +19,7 @@ module Rtm.Common
     collapseRtmGaps,
     extractIntsFromLabels,
     reconstructLabelsFromInts,
-    setRtmLabelInt
+    setRtmLabelInt,
   )
 where
 
@@ -35,8 +36,7 @@ rtm' [s 1, g 3, 2 |: [s 1, g 1, s 1], s 1]
 
 isValidRtm $ rtm' [s 1, g 3, 2 |: [s 1, g 1, s 1], s 1]
 
-------------------------------------------------------------------------------------------------} 
-
+------------------------------------------------------------------------------------------------}
 
 data RtmLabel
   = RtmScalar Int
@@ -46,7 +46,6 @@ data RtmLabel
   deriving (Eq, Show, Data)
 
 type Rtm = Tree RtmLabel
-
 
 showRtm :: Rtm -> String
 showRtm (Node (RtmScalar num) []) = show num
@@ -71,7 +70,6 @@ vector x cs = if x == 0 then Node (RtmGap 0) [] else Node (RtmVector (abs x)) cs
 v = vector
 
 -- | RtmCons constructor.
---
 rtm' :: [Rtm] -> Rtm
 rtm' = Node RtmCons
 
@@ -185,19 +183,19 @@ main = printRtm example
 {-
 ghci> main
 RtmCons
-|
+\|
 +- RtmScalar 1
-|
+\|
 +- RtmGap 3
-|
+\|
 +- RtmVector 2
-|  |
-|  +- RtmScalar 1
-|  |
-|  +- RtmGap 1
-|  |
-|  `- RtmScalar 1
-|
+\|  |
+\|  +- RtmScalar 1
+\|  |
+\|  +- RtmGap 1
+\|  |
+\|  `- RtmScalar 1
+\|
 `- RtmScalar 1
 
 -}

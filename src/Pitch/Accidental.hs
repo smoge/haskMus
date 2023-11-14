@@ -1,7 +1,7 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveLift #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE DeriveDataTypeable #-}
 
 module Pitch.Accidental
   ( Accidental (..),
@@ -22,10 +22,10 @@ module Pitch.Accidental
   )
 where
 
+import Data.Data
 import Data.List (isPrefixOf)
 import Data.Ord (comparing)
 import Data.Ratio
-import Data.Data
 import Data.String
 import qualified Data.Text as T
 import Language.Haskell.TH.Syntax (Lift)

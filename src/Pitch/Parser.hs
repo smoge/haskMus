@@ -63,9 +63,6 @@ octaveParser = do
   let octs = length upOctaves - length downOctaves
   pure (Octave (octs + 4))
 
--- mkPitch' :: PitchClass -> Octave -> Pitch
--- mkPitch' pc o = Pitch (pc ^. noteName) (pc ^. accidental) o
-
 -- Parser for pitches
 pitchParser :: Parser Pitch
 pitchParser = do
@@ -84,4 +81,3 @@ pitchesParser = sepEndBy pitchParser spaces
 
 parsePitches :: String -> Either ParseError [Pitch]
 parsePitches = parse pitchesParser ""
-
