@@ -32,6 +32,9 @@ kolmogorovComplexityRational r = length (primeFactors (numerator r)) + length (p
 isPowerOfTwo :: Int -> Bool
 isPowerOfTwo n = n > 0 && (n .&. (n - 1)) == 0
 
+isPowerOfTwo' :: Integer -> Bool
+isPowerOfTwo' x = x /= 0 && (x .&. (x - 1)) == 0
+
 isPrime :: Integer -> Bool
 isPrime n = n `elem` takeWhile (<= n) primes
 

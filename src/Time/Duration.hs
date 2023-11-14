@@ -69,7 +69,7 @@ dotsFromMultiplier r
   | otherwise = binarySearch 0 9
   where
     -- Cache for dotMultiplier, converting each integer to Dots
-    cache = map (dotMultiplier . Dots) [0 .. 9]
+    cache = fmap (dotMultiplier . Dots) [0 .. 9]
 
     binarySearch :: Integer -> Integer -> Maybe Dots
     binarySearch low high

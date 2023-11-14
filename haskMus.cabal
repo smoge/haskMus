@@ -23,7 +23,7 @@ tested-with:   GHC ==9.4.7 || ==9.6.3 || ==9.8.1
 library
   hs-source-dirs:     src
   exposed-modules:
-    Pitch.Accidental
+        Pitch.Accidental
     Pitch.Parser
     Pitch.Pitch
     Pitch.QuasiQuoter
@@ -33,6 +33,7 @@ library
     Rtm.Shape
     Time.Dur
     Time.Duration
+    Time.SimpleDuration
     Time.TimeSignature
     Util.Fraction
     Util.MathDuration

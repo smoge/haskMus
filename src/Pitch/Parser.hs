@@ -65,7 +65,7 @@ octaveParser = do
 
 -- Parser for pitches
 pitchParser :: Parser Pitch
-pitchParser = do
+pitchParser = spaced $ do
   _ <- spaces
   pc <- pitchClassParser
   _ <- spaces
@@ -77,7 +77,7 @@ parsePitch :: String -> Either ParseError Pitch
 parsePitch = parse pitchParser ""
 
 pitchesParser :: Parser [Pitch]
-pitchesParser = sepEndBy pitchParser spaces
+pitchesParser = spaced $ sepEndBy pitchParser spaces
 
 parsePitches :: String -> Either ParseError [Pitch]
 parsePitches = parse pitchesParser ""
