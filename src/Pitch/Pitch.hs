@@ -195,6 +195,11 @@ noteNameToRational name = case Prelude.lookup name noteNameToRational' of
 pitchToRational :: Pitch -> Rational
 pitchToRational (Pitch nm ac oct) = pcToRational (PitchClass nm ac) + fromIntegral (unOctave oct + 1) * 12
 
+rationalToFloat :: Rational -> Float
+rationalToFloat = fromRational
+
+pitchToFloat :: Pitch -> Float
+pitchToFloat = rationalToFloat. pitchToRational
 
 allPitchClasses :: [PitchClass]
 allPitchClasses = liftA2 PitchClass [C, D, E, F, G, A, B] allAccidentals
