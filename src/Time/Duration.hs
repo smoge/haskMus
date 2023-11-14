@@ -17,28 +17,36 @@ newtype Division = Division {unDivision :: Integer} deriving (Eq, Show, Ord, Dat
 -- | Represents the number of dots in a musical notation, affecting the duration.
 newtype Dots = Dots {unDots :: Integer} deriving (Eq, Show, Enum, Ord, Data, Lift)
 
-newtype Multiplier = Multiplier {unMultiplier :: Rational} deriving (Eq, Show, Ord, Data, Lift)
+-- | Represents a multiplier value.
+newtype Multiplier = Multiplier
+  { -- | The underlying rational value of the multiplier.
+    unMultiplier :: Rational
+  }
+  deriving (Eq, Show, Ord, Data, Lift)
 
+-- | Represents a duration with division, dots, and multiplier.
 data Duration = Duration
-  { _division :: Division,
+  { -- | The division value of the duration.
+    _division :: Division,
+    -- | The dots value of the duration.
     _dots :: Dots,
+    -- | The multiplier value of the duration.
     _multiplier :: Rational
   }
-  deriving (Eq, Show)
+  deriving (Eq, Show, Data, Lift)
 
 makeLenses ''Duration
-
 
 -- | Creates a 'Dots' instance ensuring the value is non-negative.
 makeDots :: Integer -> Maybe Dots
 makeDots n
-  | n >= 0    = Just $ Dots n
+  | n >= 0 = Just $ Dots n
   | otherwise = Nothing
-
 
 -- | Convert a 'Division' to a 'Rational'
 divisionToRational :: Division -> Rational
-divisionToRational = (1 %) . unDivision
+divisionToRational (Division 0) = 0 % 1
+divisionToRational (Division d) = 1 % d
 
 -- | Convert a 'Duration' to a 'Rational'
 durationToRational :: Duration -> Rational
@@ -49,19 +57,6 @@ durationToRational Duration {_division = d, _dots = dots_, _multiplier = m} =
 dotMultiplier :: Dots -> Rational
 dotMultiplier (Dots d) = 1 + (2 ^ d - 1) % (2 ^ d)
 
--- dotsFromMultiplier :: Rational -> Dots
--- dotsFromMultiplier r = binarySearch 0 9
---   where
---     binarySearch :: Integer -> Integer -> Dots
---     binarySearch low high
---       | low > high = error "Invalid multiplier or too many dots"
---       | midMultiplier == r = Dots mid
---       | midMultiplier < r = binarySearch (mid + 1) high
---       | otherwise = binarySearch low (mid - 1)
---       where
---         mid = (low + high) `div` 2
---         midMultiplier = dotMultiplier (Dots mid)
-
 -- | Given a rational number, returns the corresponding dots value.
 --   If the rational number is negative, returns Nothing.
 --   Uses binary search to find the dots value.
@@ -70,11 +65,11 @@ dotMultiplier (Dots d) = 1 + (2 ^ d - 1) % (2 ^ d)
 --   The cache is used to speed up the search.
 dotsFromMultiplier :: Rational -> Maybe Dots
 dotsFromMultiplier r
-  | r < 0 = Nothing  -- check for negative rationals
+  | r < 0 = Nothing -- check for negative rationals
   | otherwise = binarySearch 0 9
   where
     -- Cache for dotMultiplier, converting each integer to Dots
-    cache = map (dotMultiplier . Dots) [0..9]
+    cache = map (dotMultiplier . Dots) [0 .. 9]
 
     binarySearch :: Integer -> Integer -> Maybe Dots
     binarySearch low high
@@ -86,6 +81,18 @@ dotsFromMultiplier r
         mid = (low + high) `div` 2
         midMultiplier = cache !! fromIntegral mid
 
+dotsFromMultiplier' :: Rational -> Dots
+dotsFromMultiplier' r = binarySearch 0 9
+  where
+    binarySearch :: Integer -> Integer -> Dots
+    binarySearch low high
+      | low > high = error "Invalid multiplier or too many dots"
+      | midMultiplier == r = Dots mid
+      | midMultiplier < r = binarySearch (mid + 1) high
+      | otherwise = binarySearch low (mid - 1)
+      where
+        mid = (low + high) `div` 2
+        midMultiplier = dotMultiplier (Dots mid)
 
 -- | Convert a 'Duration' to a 'Rational'
 durationToRat :: Duration -> Rational
@@ -99,13 +106,15 @@ areMultiplierEqual dur1 dur2 = view multiplier dur1 == view multiplier dur2
 
 -- | Custom 'Ord' instance for 'Duration'
 instance Ord Duration where
-  -- | Compare two durations based on their 'Rational' representation
+  -- \| Compare two durations based on their 'Rational' representation
   compare :: Duration -> Duration -> Ordering
   compare = comparing durationToRational
 
 -- | Add a specified number of dots to a 'Duration'
 addDotsToDuration :: Duration -> Integer -> Duration
-addDotsToDuration dur m = dur & dots %~ (\(Dots n) -> Dots (n + m))
+addDotsToDuration dur m = case makeDots (unDots (view dots dur) + m) of
+  Just newDots -> dur & dots .~ newDots
+  Nothing -> dur
 
 -- | Operator for adding dots to a 'Duration'
 (+.) :: Duration -> Integer -> Duration
