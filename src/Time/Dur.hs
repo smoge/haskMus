@@ -11,9 +11,9 @@ module Time.Dur
   )
 where
 
+import Data.Data (Data)
 import Data.Default
-import Data.Ratio ( (%), numerator )
-import Data.Data ( Data )
+import Data.Ratio (numerator, (%))
 
 -- | The 'Dur' type represents musical durations or any other kind of durations
 -- as a rational number.
@@ -24,7 +24,6 @@ newtype Dur = Dur
 
 instance Show Dur where
   show (Dur x) = "Dur (" <> show x <> ")"
-
 
 -- instance Show Dur where
 --   showsPrec d (Dur x) = showParen (d > 10) $ showString "Dur " . showsPrec 11 x
