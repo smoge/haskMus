@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveLift #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Pitch.Pitch where
@@ -15,9 +16,10 @@ import Language.Haskell.TH.Syntax
 import Pitch.Accidental
 import Test.QuickCheck (Arbitrary (arbitrary), Gen, elements)
 import Util.Fraction (splitFraction)
+import Data.Data
 
 data NoteName = C | D | E | F | G | A | B
-  deriving (Eq, Ord, Show, Enum, Bounded, Lift)
+  deriving (Eq, Ord, Show, Enum, Bounded, Lift, Data)
 
 data IntervalBasis = Chromatic | Diatonic
   deriving (Eq, Ord, Show, Enum)
@@ -28,7 +30,7 @@ data PitchClass where
       _accidental :: Accidental
     } ->
     PitchClass
-  deriving (Eq, Lift)
+  deriving (Eq, Lift, Data)
 
 data Pitch where
   Pitch ::
@@ -38,11 +40,12 @@ data Pitch where
       _octave :: Octave
     } ->
     Pitch
-  deriving (Eq, Lift)
+  deriving (Eq, Lift, Data)
 
-newtype Octave = Octave {getOctaves :: Int}
-  deriving (Eq, Ord, Lift)
+newtype Octave = Octave {unOctave :: Int}
+  deriving (Eq, Ord, Lift, Data)
 
+-- deriving instance Data Pitch
 
 mkPitch :: NoteName -> Accidental -> Octave -> Pitch
 mkPitch nn acc o = Pitch nn acc o

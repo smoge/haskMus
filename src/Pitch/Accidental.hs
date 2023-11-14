@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveLift #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 
 module Pitch.Accidental
   ( Accidental (..),
@@ -24,6 +25,7 @@ where
 import Data.List (isPrefixOf)
 import Data.Ord (comparing)
 import Data.Ratio
+import Data.Data
 import Data.String
 import qualified Data.Text as T
 import Language.Haskell.TH.Syntax (Lift)
@@ -39,7 +41,7 @@ data Accidental
   | ThreeQuartersSharp
   | DoubleSharp
   | Custom Rational
-  deriving (Eq, Ord, Show, Lift)
+  deriving (Eq, Ord, Show, Lift, Data)
 
 -- instance Lift Accidental
 

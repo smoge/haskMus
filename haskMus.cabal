@@ -26,6 +26,7 @@ library
     Pitch.Accidental
     Pitch.Parser
     Pitch.Pitch
+    Pitch.QuasiQuoter
     Rtm.Common
     Rtm.Parser
     Rtm.QuasiQuoter

@@ -6,7 +6,7 @@ module Pitch.Parser where
 
 import Control.Lens
 import Language.Haskell.TH
-import Language.Haskell.TH.Quote (QuasiQuoter (..))
+import Language.Haskell.TH.Quote
 import Language.Haskell.TH.Syntax
 import Pitch.Accidental
 import Pitch.Pitch
@@ -71,15 +71,12 @@ pitchParser = do
   _ <- spaces
   pure $ mkPitch' pc oct
 
--- Define the pitch QuasiQuoter
-pitch :: QuasiQuoter
-pitch =
-  QuasiQuoter
-    { quoteExp = \str -> case parse pitchParser "" str of
-        Left err -> error (show err)
-        Right pit -> [|pit|],
-      quotePat = undefined,
-      quoteType = undefined,
-      quoteDec = undefined
-    }
+parsePitch :: String -> Either ParseError Pitch
+parsePitch = parse pitchParser ""
+
+pitchesParser :: Parser [Pitch]
+pitchesParser = sepEndBy pitchParser spaces
+
+parsePitches :: String -> Either ParseError [Pitch]
+parsePitches = parse pitchesParser ""
 
