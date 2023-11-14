@@ -1,4 +1,4 @@
-module Pitch.QuasiQuoter (parsePitches) where
+module Pitch.QuasiQuoter (pitch) where
 
 import Language.Haskell.TH (Exp, Quote)
 import Language.Haskell.TH.Quote (QuasiQuoter (..))
@@ -16,6 +16,7 @@ pitch =
     }
 
 -- Convert a string to a [Pitch] Exp
+
 parsePitchesToExp :: (MonadFail m, Quote m) => String -> m Exp
 parsePitchesToExp s = case parsePitches s of
   Left err -> fail $ "Parse error: " <> show err

@@ -1,200 +1,564 @@
 
-src/Pitch/Accidental.hs,2823
-module Pitch.AccidentalPitch.Accidental0,1
-data AccidentalAccidental25,26
-  = DoubleFlatDoubleFlat26,27
-  | ThreeQuartersFlatThreeQuartersFlat27,28
-  | FlatFlat28,29
-  | QuarterFlatQuarterFlat29,30
-  | NaturalNatural30,31
-  | QuarterSharpQuarterSharp31,32
-  | SharpSharp32,33
-  | ThreeQuartersSharpThreeQuartersSharp33,34
-  | DoubleSharpDoubleSharp34,35
-  | Custom Custom35,36
-sharpenQ sharpenQ47,48
-sharpenS sharpenS50,51
-flattenQ flattenQ53,54
-flattenS flattenS56,57
-accidentalCompare accidentalCompare59,60
-class IsAccidental IsAccidental71,72
-  toAccidental toAccidental72,73
-data SomeAccidentalSomeAccidental74,75
-  = forall forall75,76
-instance IsAccidental IsAccidental SomeAccidental79,80
-  toAccidental toAccidental80,81
-instance IsAccidental IsAccidental Accidental83,84
-  toAccidental toAccidental84,85
-instance IsAccidental IsAccidental Rational87,88
-  toAccidental toAccidental88,89
-class AccClass AccClass91,92
-  sayAccidental sayAccidental92,93
-instance Show Show SomeAccidental94,95
-  show show95,96
-instance AccClass AccClass DoubleFlat97,98
-  sayAccidental sayAccidental98,99
-instance AccClass AccClass Flat100,101
+./Setup.hs,15
+main main2,3
+
+./app/Main.hs,37
+module Main Main0,1
+main main3,4
+
+./test/AccidentalProperties.hs,389
+module AccidentalProperties AccidentalProperties4,5
+prop_accidentalToSemitones prop_accidentalToSemitones11,12
+prop_roundTripAccidental prop_roundTripAccidental16,17
+prop_consistencyOrder prop_consistencyOrder21,22
+prop_addition prop_addition27,28
+prop_multiplication prop_multiplication36,37
+prop_addAccidentalInverse prop_addAccidentalInverse45,46
+runTests runTests72,73
+
+./test/PitchProperties.hs,452
+module PitchProperties PitchProperties7,8
+prop_setAccidental prop_setAccidental20,21
+prop_setAccidentalPitch prop_setAccidentalPitch24,25
+prop_identityAccidentalIsUnchanged prop_identityAccidentalIsUnchanged57,58
+runTests runTests71,72
+instance Arbitrary Arbitrary Accidental78,79
+  arbitrary arbitrary79,80
+newtype AccidentalStringAccidentalString86,87
+instance Arbitrary Arbitrary AccidentalString91,92
+  arbitrary arbitrary92,93
+
+./test/PitchSpec.hs,66
+module PitchSpec PitchSpec2,3
+spec spec10,11
+main main74,75
+
+./test/Test.hs,73
+module Main Main0,1
+reportResults reportResults9,10
+main main16,17
+
+./old/RtmProperties.hs,104
+module RtmProperties RtmProperties3,4
+prop_toFromRtmArray prop_toFromRtmArray10,11
+main main20,21
+
+./old/TSSpec.hs,63
+module TSSpecTSSpec0,1
+specTS specTS11,12
+main main61,62
+
+./old/src/Music/Pitch/Accidental.hs,2570
+module Music.Pitch.AccidentalMusic.Pitch.Accidental14,15
+data AccidentalAccidental39,40
+  = DoubleFlatDoubleFlat40,41
+  | ThreeQuartersFlatThreeQuartersFlat41,42
+  | FlatFlat42,43
+  | QuarterFlatQuarterFlat43,44
+  | NaturalNatural44,45
+  | QuarterSharpQuarterSharp45,46
+  | SharpSharp46,47
+  | ThreeQuartersSharpThreeQuartersSharp47,48
+  | DoubleSharpDoubleSharp48,49
+  | Custom Custom49,50
+class IsAccidental IsAccidental52,53
+  toAccidental toAccidental53,54
+data SomeAccidental SomeAccidental55,56
+  forall forall56,57
+instance IsAccidental IsAccidental SomeAccidental59,60
+  toAccidental toAccidental60,61
+newtype AccidentalSelection AccidentalSelection63,64
+  { getAccidentalSelection getAccidentalSelection64,65
+class AccClass AccClass67,68
+  sayAccidental sayAccidental68,69
+instance Show Show SomeAccidental71,72
+  show show72,73
+instance AccClass AccClass DoubleFlat74,75
+  sayAccidental sayAccidental75,76
+instance AccClass AccClass Flat77,78
+  sayAccidental sayAccidental78,79
+instance AccClass AccClass Natural80,81
+  sayAccidental sayAccidental81,82
+instance AccClass AccClass QuarterFlat83,84
+  sayAccidental sayAccidental84,85
+instance AccClass AccClass QuarterSharp86,87
+  sayAccidental sayAccidental87,88
+instance AccClass AccClass Sharp89,90
+  sayAccidental sayAccidental90,91
+instance AccClass AccClass ThreeQuartersSharp92,93
+  sayAccidental sayAccidental93,94
+instance AccClass AccClass ThreeQuartersFlat95,96
+  sayAccidental sayAccidental96,97
+instance AccClass AccClass DoubleSharp98,99
+  sayAccidental sayAccidental99,100
+acidente1 acidente1101,102
+type AccSelection AccSelection106,107
+instance Enum Enum Accidental131,132
+  toEnum toEnum132,133
+  fromEnum fromEnum144,145
+instance Bounded Bounded Accidental158,159
+  minBound minBound159,160
+  maxBound maxBound160,161
+accidentalToSemitones accidentalToSemitones177,178
+semitonesToAccidental semitonesToAccidental190,191
+accToLily accToLily207,208
+instance IsString IsString Accidental220,221
+  fromString fromString221,222
+    | "custom " `isPrefixOf`isPrefixOf246,247
+modifyAccidental modifyAccidental288,289
+checkAccidental checkAccidental305,306
+addAccidental addAccidental323,324
+allAccidentals allAccidentals347,348
+allSemitones allSemitones360,361
+instance Arbitrary Arbitrary Accidental364,365
+  arbitrary arbitrary365,366
+newtype AccidentalString AccidentalString372,373
+instance Arbitrary Arbitrary AccidentalString377,378
+  arbitrary arbitrary378,379
+
+./old/src/Music/Pitch/Pitch.hs,3299
+module Music.Pitch.Pitch Music.Pitch.Pitch15,16
+data NoteName NoteName29,30
+data NoteName = C C29,30
+data NoteName = C | D D29,30
+data NoteName = C | D | E E29,30
+data NoteName = C | D | E | F F29,30
+data NoteName = C | D | E | F | G G29,30
+data NoteName = C | D | E | F | G | A A29,30
+data NoteName = C | D | E | F | G | A | BB29,30
+class NoteClass NoteClass33,34
+  sayNote sayNote34,35
+class IsNoteName IsNoteName36,37
+  toNoteName toNoteName37,38
+data SomeNote SomeNote39,40
+data SomeNote = forall forall39,40
+instance IsNoteName IsNoteName SomeNote41,42
+  toNoteName toNoteName42,43
+newtype NotesSelection NotesSelection47,48
+  { getNotesSelection getNotesSelection48,49
+instance Show Show SomeNote51,52
+  show show52,53
+instance NoteClass NoteClass C54,55
+  sayNote sayNote55,56
+instance NoteClass NoteClass D56,57
+  sayNote sayNote57,58
+instance NoteClass NoteClass E58,59
+  sayNote sayNote59,60
+instance NoteClass NoteClass F60,61
+  sayNote sayNote61,62
+instance NoteClass NoteClass G62,63
+  sayNote sayNote63,64
+instance NoteClass NoteClass A64,65
+  sayNote sayNote65,66
+instance NoteClass NoteClass B66,67
+  sayNote sayNote67,68
+instance IsString IsString NoteName85,86
+  fromString fromString86,87
+data IntervalBasis IntervalBasis96,97
+data IntervalBasis = Chromatic Chromatic96,97
+data IntervalBasis = Chromatic | DiatonicDiatonic96,97
+data PitchClass PitchClass99,100
+  PitchClass PitchClass100,101
+    { _noteName _noteName101,102
+      _accidental _accidental102,103
+  PitchClass PitchClass100,101
+instance Show Show PitchClass107,108
+  show show108,109
+newtype Octave Octave111,112
+newtype Octave = Octave {getOctaves getOctaves111,112
+instance Show Show Octave114,115
+  show show115,116
+data Pitch Pitch117,118
+  Pitch Pitch118,119
+      _noteName _noteName120,121
+      _accidental _accidental121,122
+      _octave _octave122,123
+  Pitch Pitch118,119
+class HasNoteName HasNoteName143,144
+  noteName noteName144,145
+class HasAccidental HasAccidental146,147
+  accidental accidental147,148
+class HasPitchClass HasPitchClass149,150
+  pitchClass pitchClass150,151
+class HasOctave HasOctave152,153
+  octave octave153,154
+instance HasNoteName HasNoteName Pitch155,156
+  noteName noteName156,157
+instance HasAccidental HasAccidental Pitch158,159
+  accidental accidental159,160
+instance HasPitchClass HasPitchClass Pitch161,162
+  pitchClass pitchClass162,163
+instance HasNoteName HasNoteName PitchClass165,166
+  noteName noteName166,167
+instance HasAccidental HasAccidental PitchClass168,169
+  accidental accidental169,170
+instance HasAccidental HasAccidental Accidental171,172
+  accidental accidental172,173
+instance HasOctave HasOctave Octave174,175
+  octave octave175,176
+instance HasOctave HasOctave Pitch177,178
+  octave octave178,179
+instance IsString IsString PitchClass183,184
+  fromString fromString184,185
+instance Arbitrary Arbitrary NoteName279,280
+  arbitrary arbitrary280,281
+instance Arbitrary Arbitrary PitchClass282,283
+  arbitrary arbitrary283,284
+instance Arbitrary Arbitrary Octave285,286
+  arbitrary arbitrary286,287
+instance Arbitrary Arbitrary Pitch289,290
+  arbitrary arbitrary290,291
+
+./old/src/Music/Time/TS.hs,1942
+module Music.Time.TS Music.Time.TS13,14
+import import18,19
+newtype Duration Duration23,24
+  { unDuration unDuration24,25
+instance Show Show Duration27,28
+  show show28,29
+instance Fractional Fractional Duration30,31
+    (D(Durationa)31,32
+    fromRational fromRational34,35
+class HasDuration HasDuration36,37
+  toDuration toDuration37,38
+  fromDuration fromDuration38,39
+instance HasDuration HasDuration Duration42,43
+  toDuration toDuration43,44
+  fromDuration fromDuration44,45
+instance HasDuration HasDuration Rational46,47
+  toDuration toDuration47,48
+  fromDuration fromDuration48,49
+dur dur51,52
+multiplyDurations multiplyDurations57,58
+(%(%/)70,71
+n n71,72
+(|(|/)79,80
+durations durations80,81
+(|(|*)90,91
+durations durations91,92
+durationToRational durationToRational99,100
+data TimeSignature TimeSignature103,104
+data TimeSignature = TimeSignatureTimeSignature103,104
+  { _upper _upper104,105
+  , _lower _lower105,106
+time time110,111
+instance Show Show TimeSignature113,114
+  show show114,115
+(/(//)119,120
+n n120,121
+toDur toDur126,127
+fromDur fromDur133,134
+timeSigToDur timeSigToDur142,143
+durToTimeSig durToTimeSig146,147
+fromDur' fromDur'160,161
+fromDur'' fromDur''174,175
+applyFunctionToTS applyFunctionToTS191,192
+applyFunctionToTS' applyFunctionToTS'201,202
+findBestDenominator findBestDenominator212,213
+isValid isValid227,228
+isPowOfTwo isPowOfTwo231,232
+tsLowerPowerOfTwo tsLowerPowerOfTwo235,236
+instance Arbitrary Arbitrary TimeSignature241,242
+  arbitrary arbitrary242,243
+instance Arbitrary Arbitrary Duration247,248
+  arbitrary arbitrary248,249
+prop_toDur_fromDur_identity prop_toDur_fromDur_identity256,257
+prop_fromDur_fromDur' prop_fromDur_fromDur'264,265
+prop_fromDur''_zero_duration prop_fromDur''_zero_duration269,270
+prop_valid_ts_power_of_two prop_valid_ts_power_of_two275,276
+main main278,279
+
+./old/src/Music/Time/Tree.hs,1724
+module Music.Time.Tree Music.Time.Tree5,6
+data ComponentLabelComponentLabel15,16
+  = Scalar Scalar16,17
+  | Gap Gap17,18
+  | Vector Vector18,19
+type Component Component21,22
+scalar scalar23,24
+gap gap26,27
+vector vector29,30
+printTree printTree32,33
+printTree' printTree'35,36
+createComponent createComponent39,40
+isValidComponent isValidComponent42,43
+changeRootVectorValue changeRootVectorValue48,49
+setRootVectorTo1 setRootVectorTo152,53
+shape shape123,124
+values values129,130
+reconstructComponent reconstructComponent138,139
+reconstructComponentHelper reconstructComponentHelper143,144
+extractComponents extractComponents160,161
+doubleScalars doubleScalars171,172
+depthOfTree depthOfTree177,178
+sumOfScalars sumOfScalars181,182
+sumAtRank sumAtRank187,188
+sumAtRankHelper sumAtRankHelper190,191
+partitionRational partitionRational231,232
+flattenTree flattenTree238,239
+filterOutGaps filterOutGaps241,242
+maxScalar maxScalar249,250
+replaceScalar replaceScalar255,256
+mapMaybe mapMaybe264,265
+filterComponents filterComponents272,273
+multiplyScalars multiplyScalars305,306
+findNodeByValue findNodeByValue329,330
+reverseScalars reverseScalars340,341
+countVectors countVectors348,349
+transformGaps transformGaps353,354
+countLeaves countLeaves372,373
+allScalars allScalars377,378
+mapToNewType mapToNewType385,386
+replaceSubtree replaceSubtree406,407
+breadthFirstTraversal breadthFirstTraversal430,431
+replaceScalar2 replaceScalar2448,449
+levels levels457,458
+exampleComponent1 exampleComponent1466,467
+shapeExample1 shapeExample1475,476
+valuesExample1 valuesExample1479,480
+reconstructedComponent1 reconstructedComponent1483,484
+
+./old/src/Parsers/RtmParser.hs,1370
+module Parsers.RtmParser Parsers.RtmParser5,6
+data ComponentLabelComponentLabel18,19
+  = Scalar Scalar19,20
+  | Gap Gap20,21
+  | Vector Vector21,22
+type Component Component24,25
+scalar scalar26,27
+gap gap29,30
+vector vector32,33
+printTree printTree35,36
+printTree' printTree'38,39
+componentToString componentToString50,51
+isValidComponent isValidComponent64,65
+componentParser componentParser79,80
+parseComponentString parseComponentString95,96
+main2 main298,99
+testComponentToString testComponentToString118,119
+testParseComponentString testParseComponentString127,128
+testIsValidComponent testIsValidComponent138,139
+instance Arbitrary Arbitrary ComponentLabel149,150
+  arbitrary arbitrary150,151
+arbitraryComponent arbitraryComponent153,154
+genComponent genComponent156,157
+vectorWithChildren vectorWithChildren163,164
+arbitraryLeaf arbitraryLeaf170,171
+positiveInt positiveInt173,174
+prop_isValidComponent prop_isValidComponent176,177
+testRoundTrip testRoundTrip182,183
+prop_roundTrip prop_roundTrip191,192
+prop_parseComponent prop_parseComponent200,201
+prop_structureValidity prop_structureValidity209,210
+isRight isRight218,219
+main3 main3231,232
+tests tests237,238
+main4 main4247,248
+buildComplexComponent buildComplexComponent513,514
+componentTree componentTree524,525
+main main532,533
+
+./src/Pitch/Accidental.hs,2864
+module Pitch.AccidentalPitch.Accidental5,6
+data AccidentalAccidental32,33
+  = DoubleFlatDoubleFlat33,34
+  | ThreeQuartersFlatThreeQuartersFlat34,35
+  | FlatFlat35,36
+  | QuarterFlatQuarterFlat36,37
+  | NaturalNatural37,38
+  | QuarterSharpQuarterSharp38,39
+  | SharpSharp39,40
+  | ThreeQuartersSharpThreeQuartersSharp40,41
+  | DoubleSharpDoubleSharp41,42
+  | Custom Custom42,43
+sharpenQ sharpenQ56,57
+sharpenS sharpenS59,60
+flattenQ flattenQ62,63
+flattenS flattenS65,66
+accidentalCompare accidentalCompare68,69
+class IsAccidental IsAccidental80,81
+  toAccidental toAccidental81,82
+data SomeAccidentalSomeAccidental83,84
+  = forall forall84,85
+instance IsAccidental IsAccidental SomeAccidental88,89
+  toAccidental toAccidental89,90
+instance IsAccidental IsAccidental Accidental92,93
+  toAccidental toAccidental93,94
+instance IsAccidental IsAccidental Rational96,97
+  toAccidental toAccidental97,98
+class AccClass AccClass100,101
   sayAccidental sayAccidental101,102
-instance AccClass AccClass Natural103,104
-  sayAccidental sayAccidental104,105
-instance AccClass AccClass QuarterFlat106,107
+instance Show Show SomeAccidental103,104
+  show show104,105
+instance AccClass AccClass DoubleFlat106,107
   sayAccidental sayAccidental107,108
-instance AccClass AccClass QuarterSharp109,110
+instance AccClass AccClass Flat109,110
   sayAccidental sayAccidental110,111
-instance AccClass AccClass Sharp112,113
+instance AccClass AccClass Natural112,113
   sayAccidental sayAccidental113,114
-instance AccClass AccClass ThreeQuartersSharp115,116
+instance AccClass AccClass QuarterFlat115,116
   sayAccidental sayAccidental116,117
-instance AccClass AccClass ThreeQuartersFlat118,119
+instance AccClass AccClass QuarterSharp118,119
   sayAccidental sayAccidental119,120
-instance AccClass AccClass DoubleSharp121,122
+instance AccClass AccClass Sharp121,122
   sayAccidental sayAccidental122,123
-instance Num Num Accidental147,148
-  (+(+)148,149
-  (-(-)149,150
-  (*(*)150,151
-  abs abs151,152
-  signum signum152,153
-  fromInteger fromInteger157,158
-  negate negate158,159
-instance Enum Enum Accidental161,162
-  toEnum toEnum162,163
-  fromEnum fromEnum174,175
-  succ succ186,187
-  pred pred191,192
-instance Bounded Bounded Accidental196,197
-  minBound minBound197,198
-  maxBound maxBound198,199
-accidentalToSemitones accidentalToSemitones201,202
-semitonesToAccidental semitonesToAccidental214,215
-accToLily accToLily230,231
-instance Read Read Accidental242,243
-instance IsString IsString Accidental264,265
-  fromString fromString265,266
-    | "custom " `isPrefixOf`isPrefixOf290,291
-modifyAccidental modifyAccidental296,297
-checkAccidental checkAccidental313,314
-addAccidental addAccidental322,323
-invertAccidental invertAccidental338,339
-allAccidentals allAccidentals341,342
-allSemitones allSemitones354,355
+instance AccClass AccClass ThreeQuartersSharp124,125
+  sayAccidental sayAccidental125,126
+instance AccClass AccClass ThreeQuartersFlat127,128
+  sayAccidental sayAccidental128,129
+instance AccClass AccClass DoubleSharp130,131
+  sayAccidental sayAccidental131,132
+instance Num Num Accidental156,157
+  (+(+)157,158
+  (-(-)158,159
+  (*(*)159,160
+  abs abs160,161
+  signum signum161,162
+  fromInteger fromInteger166,167
+  negate negate167,168
+instance Enum Enum Accidental170,171
+  toEnum toEnum171,172
+  fromEnum fromEnum183,184
+  succ succ195,196
+  pred pred200,201
+instance Bounded Bounded Accidental205,206
+  minBound minBound206,207
+  maxBound maxBound207,208
+accidentalToSemitones accidentalToSemitones210,211
+semitonesToAccidental semitonesToAccidental223,224
+accToLily accToLily239,240
+instance Read Read Accidental251,252
+readsPrec readsPrec253,254
+instance IsString IsString Accidental277,278
+  fromString fromString278,279
+    | "custom " `isPrefixOf`isPrefixOf303,304
+modifyAccidental modifyAccidental309,310
+checkAccidental checkAccidental326,327
+addAccidental addAccidental335,336
+invertAccidental invertAccidental351,352
+allAccidentals allAccidentals354,355
+allSemitones allSemitones367,368
 
-src/Pitch/Parser.hs,210
-module Pitch.Parser Pitch.Parser17,18
-spaced spaced36,37
-pitchClassParser pitchClassParser39,40
-octaveParser octaveParser71,72
-mkPitch' mkPitch'80,81
-pitchParser pitchParser84,85
-pitch pitch94,95
-
-src/Pitch/Pitch.hs,3386
-module Pitch.Pitch Pitch.Pitch5,6
-data NoteName NoteName19,20
-data NoteName = C C19,20
-data NoteName = C | D D19,20
-data NoteName = C | D | E E19,20
-data NoteName = C | D | E | F F19,20
-data NoteName = C | D | E | F | G G19,20
-data NoteName = C | D | E | F | G | A A19,20
-data NoteName = C | D | E | F | G | A | BB19,20
+./src/Pitch/Pitch.hs,3261
+module Pitch.Pitch Pitch.Pitch6,7
+data NoteName NoteName20,21
+data NoteName = C C20,21
+data NoteName = C | D D20,21
+data NoteName = C | D | E E20,21
+data NoteName = C | D | E | F F20,21
+data NoteName = C | D | E | F | G G20,21
+data NoteName = C | D | E | F | G | A A20,21
+data NoteName = C | D | E | F | G | A | BB20,21
 data IntervalBasis IntervalBasis23,24
 data IntervalBasis = Chromatic Chromatic23,24
 data IntervalBasis = Chromatic | DiatonicDiatonic23,24
-data PitchClass PitchClass27,28
-  PitchClass PitchClass29,30
-      _noteName _noteName31,32
-      _accidental _accidental33,34
-  PitchClass PitchClass29,30
-data Pitch Pitch39,40
-  Pitch Pitch41,42
-      _noteName _noteName43,44
-      _accidental _accidental45,46
-      _octave _octave47,48
-  Pitch Pitch41,42
-newtype Octave Octave53,54
-newtype Octave = Octave {getOctaves getOctaves53,54
-instance Lift Lift NoteName59,60
-instance Lift Lift Accidental61,62
-instance Lift Lift Octave63,64
-instance Lift Lift PitchClass65,66
-instance Lift Lift Pitch67,68
-mkPitch mkPitch69,70
-data SomeNote SomeNote72,73
-data SomeNote = forall forall72,73
-class NoteClass NoteClass78,79
-  sayNote sayNote79,80
-class IsNoteName IsNoteName81,82
-  toNoteName toNoteName82,83
-class HasNoteName HasNoteName84,85
-  noteName noteName85,86
-class HasAccidental HasAccidental87,88
-  accidental accidental88,89
-class HasPitchClass HasPitchClass90,91
-  pitchClass pitchClass91,92
-class HasOctave HasOctave93,94
-  octave octave94,95
-instance HasNoteName HasNoteName Pitch101,102
-  noteName noteName103,104
-instance HasAccidental HasAccidental Pitch106,107
-  accidental accidental108,109
-instance HasPitchClass HasPitchClass Pitch111,112
-  pitchClass pitchClass113,114
-instance HasNoteName HasNoteName PitchClass117,118
-  noteName noteName119,120
-instance HasAccidental HasAccidental PitchClass122,123
-  accidental accidental124,125
-instance IsNoteName IsNoteName SomeNote127,128
-  toNoteName toNoteName129,130
-instance Show Show SomeNote132,133
-  show show133,134
-instance NoteClass NoteClass C135,136
-  sayNote sayNote136,137
-instance NoteClass NoteClass D138,139
-  sayNote sayNote139,140
-instance NoteClass NoteClass E141,142
-  sayNote sayNote142,143
-instance NoteClass NoteClass F144,145
-  sayNote sayNote145,146
-instance NoteClass NoteClass G147,148
-  sayNote sayNote148,149
-instance NoteClass NoteClass A150,151
-  sayNote sayNote151,152
-instance NoteClass NoteClass B153,154
-  sayNote sayNote154,155
-instance IsString IsString NoteName156,157
-  fromString fromString157,158
-instance Show Show PitchClass167,168
-  show show168,169
-instance Show Show Octave170,171
-  show show171,172
-instance Show Show Pitch173,174
-  show show174,175
-pcToRational pcToRational187,188
-(=(=~)197,198
-pc1 pc1198,199
-noteNameToRational' noteNameToRational'200,201
-noteNameToRational noteNameToRational203,204
-allPitchClasses allPitchClasses208,209
-allPCRationals allPCRationals211,212
-enharmonicPCEquivs enharmonicPCEquivs214,215
-enharmonicPCEquivs' enharmonicPCEquivs'218,219
-type EnharmonicMapping EnharmonicMapping222,223
-enharmonicMapping enharmonicMapping224,225
-enharmonics enharmonics227,228
-allEnharmonics allEnharmonics232,233
-allEnharmonicsMapping allEnharmonicsMapping235,236
+data PitchClass PitchClass26,27
+  PitchClass PitchClass27,28
+    { _noteName _noteName28,29
+      _accidental _accidental29,30
+  PitchClass PitchClass27,28
+data Pitch Pitch34,35
+  Pitch Pitch35,36
+      _noteName _noteName37,38
+      _accidental _accidental38,39
+      _octave _octave39,40
+  Pitch Pitch35,36
+newtype Octave Octave44,45
+newtype Octave = Octave {unOctave unOctave44,45
+mkPitch mkPitch49,50
+data SomeNote SomeNote52,53
+data SomeNote = forall forall52,53
+class NoteClass NoteClass58,59
+  sayNote sayNote59,60
+class IsNoteName IsNoteName61,62
+  toNoteName toNoteName62,63
+class HasNoteName HasNoteName64,65
+  noteName noteName65,66
+class HasAccidental HasAccidental67,68
+  accidental accidental68,69
+class HasPitchClass HasPitchClass70,71
+  pitchClass pitchClass71,72
+class HasOctave HasOctave73,74
+  octave octave74,75
+instance HasNoteName HasNoteName Pitch81,82
+  noteName noteName83,84
+instance HasOctave HasOctave Pitch85,86
+  octave octave86,87
+instance HasAccidental HasAccidental Pitch89,90
+  accidental accidental91,92
+instance HasPitchClass HasPitchClass Pitch94,95
+  pitchClass pitchClass96,97
+instance HasNoteName HasNoteName PitchClass100,101
+  noteName noteName102,103
+instance HasAccidental HasAccidental PitchClass105,106
+  accidental accidental107,108
+instance IsNoteName IsNoteName SomeNote110,111
+  toNoteName toNoteName112,113
+instance Show Show SomeNote115,116
+  show show116,117
+instance NoteClass NoteClass C118,119
+  sayNote sayNote119,120
+instance NoteClass NoteClass D121,122
+  sayNote sayNote122,123
+instance NoteClass NoteClass E124,125
+  sayNote sayNote125,126
+instance NoteClass NoteClass F127,128
+  sayNote sayNote128,129
+instance NoteClass NoteClass G130,131
+  sayNote sayNote131,132
+instance NoteClass NoteClass A133,134
+  sayNote sayNote134,135
+instance NoteClass NoteClass B136,137
+  sayNote sayNote137,138
+instance IsString IsString NoteName139,140
+  fromString fromString140,141
+instance Show Show PitchClass150,151
+  show show151,152
+instance Show Show Octave153,154
+  show show154,155
+instance Show Show Pitch156,157
+  show show157,158
+pcToRational pcToRational170,171
+(=(=~)180,181
+pc1 pc1181,182
+noteNameToRational' noteNameToRational'183,184
+noteNameToRational noteNameToRational186,187
+allPitchClasses allPitchClasses191,192
+allPCRationals allPCRationals194,195
+enharmonicPCEquivs enharmonicPCEquivs197,198
+enharmonicPCEquivs' enharmonicPCEquivs'201,202
+type EnharmonicMapping EnharmonicMapping205,206
+enharmonicMapping enharmonicMapping207,208
+enharmonics enharmonics210,211
+allEnharmonics allEnharmonics215,216
+allEnharmonicsMapping allEnharmonicsMapping218,219
 
-src/Rtm/QuasiQuoter.hs,84
+./src/Pitch/Parser.hs,286
+module Pitch.Parser Pitch.Parser4,5
+spaced spaced16,17
+pitchClassParser pitchClassParser19,20
+octaveParser octaveParser51,52
+mkPitch' mkPitch'60,61
+pitchParser pitchParser64,65
+parsePitch parsePitch73,74
+pitchesParser pitchesParser76,77
+parsePitches parsePitches79,80
+
+./src/Pitch/QuasiQuoter.hs,108
+module Pitch.QuasiQuoter Pitch.QuasiQuoter0,1
+pitch pitch8,9
+parsePitchesToExp parsePitchesToExp18,19
+
+./src/Rtm/QuasiQuoter.hs,84
 module Rtm.QuasiQuoter Rtm.QuasiQuoter1,2
 rtm rtm12,13
 rtmToExp rtmToExp21,22
 
-src/Rtm/Rtm.hs,50
+./src/Rtm/Rtm.hs,50
 module Rtm.Rtm Rtm.Rtm3,4
 example example9,10
 
-src/Rtm/Shape.hs,521
+./src/Rtm/Shape.hs,521
 module Rtm.Shape Rtm.Shape2,3
 data ShapeTree ShapeTree9,10
 data ShapeTree a = ShapeLeaf ShapeLeaf9,10
@@ -213,43 +577,7 @@ originalLabels originalLabels59,60
 newInts newInts63,64
 reconstructedLabels reconstructedLabels67,68
 
-src/Rtm/Common.hs,904
-module Rtm.CommonRtm.Common10,11
-data RtmLabelRtmLabel38,39
-    RtmScalar RtmScalar40,41
-    RtmGap RtmGap42,43
-    RtmVector RtmVector44,45
-    RtmConsRtmCons46,47
-type Rtm Rtm52,53
-showRtm showRtm58,59
-scalar, s s66,67
-scalar,scalar66,67
-s s68,69
-gap, g g71,72
-gap,gap71,72
-g g73,74
-vector, v v76,77
-vector,vector76,77
-v v78,79
-rtm' rtm'83,84
-(|(|:)89,90
-num num90,91
-isValidScalar isValidScalar93,94
-isValidGap isValidGap98,99
-isValidVector isValidVector103,104
-isValidRtm isValidRtm111,112
-printRtm printRtm122,123
-rtmDepth rtmDepth126,127
-collapseRtmGaps collapseRtmGaps132,133
-noRtmGaps noRtmGaps149,150
-countRtmScalars countRtmScalars156,157
-extractIntsFromLabels extractIntsFromLabels163,164
-setRtmLabelInt setRtmLabelInt173,174
-reconstructLabelsFromInts reconstructLabelsFromInts180,181
-example example190,191
-main main193,194
-
-src/Rtm/Parser.hs,276
+./src/Rtm/Parser.hs,276
 module Rtm.ParserRtm.Parser0,1
 spaced spaced25,26
 signedNumber signedNumber28,29
@@ -261,7 +589,43 @@ rtmParser rtmParser64,65
 spaces_ spaces_71,72
 parseRtm parseRtm74,75
 
-src/Time/Dur.hs,740
+./src/Rtm/Common.hs,899
+module Rtm.CommonRtm.Common0,1
+data RtmLabelRtmLabel40,41
+  = RtmScalar RtmScalar41,42
+  | RtmGap RtmGap42,43
+  | RtmVector RtmVector43,44
+  | RtmConsRtmCons44,45
+type Rtm Rtm47,48
+showRtm showRtm50,51
+scalar, s s58,59
+scalar,scalar58,59
+s s60,61
+gap, g g63,64
+gap,gap63,64
+g g65,66
+vector, v v68,69
+vector,vector68,69
+v v70,71
+rtm' rtm'74,75
+(|(|:)80,81
+num num81,82
+isValidScalar isValidScalar84,85
+isValidGap isValidGap89,90
+isValidVector isValidVector94,95
+isValidRtm isValidRtm99,100
+printRtm printRtm110,111
+rtmDepth rtmDepth114,115
+collapseRtmGaps collapseRtmGaps120,121
+noRtmGaps noRtmGaps137,138
+countRtmScalars countRtmScalars144,145
+extractIntsFromLabels extractIntsFromLabels151,152
+setRtmLabelInt setRtmLabelInt161,162
+reconstructLabelsFromInts reconstructLabelsFromInts168,169
+example example178,179
+main main181,182
+
+./src/Time/Dur.hs,740
 module Time.DurTime.Dur0,1
 newtype Dur Dur16,17
   { unDur unDur17,18
@@ -292,7 +656,7 @@ durations durations146,147
 from_dur_1 from_dur_1162,163
 from_dur_2 from_dur_2165,166
 
-src/Time/TimeSignature.hs,650
+./src/Time/TimeSignature.hs,650
 module Time.TimeSignatureTime.TimeSignature7,8
 data TimeSignature TimeSignature26,27
 data TimeSignature = TimeSignatureTimeSignature26,27
@@ -314,7 +678,522 @@ durToTimeSig8 durToTimeSig8115,116
 powersOfTwo powersOfTwo122,123
 isPowerOfTwo isPowerOfTwo125,126
 
-src/Util/Fraction.hs,111
+./src/Util/Fraction.hs,111
 module Util.FractionUtil.Fraction0,1
 splitFraction splitFraction8,9
 unsplitFraction unsplitFraction13,14
+
+./sketch/SeqDur.hs,413
+module Time.SeqDur Time.SeqDur0,1
+type Durs Durs8,9
+showDurs showDurs10,11
+frontAdd frontAdd13,14
+endAdd endAdd16,17
+concatSeq concatSeq19,20
+leftMost leftMost22,23
+rightMost rightMost27,28
+getAtIndex getAtIndex32,33
+modifyAtIndex modifyAtIndex35,36
+setAtIndex setAtIndex38,39
+insertElemAt insertElemAt41,42
+deleteElemAt deleteElemAt44,45
+seqDurs seqDurs49,50
+seqDurs' seqDurs'52,53
+
+./sketch/Literals.hs,19621
+module Pitch.LiteralsPitch.Literals0,1
+_c, _cs, _df, _d, _ds, _ef, _e, _f, _fs, _g, _gs, _af, _a, _as, _bf, _b _b263,264
+_c, _cs, _df, _d, _ds, _ef, _e, _f, _fs, _g, _gs, _af, _a, _as, _bf,_bf263,264
+_c, _cs, _df, _d, _ds, _ef, _e, _f, _fs, _g, _gs, _af, _a, _as,_as263,264
+_c, _cs, _df, _d, _ds, _ef, _e, _f, _fs, _g, _gs, _af, _a,_a263,264
+_c, _cs, _df, _d, _ds, _ef, _e, _f, _fs, _g, _gs, _af,_af263,264
+_c, _cs, _df, _d, _ds, _ef, _e, _f, _fs, _g, _gs,_gs263,264
+_c, _cs, _df, _d, _ds, _ef, _e, _f, _fs, _g,_g263,264
+_c, _cs, _df, _d, _ds, _ef, _e, _f, _fs,_fs263,264
+_c, _cs, _df, _d, _ds, _ef, _e, _f,_f263,264
+_c, _cs, _df, _d, _ds, _ef, _e,_e263,264
+_c, _cs, _df, _d, _ds, _ef,_ef263,264
+_c, _cs, _df, _d, _ds,_ds263,264
+_c, _cs, _df, _d,_d263,264
+_c, _cs, _df,_df263,264
+_c, _cs,_cs263,264
+_c,_c263,264
+_cs _cs265,266
+_df _df266,267
+_d _d267,268
+_ds _ds268,269
+_ef _ef269,270
+_e _e270,271
+_f _f271,272
+_fs _fs272,273
+_gf _gf274,275
+_g _g277,278
+_gs _gs279,280
+_af _af281,282
+_a _a283,284
+_as _as285,286
+_bf _bf287,288
+_b _b289,290
+_cqs, _dqf, _dqs, _eqf, _eqs, _fqs, _gqf, _gqs, _aqf, _aqs, _bqf, _bqs _bqs291,292
+_cqs, _dqf, _dqs, _eqf, _eqs, _fqs, _gqf, _gqs, _aqf, _aqs, _bqf,_bqf291,292
+_cqs, _dqf, _dqs, _eqf, _eqs, _fqs, _gqf, _gqs, _aqf, _aqs,_aqs291,292
+_cqs, _dqf, _dqs, _eqf, _eqs, _fqs, _gqf, _gqs, _aqf,_aqf291,292
+_cqs, _dqf, _dqs, _eqf, _eqs, _fqs, _gqf, _gqs,_gqs291,292
+_cqs, _dqf, _dqs, _eqf, _eqs, _fqs, _gqf,_gqf291,292
+_cqs, _dqf, _dqs, _eqf, _eqs, _fqs,_fqs291,292
+_cqs, _dqf, _dqs, _eqf, _eqs,_eqs291,292
+_cqs, _dqf, _dqs, _eqf,_eqf291,292
+_cqs, _dqf, _dqs,_dqs291,292
+_cqs, _dqf,_dqf291,292
+_cqs,_cqs291,292
+_dqf _dqf293,294
+_dqs _dqs294,295
+_eqf _eqf295,296
+_eqs _eqs296,297
+_fqs _fqs297,298
+_gqf _gqf298,299
+_gqs _gqs299,300
+_aqf _aqf300,301
+_aqs _aqs301,302
+_bqf _bqf302,303
+_bqs _bqs303,304
+c, cs, df, d, ds, ef, e, f, fs, g, gs, gf, af, a, as, bf, b b305,306
+c, cs, df, d, ds, ef, e, f, fs, g, gs, gf, af, a, as, bf,bf305,306
+c, cs, df, d, ds, ef, e, f, fs, g, gs, gf, af, a, as,as305,306
+c, cs, df, d, ds, ef, e, f, fs, g, gs, gf, af, a,a305,306
+c, cs, df, d, ds, ef, e, f, fs, g, gs, gf, af,af305,306
+c, cs, df, d, ds, ef, e, f, fs, g, gs, gf,gf305,306
+c, cs, df, d, ds, ef, e, f, fs, g, gs,gs305,306
+c, cs, df, d, ds, ef, e, f, fs, g,g305,306
+c, cs, df, d, ds, ef, e, f, fs,fs305,306
+c, cs, df, d, ds, ef, e, f,f305,306
+c, cs, df, d, ds, ef, e,e305,306
+c, cs, df, d, ds, ef,ef305,306
+c, cs, df, d, ds,ds305,306
+c, cs, df, d,d305,306
+c, cs, df,df305,306
+c, cs,cs305,306
+c,c305,306
+cs cs307,308
+df df308,309
+d d309,310
+ds ds310,311
+ef ef311,312
+e e312,313
+f f313,314
+fs fs314,315
+gf gf315,316
+g g316,317
+gs gs317,318
+af af318,319
+a a319,320
+as as320,321
+bf bf321,322
+b b322,323
+c', cs', df', d', ds', ef', e', f', fs', g', gf', gs', af', a', as', bf', b' b'324,325
+c', cs', df', d', ds', ef', e', f', fs', g', gf', gs', af', a', as', bf',bf'324,325
+c', cs', df', d', ds', ef', e', f', fs', g', gf', gs', af', a', as',as'324,325
+c', cs', df', d', ds', ef', e', f', fs', g', gf', gs', af', a',a'324,325
+c', cs', df', d', ds', ef', e', f', fs', g', gf', gs', af',af'324,325
+c', cs', df', d', ds', ef', e', f', fs', g', gf', gs',gs'324,325
+c', cs', df', d', ds', ef', e', f', fs', g', gf',gf'324,325
+c', cs', df', d', ds', ef', e', f', fs', g',g'324,325
+c', cs', df', d', ds', ef', e', f', fs',fs'324,325
+c', cs', df', d', ds', ef', e', f',f'324,325
+c', cs', df', d', ds', ef', e',e'324,325
+c', cs', df', d', ds', ef',ef'324,325
+c', cs', df', d', ds',ds'324,325
+c', cs', df', d',d'324,325
+c', cs', df',df'324,325
+c', cs',cs'324,325
+c',c'324,325
+cs' cs'326,327
+df' df'327,328
+d' d'328,329
+ds' ds'329,330
+ef' ef'330,331
+e' e'331,332
+f' f'332,333
+fs' fs'333,334
+g' g'334,335
+gf' gf'335,336
+gs' gs'336,337
+af' af'337,338
+a' a'338,339
+as' as'339,340
+bf' bf'340,341
+b' b'341,342
+c'', cs'', df'', d'', ds'', ef'', e'', f'', fs'', g'', gs'', af'', a'', as'', bf'', b'' b''343,344
+c'', cs'', df'', d'', ds'', ef'', e'', f'', fs'', g'', gs'', af'', a'', as'', bf'',bf''343,344
+c'', cs'', df'', d'', ds'', ef'', e'', f'', fs'', g'', gs'', af'', a'', as'',as''343,344
+c'', cs'', df'', d'', ds'', ef'', e'', f'', fs'', g'', gs'', af'', a'',a''343,344
+c'', cs'', df'', d'', ds'', ef'', e'', f'', fs'', g'', gs'', af'',af''343,344
+c'', cs'', df'', d'', ds'', ef'', e'', f'', fs'', g'', gs'',gs''343,344
+c'', cs'', df'', d'', ds'', ef'', e'', f'', fs'', g'',g''343,344
+c'', cs'', df'', d'', ds'', ef'', e'', f'', fs'',fs''343,344
+c'', cs'', df'', d'', ds'', ef'', e'', f'',f''343,344
+c'', cs'', df'', d'', ds'', ef'', e'',e''343,344
+c'', cs'', df'', d'', ds'', ef'',ef''343,344
+c'', cs'', df'', d'', ds'',ds''343,344
+c'', cs'', df'', d'',d''343,344
+c'', cs'', df'',df''343,344
+c'', cs'',cs''343,344
+c'',c''343,344
+cs'' cs''345,346
+df'' df''346,347
+d'' d''347,348
+ds'' ds''348,349
+ef'' ef''349,350
+e'' e''350,351
+f'' f''351,352
+fs'' fs''352,353
+gf'' gf''354,355
+g'' g''357,358
+gs'' gs''359,360
+af'' af''361,362
+a'' a''363,364
+as'' as''365,366
+bf'' bf''367,368
+b'' b''369,370
+c''', cs''', df''', d''', ds''', ef''', e''', f''', fs''', g''', gs''', af''', a''', as''', bf''', b''' b'''371,372
+c''', cs''', df''', d''', ds''', ef''', e''', f''', fs''', g''', gs''', af''', a''', as''', bf''',bf'''371,372
+c''', cs''', df''', d''', ds''', ef''', e''', f''', fs''', g''', gs''', af''', a''', as''',as'''371,372
+c''', cs''', df''', d''', ds''', ef''', e''', f''', fs''', g''', gs''', af''', a''',a'''371,372
+c''', cs''', df''', d''', ds''', ef''', e''', f''', fs''', g''', gs''', af''',af'''371,372
+c''', cs''', df''', d''', ds''', ef''', e''', f''', fs''', g''', gs''',gs'''371,372
+c''', cs''', df''', d''', ds''', ef''', e''', f''', fs''', g''',g'''371,372
+c''', cs''', df''', d''', ds''', ef''', e''', f''', fs''',fs'''371,372
+c''', cs''', df''', d''', ds''', ef''', e''', f''',f'''371,372
+c''', cs''', df''', d''', ds''', ef''', e''',e'''371,372
+c''', cs''', df''', d''', ds''', ef''',ef'''371,372
+c''', cs''', df''', d''', ds''',ds'''371,372
+c''', cs''', df''', d''',d'''371,372
+c''', cs''', df''',df'''371,372
+c''', cs''',cs'''371,372
+c''',c'''371,372
+gf''' gf'''372,373
+c''' c'''373,374
+cs''' cs'''374,375
+df''' df'''375,376
+d''' d'''376,377
+ds''' ds'''377,378
+ef''' ef'''378,379
+e''' e'''379,380
+f''' f'''380,381
+fs''' fs'''381,382
+gf''' gf'''383,384
+g''' g'''385,386
+gs''' gs'''387,388
+af''' af'''389,390
+a''' a'''391,392
+as''' as'''393,394
+bf''' bf'''395,396
+b''' b'''397,398
+c'''', cs'''', df'''', d'''', ds'''', ef'''', e'''', f'''', fs'''', g'''', gs'''', af'''', a'''', as'''', bf'''', b'''' b''''399,400
+c'''', cs'''', df'''', d'''', ds'''', ef'''', e'''', f'''', fs'''', g'''', gs'''', af'''', a'''', as'''', bf'''',bf''''399,400
+c'''', cs'''', df'''', d'''', ds'''', ef'''', e'''', f'''', fs'''', g'''', gs'''', af'''', a'''', as'''',as''''399,400
+c'''', cs'''', df'''', d'''', ds'''', ef'''', e'''', f'''', fs'''', g'''', gs'''', af'''', a'''',a''''399,400
+c'''', cs'''', df'''', d'''', ds'''', ef'''', e'''', f'''', fs'''', g'''', gs'''', af'''',af''''399,400
+c'''', cs'''', df'''', d'''', ds'''', ef'''', e'''', f'''', fs'''', g'''', gs'''',gs''''399,400
+c'''', cs'''', df'''', d'''', ds'''', ef'''', e'''', f'''', fs'''', g'''',g''''399,400
+c'''', cs'''', df'''', d'''', ds'''', ef'''', e'''', f'''', fs'''',fs''''399,400
+c'''', cs'''', df'''', d'''', ds'''', ef'''', e'''', f'''',f''''399,400
+c'''', cs'''', df'''', d'''', ds'''', ef'''', e'''',e''''399,400
+c'''', cs'''', df'''', d'''', ds'''', ef'''',ef''''399,400
+c'''', cs'''', df'''', d'''', ds'''',ds''''399,400
+c'''', cs'''', df'''', d'''',d''''399,400
+c'''', cs'''', df'''',df''''399,400
+c'''', cs'''',cs''''399,400
+c'''',c''''399,400
+cs'''' cs''''401,402
+df'''' df''''402,403
+d'''' d''''403,404
+ds'''' ds''''404,405
+ef'''' ef''''405,406
+e'''' e''''406,407
+f'''' f''''407,408
+fs'''' fs''''408,409
+g'''' g''''409,410
+gs'''' gs''''410,411
+af'''' af''''411,412
+a'''' a''''412,413
+as'''' as''''413,414
+bf'''' bf''''414,415
+b'''' b''''415,416
+c_, cs_, df_, d_, ds_, ef_, e_, f_, fs_, g_, gs_, af_, a_, as_, bf_, b_ b_417,418
+c_, cs_, df_, d_, ds_, ef_, e_, f_, fs_, g_, gs_, af_, a_, as_, bf_,bf_417,418
+c_, cs_, df_, d_, ds_, ef_, e_, f_, fs_, g_, gs_, af_, a_, as_,as_417,418
+c_, cs_, df_, d_, ds_, ef_, e_, f_, fs_, g_, gs_, af_, a_,a_417,418
+c_, cs_, df_, d_, ds_, ef_, e_, f_, fs_, g_, gs_, af_,af_417,418
+c_, cs_, df_, d_, ds_, ef_, e_, f_, fs_, g_, gs_,gs_417,418
+c_, cs_, df_, d_, ds_, ef_, e_, f_, fs_, g_,g_417,418
+c_, cs_, df_, d_, ds_, ef_, e_, f_, fs_,fs_417,418
+c_, cs_, df_, d_, ds_, ef_, e_, f_,f_417,418
+c_, cs_, df_, d_, ds_, ef_, e_,e_417,418
+c_, cs_, df_, d_, ds_, ef_,ef_417,418
+c_, cs_, df_, d_, ds_,ds_417,418
+c_, cs_, df_, d_,d_417,418
+c_, cs_, df_,df_417,418
+c_, cs_,cs_417,418
+c_,c_417,418
+cs_ cs_419,420
+df_ df_420,421
+d_ d_421,422
+ds_ ds_422,423
+ef_ ef_423,424
+e_ e_424,425
+f_ f_425,426
+fs_ fs_426,427
+g_ g_427,428
+gs_ gs_428,429
+af_ af_429,430
+a_ a_430,431
+as_ as_431,432
+bf_ bf_432,433
+b_ b_433,434
+c__, cs__, df__, d__, ds__, ef__, e__, f__, fs__, g__, gs__, af__, a__, as__, bf__, b__ b__435,436
+c__, cs__, df__, d__, ds__, ef__, e__, f__, fs__, g__, gs__, af__, a__, as__, bf__,bf__435,436
+c__, cs__, df__, d__, ds__, ef__, e__, f__, fs__, g__, gs__, af__, a__, as__,as__435,436
+c__, cs__, df__, d__, ds__, ef__, e__, f__, fs__, g__, gs__, af__, a__,a__435,436
+c__, cs__, df__, d__, ds__, ef__, e__, f__, fs__, g__, gs__, af__,af__435,436
+c__, cs__, df__, d__, ds__, ef__, e__, f__, fs__, g__, gs__,gs__435,436
+c__, cs__, df__, d__, ds__, ef__, e__, f__, fs__, g__,g__435,436
+c__, cs__, df__, d__, ds__, ef__, e__, f__, fs__,fs__435,436
+c__, cs__, df__, d__, ds__, ef__, e__, f__,f__435,436
+c__, cs__, df__, d__, ds__, ef__, e__,e__435,436
+c__, cs__, df__, d__, ds__, ef__,ef__435,436
+c__, cs__, df__, d__, ds__,ds__435,436
+c__, cs__, df__, d__,d__435,436
+c__, cs__, df__,df__435,436
+c__, cs__,cs__435,436
+c__,c__435,436
+cs__ cs__437,438
+df__ df__438,439
+d__ d__439,440
+ds__ ds__440,441
+ef__ ef__441,442
+e__ e__442,443
+f__ f__443,444
+fs__ fs__444,445
+g__ g__445,446
+gs__ gs__446,447
+af__ af__447,448
+a__ a__448,449
+as__ as__449,450
+bf__ bf__450,451
+b__ b__451,452
+c___, cs___, df___, d___, ds___, ef___, e___, f___, fs___, g___, gs___, af___, a___, as___, bf___, b___ b___453,454
+c___, cs___, df___, d___, ds___, ef___, e___, f___, fs___, g___, gs___, af___, a___, as___, bf___,bf___453,454
+c___, cs___, df___, d___, ds___, ef___, e___, f___, fs___, g___, gs___, af___, a___, as___,as___453,454
+c___, cs___, df___, d___, ds___, ef___, e___, f___, fs___, g___, gs___, af___, a___,a___453,454
+c___, cs___, df___, d___, ds___, ef___, e___, f___, fs___, g___, gs___, af___,af___453,454
+c___, cs___, df___, d___, ds___, ef___, e___, f___, fs___, g___, gs___,gs___453,454
+c___, cs___, df___, d___, ds___, ef___, e___, f___, fs___, g___,g___453,454
+c___, cs___, df___, d___, ds___, ef___, e___, f___, fs___,fs___453,454
+c___, cs___, df___, d___, ds___, ef___, e___, f___,f___453,454
+c___, cs___, df___, d___, ds___, ef___, e___,e___453,454
+c___, cs___, df___, d___, ds___, ef___,ef___453,454
+c___, cs___, df___, d___, ds___,ds___453,454
+c___, cs___, df___, d___,d___453,454
+c___, cs___, df___,df___453,454
+c___, cs___,cs___453,454
+c___,c___453,454
+cs___ cs___455,456
+df___ df___456,457
+d___ d___457,458
+ds___ ds___458,459
+ef___ ef___459,460
+e___ e___460,461
+f___ f___461,462
+fs___ fs___462,463
+g___ g___463,464
+gs___ gs___464,465
+af___ af___465,466
+a___ a___466,467
+as___ as___467,468
+bf___ bf___468,469
+b___ b___469,470
+cqs, dqf, dqs, eqf, eqs, fqs, gqf, gqs, aqf, aqs, bqf, bqs bqs471,472
+cqs, dqf, dqs, eqf, eqs, fqs, gqf, gqs, aqf, aqs, bqf,bqf471,472
+cqs, dqf, dqs, eqf, eqs, fqs, gqf, gqs, aqf, aqs,aqs471,472
+cqs, dqf, dqs, eqf, eqs, fqs, gqf, gqs, aqf,aqf471,472
+cqs, dqf, dqs, eqf, eqs, fqs, gqf, gqs,gqs471,472
+cqs, dqf, dqs, eqf, eqs, fqs, gqf,gqf471,472
+cqs, dqf, dqs, eqf, eqs, fqs,fqs471,472
+cqs, dqf, dqs, eqf, eqs,eqs471,472
+cqs, dqf, dqs, eqf,eqf471,472
+cqs, dqf, dqs,dqs471,472
+cqs, dqf,dqf471,472
+cqs,cqs471,472
+dqf dqf473,474
+dqs dqs474,475
+eqf eqf475,476
+eqs eqs476,477
+fqs fqs477,478
+gqf gqf478,479
+gqs gqs479,480
+aqf aqf480,481
+aqs aqs481,482
+bqf bqf482,483
+bqs bqs483,484
+cqs', dqf', dqs', eqf', eqs', fqs', gqf', gqs', aqf', aqs', bqf', bqs' bqs'485,486
+cqs', dqf', dqs', eqf', eqs', fqs', gqf', gqs', aqf', aqs', bqf',bqf'485,486
+cqs', dqf', dqs', eqf', eqs', fqs', gqf', gqs', aqf', aqs',aqs'485,486
+cqs', dqf', dqs', eqf', eqs', fqs', gqf', gqs', aqf',aqf'485,486
+cqs', dqf', dqs', eqf', eqs', fqs', gqf', gqs',gqs'485,486
+cqs', dqf', dqs', eqf', eqs', fqs', gqf',gqf'485,486
+cqs', dqf', dqs', eqf', eqs', fqs',fqs'485,486
+cqs', dqf', dqs', eqf', eqs',eqs'485,486
+cqs', dqf', dqs', eqf',eqf'485,486
+cqs', dqf', dqs',dqs'485,486
+cqs', dqf',dqf'485,486
+cqs',cqs'485,486
+dqf' dqf'487,488
+dqs' dqs'488,489
+eqf' eqf'489,490
+eqs' eqs'490,491
+fqs' fqs'491,492
+gqf' gqf'492,493
+gqs' gqs'493,494
+aqf' aqf'494,495
+aqs' aqs'495,496
+bqf' bqf'496,497
+bqs' bqs'497,498
+cqs'', dqf'', dqs'', eqf'', eqs'', fqs'', gqf'', gqs'', aqf'', aqs'', bqf'', bqs'' bqs''499,500
+cqs'', dqf'', dqs'', eqf'', eqs'', fqs'', gqf'', gqs'', aqf'', aqs'', bqf'',bqf''499,500
+cqs'', dqf'', dqs'', eqf'', eqs'', fqs'', gqf'', gqs'', aqf'', aqs'',aqs''499,500
+cqs'', dqf'', dqs'', eqf'', eqs'', fqs'', gqf'', gqs'', aqf'',aqf''499,500
+cqs'', dqf'', dqs'', eqf'', eqs'', fqs'', gqf'', gqs'',gqs''499,500
+cqs'', dqf'', dqs'', eqf'', eqs'', fqs'', gqf'',gqf''499,500
+cqs'', dqf'', dqs'', eqf'', eqs'', fqs'',fqs''499,500
+cqs'', dqf'', dqs'', eqf'', eqs'',eqs''499,500
+cqs'', dqf'', dqs'', eqf'',eqf''499,500
+cqs'', dqf'', dqs'',dqs''499,500
+cqs'', dqf'',dqf''499,500
+cqs'',cqs''499,500
+dqf'' dqf''501,502
+dqs'' dqs''502,503
+eqf'' eqf''503,504
+eqs'' eqs''504,505
+fqs'' fqs''505,506
+gqf'' gqf''506,507
+gqs'' gqs''507,508
+aqf'' aqf''508,509
+aqs'' aqs''509,510
+bqf'' bqf''510,511
+bqs'' bqs''511,512
+cqs''', dqf''', dqs''', eqf''', eqs''', fqs''', gqf''', gqs''', aqf''', aqs''', bqf''', bqs''' bqs'''513,514
+cqs''', dqf''', dqs''', eqf''', eqs''', fqs''', gqf''', gqs''', aqf''', aqs''', bqf''',bqf'''513,514
+cqs''', dqf''', dqs''', eqf''', eqs''', fqs''', gqf''', gqs''', aqf''', aqs''',aqs'''513,514
+cqs''', dqf''', dqs''', eqf''', eqs''', fqs''', gqf''', gqs''', aqf''',aqf'''513,514
+cqs''', dqf''', dqs''', eqf''', eqs''', fqs''', gqf''', gqs''',gqs'''513,514
+cqs''', dqf''', dqs''', eqf''', eqs''', fqs''', gqf''',gqf'''513,514
+cqs''', dqf''', dqs''', eqf''', eqs''', fqs''',fqs'''513,514
+cqs''', dqf''', dqs''', eqf''', eqs''',eqs'''513,514
+cqs''', dqf''', dqs''', eqf''',eqf'''513,514
+cqs''', dqf''', dqs''',dqs'''513,514
+cqs''', dqf''',dqf'''513,514
+cqs''',cqs'''513,514
+dqf''' dqf'''515,516
+dqs''' dqs'''516,517
+eqf''' eqf'''517,518
+eqs''' eqs'''518,519
+fqs''' fqs'''519,520
+gqf''' gqf'''520,521
+gqs''' gqs'''521,522
+aqf''' aqf'''522,523
+aqs''' aqs'''523,524
+bqf''' bqf'''524,525
+bqs''' bqs'''525,526
+cqs'''', dqf'''', dqs'''', eqf'''', eqs'''', fqs'''', gqf'''', gqs'''', aqf'''', aqs'''', bqf'''', bqs'''' bqs''''527,528
+cqs'''', dqf'''', dqs'''', eqf'''', eqs'''', fqs'''', gqf'''', gqs'''', aqf'''', aqs'''', bqf'''',bqf''''527,528
+cqs'''', dqf'''', dqs'''', eqf'''', eqs'''', fqs'''', gqf'''', gqs'''', aqf'''', aqs'''',aqs''''527,528
+cqs'''', dqf'''', dqs'''', eqf'''', eqs'''', fqs'''', gqf'''', gqs'''', aqf'''',aqf''''527,528
+cqs'''', dqf'''', dqs'''', eqf'''', eqs'''', fqs'''', gqf'''', gqs'''',gqs''''527,528
+cqs'''', dqf'''', dqs'''', eqf'''', eqs'''', fqs'''', gqf'''',gqf''''527,528
+cqs'''', dqf'''', dqs'''', eqf'''', eqs'''', fqs'''',fqs''''527,528
+cqs'''', dqf'''', dqs'''', eqf'''', eqs'''',eqs''''527,528
+cqs'''', dqf'''', dqs'''', eqf'''',eqf''''527,528
+cqs'''', dqf'''', dqs'''',dqs''''527,528
+cqs'''', dqf'''',dqf''''527,528
+cqs'''',cqs''''527,528
+dqf'''' dqf''''529,530
+dqs'''' dqs''''530,531
+eqf'''' eqf''''531,532
+eqs'''' eqs''''532,533
+fqs'''' fqs''''533,534
+gqf'''' gqf''''534,535
+gqs'''' gqs''''535,536
+aqf'''' aqf''''536,537
+aqs'''' aqs''''537,538
+bqf'''' bqf''''538,539
+bqs'''' bqs''''539,540
+cqs_, dqf_, dqs_, eqf_, eqs_, fqs_, gqf_, gqs_, aqf_, aqs_, bqf_, bqs_ bqs_541,542
+cqs_, dqf_, dqs_, eqf_, eqs_, fqs_, gqf_, gqs_, aqf_, aqs_, bqf_,bqf_541,542
+cqs_, dqf_, dqs_, eqf_, eqs_, fqs_, gqf_, gqs_, aqf_, aqs_,aqs_541,542
+cqs_, dqf_, dqs_, eqf_, eqs_, fqs_, gqf_, gqs_, aqf_,aqf_541,542
+cqs_, dqf_, dqs_, eqf_, eqs_, fqs_, gqf_, gqs_,gqs_541,542
+cqs_, dqf_, dqs_, eqf_, eqs_, fqs_, gqf_,gqf_541,542
+cqs_, dqf_, dqs_, eqf_, eqs_, fqs_,fqs_541,542
+cqs_, dqf_, dqs_, eqf_, eqs_,eqs_541,542
+cqs_, dqf_, dqs_, eqf_,eqf_541,542
+cqs_, dqf_, dqs_,dqs_541,542
+cqs_, dqf_,dqf_541,542
+cqs_,cqs_541,542
+dqf_ dqf_543,544
+dqs_ dqs_544,545
+eqf_ eqf_545,546
+eqs_ eqs_546,547
+fqs_ fqs_547,548
+gqf_ gqf_548,549
+gqs_ gqs_549,550
+aqf_ aqf_550,551
+aqs_ aqs_551,552
+bqf_ bqf_552,553
+bqs_ bqs_553,554
+cqs__, dqf__, dqs__, eqf__, eqs__, fqs__, gqf__, gqs__, aqf__, aqs__, bqf__, bqs__ bqs__555,556
+cqs__, dqf__, dqs__, eqf__, eqs__, fqs__, gqf__, gqs__, aqf__, aqs__, bqf__,bqf__555,556
+cqs__, dqf__, dqs__, eqf__, eqs__, fqs__, gqf__, gqs__, aqf__, aqs__,aqs__555,556
+cqs__, dqf__, dqs__, eqf__, eqs__, fqs__, gqf__, gqs__, aqf__,aqf__555,556
+cqs__, dqf__, dqs__, eqf__, eqs__, fqs__, gqf__, gqs__,gqs__555,556
+cqs__, dqf__, dqs__, eqf__, eqs__, fqs__, gqf__,gqf__555,556
+cqs__, dqf__, dqs__, eqf__, eqs__, fqs__,fqs__555,556
+cqs__, dqf__, dqs__, eqf__, eqs__,eqs__555,556
+cqs__, dqf__, dqs__, eqf__,eqf__555,556
+cqs__, dqf__, dqs__,dqs__555,556
+cqs__, dqf__,dqf__555,556
+cqs__,cqs__555,556
+dqf__ dqf__557,558
+dqs__ dqs__558,559
+eqf__ eqf__559,560
+eqs__ eqs__560,561
+fqs__ fqs__561,562
+gqf__ gqf__562,563
+gqs__ gqs__563,564
+aqf__ aqf__564,565
+aqs__ aqs__565,566
+bqf__ bqf__566,567
+bqs__ bqs__567,568
+cqs___, dqf___, dqs___, eqf___, eqs___, fqs___, gqf___, gqs___, aqf___, aqs___, bqf___, bqs___ bqs___569,570
+cqs___, dqf___, dqs___, eqf___, eqs___, fqs___, gqf___, gqs___, aqf___, aqs___, bqf___,bqf___569,570
+cqs___, dqf___, dqs___, eqf___, eqs___, fqs___, gqf___, gqs___, aqf___, aqs___,aqs___569,570
+cqs___, dqf___, dqs___, eqf___, eqs___, fqs___, gqf___, gqs___, aqf___,aqf___569,570
+cqs___, dqf___, dqs___, eqf___, eqs___, fqs___, gqf___, gqs___,gqs___569,570
+cqs___, dqf___, dqs___, eqf___, eqs___, fqs___, gqf___,gqf___569,570
+cqs___, dqf___, dqs___, eqf___, eqs___, fqs___,fqs___569,570
+cqs___, dqf___, dqs___, eqf___, eqs___,eqs___569,570
+cqs___, dqf___, dqs___, eqf___,eqf___569,570
+cqs___, dqf___, dqs___,dqs___569,570
+cqs___, dqf___,dqf___569,570
+cqs___,cqs___569,570
+dqf___ dqf___571,572
+dqs___ dqs___572,573
+eqf___ eqf___573,574
+eqs___ eqs___574,575
+fqs___ fqs___575,576
+gqf___ gqf___576,577
+gqs___ gqs___577,578
+aqf___ aqf___578,579
+''aqs___ ''aqs___579,580
+bqf___ bqf___580,581
+bqs___ bqs___581,582
