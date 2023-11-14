@@ -4,7 +4,7 @@
 - group: { name: use-lens, enabled: true }
 - group: { name: generalise, enabled: true }
 
-- arguments: [--color, --cross, --refactor]
+- arguments: [--color, --cross, --refactor, -XQuasiQuotes]
 # XQuasiQuotes
 
 # Control which extensions/flags/modules/functions can be used

@@ -50,6 +50,9 @@ newtype Octave = Octave {unOctave :: Int}
 mkPitch :: NoteName -> Accidental -> Octave -> Pitch
 mkPitch nn acc o = Pitch nn acc o
 
+mkPitch' :: PitchClass -> Octave -> Pitch
+mkPitch' pc o = Pitch (pc ^. noteName) (pc ^. accidental) o
+
 data SomeNote = forall notename. (IsNoteName notename) => SomeNote notename
 
 -------------------------------------------------------------------------------------
@@ -189,6 +192,10 @@ noteNameToRational name = case Prelude.lookup name noteNameToRational' of
   Just val -> val
   Nothing -> error ("NoteName " <> show name <> " not found")
 
+pitchToRational :: Pitch -> Rational
+pitchToRational (Pitch nm ac oct) = pcToRational (PitchClass nm ac) + fromIntegral (unOctave oct + 1) * 12
+
+
 allPitchClasses :: [PitchClass]
 allPitchClasses = liftA2 PitchClass [C, D, E, F, G, A, B] allAccidentals
 
@@ -224,6 +231,15 @@ allEnharmonicsMapping = zip allPitchClasses allEnharmonics
 c = PitchClass C Natural
 c ^. noteName
 c ^. accidental
+
+
+c4 = Pitch C Natural (Octave 4)
+
+pitchToRational c4
+
+splitFraction $ pitchToRational $  Pitch G QuarterSharp (Octave 5)
+
+fromRational $ pitchToRational $  Pitch E QuarterSharp (Octave 3)
 
 
 -- Changes the accidental of 'c' to Sharp
