@@ -1,3 +1,5 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module Time.Dur
   ( Dur (..),
     (%/),
@@ -10,17 +12,22 @@ module Time.Dur
 where
 
 import Data.Default
-import Data.Ratio
+import Data.Ratio ( (%), numerator )
+import Data.Data ( Data )
 
 -- | The 'Dur' type represents musical durations or any other kind of durations
 -- as a rational number.
 newtype Dur = Dur
   { unDur :: Rational
   }
-  deriving (Eq, Ord, Num, Fractional, Real)
+  deriving (Eq, Ord, Num, Fractional, Real, Data)
 
 instance Show Dur where
   show (Dur x) = "Dur (" <> show x <> ")"
+
+
+-- instance Show Dur where
+--   showsPrec d (Dur x) = showParen (d > 10) $ showString "Dur " . showsPrec 11 x
 
 -- | Default value for 'Dur'
 -- >>> def :: Dur
@@ -132,7 +139,7 @@ normalizeDurList durations = [toDur x / toDur total | x <- durations]
 durations |/ divisorValue =
   fmap
     ( \durVal ->
-        let durRational = toRational (toDur durVal)
+        let durRational = unDur (toDur durVal)
             divisor = toRational divisorValue
          in fromDur $ Dur (durRational / divisor)
     )
@@ -147,7 +154,7 @@ durations |/ divisorValue =
 durations |* multiplierValue =
   fmap
     ( \durVal ->
-        let durRational = toRational (toDur durVal)
+        let durRational = unDur (toDur durVal)
             multiplier = toRational multiplierValue
          in fromDur $ Dur (durRational * multiplier)
     )

@@ -1,10 +1,10 @@
 - group: { name: future, enabled: true }
 - group: { name: extra, enabled: true }
-# - group: { name: teaching, enabled: true }
+- group: { name: teaching, enabled: true }
 - group: { name: use-lens, enabled: true }
-# - group: { name: generalise, enabled: true }
+- group: { name: generalise, enabled: true }
 
-- arguments: [ --cross, --refactor, -XQuasiQuotes]
+- arguments: [ --color, --cross, --refactor, -XQuasiQuotes]
 # XQuasiQuotes --color,
 
 # Control which extensions/flags/modules/functions can be used
