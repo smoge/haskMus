@@ -6,8 +6,8 @@ import Data.Bits ((.&.))
 import Data.List (find, sortOn, unfoldr)
 import Data.Ratio
 
-orderByMusicalSimplicity :: [Rational] -> [Rational]
-orderByMusicalSimplicity = sortOn musicalOrderHelper
+-- orderByMusicalSimplicity :: [Rational] -> [Rational]
+-- orderByMusicalSimplicity = sortOn musicalOrderHelper
 
 musicalOrderHelper :: Rational -> (Int, Int, Int, Int, Int, Int)
 musicalOrderHelper r =

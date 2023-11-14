@@ -1,11 +1,11 @@
 - group: { name: future, enabled: true }
 - group: { name: extra, enabled: true }
-- group: { name: teaching, enabled: true }
+# - group: { name: teaching, enabled: true }
 - group: { name: use-lens, enabled: true }
-- group: { name: generalise, enabled: true }
+# - group: { name: generalise, enabled: true }
 
-- arguments: [--color, --cross, --refactor, -XQuasiQuotes]
-# XQuasiQuotes
+- arguments: [ --cross, --refactor, -XQuasiQuotes]
+# XQuasiQuotes --color,
 
 # Control which extensions/flags/modules/functions can be used
 #
@@ -52,10 +52,9 @@
 - ignore: { name: Redundant bracket }
 - ignore: { name: Unused LANGUAGE pragma }
 - ignore: { name: Eta reduce }
-- ignore: { name: Redundant import }
-- ignore: { name: Redundant bracket }
-- ignore: { name: Unused import }
-- ignore: { name: Use fewer imports }
+# - ignore: { name: Redundant import }
+# - ignore: { name: Unused import }
+# - ignore: { name: Use fewer imports }
 - ignore: { name: Unused top binds }
 
 # Define some custom infix operators
