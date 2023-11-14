@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
+
 module Rtm.Common
   ( RtmLabel (..),
     Rtm,
