@@ -73,8 +73,8 @@ instance HasDur TimeSignature where
     toDur :: TimeSignature -> Dur
     toDur = timeSigToDur
 
-    fromDur :: Dur -> TimeSignature
-    fromDur d = numerator (unDur d) // denominator (unDur d)
+    setDur :: TimeSignature -> Dur -> TimeSignature
+    setDur ts d = durToTimeSig (denominator $ unDur $ toDur ts ) d
 
 {- | Converts a 'TimeSignature' to a 'Dur'.
 
