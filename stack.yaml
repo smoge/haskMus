@@ -1,5 +1,5 @@
-#resolver: nightly-2023-11-10
-resolver: lts-21.20
+resolver: nightly-2023-11-15
+#resolver: lts-21.20
 
 packages:
   - "."
@@ -18,4 +18,4 @@ extra-package-dbs: []
 
 
 
-allow-newer: true
+allow-newer: false

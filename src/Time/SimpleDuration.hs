@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveLift #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Time.SimpleDuration where
 
@@ -70,6 +71,7 @@ example3 = parseLilyPondDuration "8.."
 
 example4 :: Either ParseError SimpleDuration
 example4 = parseLilyPondDuration "5.."
+-- Invalid
 
 example5 :: Either ParseError SimpleDuration
 example5 = parseLilyPondDuration "16"
