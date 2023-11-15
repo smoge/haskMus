@@ -5,14 +5,13 @@ module Time.Dur (
     Dur (..),
     (%/),
     HasDur (..),
-    normalizeDurList
+    normalizeDurList,
 ) where
 
+import Control.Lens
 import Data.Data (Data)
 import Data.Default
-import Data.Ratio 
-import Control.Lens
-
+import Data.Ratio
 
 newtype Dur = Dur
     { unDur :: Rational
@@ -35,7 +34,6 @@ instance Show Dur where
 instance Default Dur where
     def = Dur (1 % 1)
 
-
 infix 7 %/
 
 (%/) :: Integer -> Integer -> Dur
@@ -52,28 +50,22 @@ instance HasDur Dur where
     toDur = id
     setDur a _ = Dur (unDur a)
 
-------------------------------
-----  Utilitity Functions ----
-------------------------------
-
 normalizeDurList :: (HasDur a) => [a] -> [Dur]
 normalizeDurList durations = fmap (\x -> toDur x / toDur total) durations
     where
         total = sum $ fmap toDur durations
 
-
 -- !FIX
 -- (|/) :: (HasDur a, Real b) => [a] -> b -> [a]
 -- durations |/ divisor =
 --     fmap (\durVal -> let temdur = toDur durVal
---                          divisorRat = toRational divisor  
+--                          divisorRat = toRational divisor
 --                          newDur = Dur (unDur temdur / divisorRat)
 --                     in setDuration dur durVal newDur)
 --          durations
 
-
 -- (|*) :: (HasDur a, Real b) => [a] -> b -> [a]
--- durations |* multiplier = 
+-- durations |* multiplier =
 --     fmap (\durVal -> let temdur = toDur durVal
 --                          multiplierRat = toRational multiplier
 --                          newDur = Dur (unDur temdur * multiplierRat)
@@ -82,17 +74,3 @@ normalizeDurList durations = fmap (\x -> toDur x / toDur total) durations
 
 -- setDuration :: ASetter a a Dur Dur -> a -> Dur -> a
 -- setDuration durSetter hasDur newDur = set durSetter newDur hasDur
-
---------------
-
-{- | Test values.
- >>> from_dur_1
- >>> from_dur_2
- 3 % 4
- Dur (3 % 4)
--}
-from_dur_1 :: Rational
-from_dur_1 = toRational $ Dur (3 % 4)
-
-from_dur_2 :: Dur
-from_dur_2 =  Dur (3 % 4)
