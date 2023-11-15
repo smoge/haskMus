@@ -10,111 +10,46 @@ import Data.Ord (comparing)
 import Data.Ratio
 import Language.Haskell.TH.Syntax
 import Util.MathDuration
+import Prelude hiding (toRational)
 
--- | Represents a musical division.
-newtype Division = Division {unDivision :: Integer} deriving (Eq, Show, Ord, Data, Lift)
+newtype Division = Division {unDivision :: Integer}
+    deriving (Eq, Show, Ord, Data, Lift)
 
--- | Represents the number of dots in a musical notation, affecting the duration.
-newtype Dots = Dots {unDots :: Integer} deriving (Eq, Show, Enum, Ord, Data, Lift)
+newtype Dots = Dots {unDot :: Integer}
+    deriving (Eq, Show, Enum, Ord, Data, Lift)
 
--- | Represents a multiplier value.
-newtype Multiplier = Multiplier
-  { -- | The underlying rational value of the multiplier.
-    unMultiplier :: Rational
-  }
-  deriving (Eq, Show, Ord, Data, Lift)
+newtype Multiplier = Multiplier {unMultiplier :: Rational}
+    deriving (Eq, Show, Ord, Data, Lift)
 
--- | Represents a duration with division, dots, and multiplier.
 data Duration = Duration
-  { -- | The division value of the duration.
-    _division :: Division,
-    -- | The dots value of the duration.
-    _dots :: Dots,
-    -- | The multiplier value of the duration.
-    _multiplier :: Rational
-  }
-  deriving (Eq, Show, Data, Lift)
+    { _division :: Division,
+      _dots :: Dots,
+      _multiplier :: Rational
+    }
+    deriving (Eq, Show, Data, Lift)
 
 makeLenses ''Duration
 
--- | Creates a 'Dots' instance ensuring the value is non-negative.
-makeDots :: Integer -> Maybe Dots
-makeDots n
-  | n >= 0 = Just $ Dots n
-  | otherwise = Nothing
-
--- | Convert a 'Division' to a 'Rational'
-divisionToRational :: Division -> Rational
-divisionToRational (Division 0) = 0 % 1
-divisionToRational (Division d) = 1 % d
-
--- | Convert a 'Duration' to a 'Rational'
-durationToRational :: Duration -> Rational
-durationToRational Duration {_division = d, _dots = dots_, _multiplier = m} =
-  1 % unDivision d * (1 + (2 ^ unDots dots_ - 1) % (2 ^ unDots dots_)) * m
+-- | Convert a 'Duration' to Lilypond notation
+durationToLilypond :: Duration -> String
+durationToLilypond (Duration (Division 0) dts _) =
+    "\\breve" <> replicate (fromIntegral $ unDot dts) '.'
+durationToLilypond (Duration dv dts _) =
+    show (unDivision dv) <> replicate (fromIntegral $ unDot dts) '.'
 
 -- | Calculate the multiplier for a given number of dots
 dotMultiplier :: Dots -> Rational
 dotMultiplier (Dots d) = 1 + (2 ^ d - 1) % (2 ^ d)
 
--- | Given a rational number, returns the corresponding dots value.
---   If the rational number is negative, returns Nothing.
---   Uses binary search to find the dots value.
---   The search is performed between 0 and 9.
---   The function caches the dotMultiplier values for each integer between 0 and 9.
---   The cache is used to speed up the search.
-dotsFromMultiplier :: Rational -> Maybe Dots
-dotsFromMultiplier r
-  | r < 0 = Nothing -- check for negative rationals
-  | otherwise = binarySearch 0 9
-  where
-    -- Cache for dotMultiplier, converting each integer to Dots
-    cache = fmap (dotMultiplier . Dots) [0 .. 9]
-
-    binarySearch :: Integer -> Integer -> Maybe Dots
-    binarySearch low high
-      | low > high = Nothing
-      | midMultiplier == r = Just $ Dots mid
-      | midMultiplier < r = binarySearch (mid + 1) high
-      | otherwise = binarySearch low (mid - 1)
-      where
-        mid = (low + high) `div` 2
-        midMultiplier = cache !! fromIntegral mid
-
-dotsFromMultiplier' :: Rational -> Dots
-dotsFromMultiplier' r = binarySearch 0 9
-  where
-    binarySearch :: Integer -> Integer -> Dots
-    binarySearch low high
-      | low > high = error "Invalid multiplier or too many dots"
-      | midMultiplier == r = Dots mid
-      | midMultiplier < r = binarySearch (mid + 1) high
-      | otherwise = binarySearch low (mid - 1)
-      where
-        mid = (low + high) `div` 2
-        midMultiplier = dotMultiplier (Dots mid)
-
--- | Convert a 'Duration' to a 'Rational'
-durationToRat :: Duration -> Rational
-durationToRat (Duration (Division divVal) dots_ m)
-  | divVal == 0 = 0 % 1
-  | otherwise = (1 % divVal) * dotMultiplier dots_ * m
-
--- | Check if the multipliers of two durations are equal
-areMultiplierEqual :: Duration -> Duration -> Bool
-areMultiplierEqual dur1 dur2 = view multiplier dur1 == view multiplier dur2
-
--- | Custom 'Ord' instance for 'Duration'
-instance Ord Duration where
-  -- \| Compare two durations based on their 'Rational' representation
-  compare :: Duration -> Duration -> Ordering
-  compare = comparing durationToRational
+-- | Order a list of 'Rational' numbers based on their musical simplicity
+orderByMusicalSimplicity :: [Rational] -> [Rational]
+orderByMusicalSimplicity = sortOn musicalOrderHelper
 
 -- | Add a specified number of dots to a 'Duration'
 addDotsToDuration :: Duration -> Integer -> Duration
-addDotsToDuration dur m = case makeDots (unDots (view dots dur) + m) of
-  Just newDots -> dur & dots .~ newDots
-  Nothing -> dur
+addDotsToDuration dur m = dur & dots .~ newDots
+    where
+        newDots = Dots (unDot (dur ^. dots) + m)
 
 -- | Operator for adding dots to a 'Duration'
 (+.) :: Duration -> Integer -> Duration
@@ -124,6 +59,84 @@ d +. i = addDotsToDuration d i
 (-.) :: Duration -> Integer -> Duration
 d -. i = addDotsToDuration d (negate i)
 
--- | Order a list of 'Rational' numbers based on their musical simplicity
-orderByMusicalSimplicity :: [Rational] -> [Rational]
-orderByMusicalSimplicity = sortOn musicalOrderHelper
+-- | Custom 'Ord' instance for 'Duration'
+instance Ord Duration where
+    -- Compare two durations based on their 'Rational' representation
+    compare = comparing durationToRational
+
+-- | Convert a 'Duration' to a 'Rational'
+durationToRational :: Duration -> Rational
+durationToRational (Duration (Division divVal) dots_ m)
+    | divVal == 0 = 0 % 1
+    | otherwise = (1 % divVal) * dotMultiplier dots_ * m
+
+-- | Convert a 'Division' to a 'Rational'
+divisionToRational :: Division -> Rational
+divisionToRational (Division 0) = 0 % 1
+divisionToRational (Division d) = 1 % d
+
+-- | Convert a value to a 'Rational'
+class ToRational a where
+    toRational :: a -> Rational
+
+instance ToRational Rational where
+    toRational = id
+
+instance ToRational Division where
+    toRational (Division 0) = 0 % 1
+    toRational (Division d) = 1 % d
+
+-- | Convert a 'Duration' to a 'Rational'
+durationToRat :: Duration -> Rational
+durationToRat (Duration (Division divVal) dots_ m)
+    | divVal == 0 = 0 % 1
+    | otherwise = (1 % divVal) * dotMultiplier dots_ * m
+
+-- | Get the number of dots corresponding to a given multiplier
+dotsFromMultiplier :: Rational -> Maybe Dots
+dotsFromMultiplier r
+    | r < 0 = Nothing -- check for negative rationals
+    | otherwise = binarySearch 0 9
+    where
+        -- Cache for dotMultiplier, converting each integer to Dots
+        cache = fmap (dotMultiplier . Dots) [0 .. 9]
+
+        binarySearch :: Integer -> Integer -> Maybe Dots
+        binarySearch low high
+            | low > high = Nothing
+            | midMultiplier == r = Just $ Dots mid
+            | midMultiplier < r = binarySearch (mid + 1) high
+            | otherwise = binarySearch low (mid - 1)
+            where
+                mid = (low + high) `div` 2
+                midMultiplier = cache !! fromIntegral mid
+
+-- | Get the number of dots corresponding to a given multiplier
+dotsFromMultiplier' :: Rational -> Dots
+dotsFromMultiplier' r = binarySearch 0 9
+    where
+        binarySearch :: Integer -> Integer -> Dots
+        binarySearch low high
+            | low > high = error "Invalid multiplier or too many dots"
+            | midMultiplier == r = Dots mid
+            | midMultiplier < r = binarySearch (mid + 1) high
+            | otherwise = binarySearch low (mid - 1)
+            where
+                mid = (low + high) `div` 2
+                midMultiplier = dotMultiplier (Dots mid)
+
+-- | Check if two durations have the same multiplier
+isMEQ :: Duration -> Duration -> Bool
+isMEQ d1 d2 = d1 ^. multiplier == d2 ^. multiplier
+
+-- | Check if a duration has a multiplier of 1
+isM1 :: Duration -> Bool
+isM1 d = d ^. multiplier == 1
+
+-- | Check if a duration has no dots
+noDots :: Duration -> Bool
+noDots d = unDot (d ^. dots) == 0
+
+-- | Create a 'Dots' value from an integer
+mkDots :: Integer -> Dots
+mkDots n = Dots (abs n)
