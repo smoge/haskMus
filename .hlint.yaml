@@ -52,8 +52,8 @@
 - ignore: { name: Redundant bracket }
 - ignore: { name: Unused LANGUAGE pragma }
 - ignore: { name: Eta reduce }
-# - ignore: { name: Redundant import }
-# - ignore: { name: Unused import }
+- ignore: { name: Use camelCase }
+- ignore: { name: Use guards }
 # - ignore: { name: Use fewer imports }
 - ignore: { name: Unused top binds }
 

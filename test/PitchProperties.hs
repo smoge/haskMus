@@ -57,8 +57,8 @@ prop_setAccidentalPitch a p = (p & accidental .~ a) ^. accidental == a
 
 prop_identityAccidentalIsUnchanged :: Accidental -> Bool
 prop_identityAccidentalIsUnchanged a =
-  let modifiedA = a & id
-   in modifiedA == a
+    let modifiedA = a & id
+     in modifiedA == a
 
 -- prop_modifyAccidentalCommutative :: Accidental -> PitchClass -> Bool
 -- prop_modifyAccidentalCommutative a pc =
@@ -77,44 +77,44 @@ runTests = $quickCheckAll
 -- QuickCheck MOVE ------------------------------------------------------------
 
 instance Arbitrary Accidental where
-  arbitrary =
-    frequency
-      [ (10, elements allAccidentals), -- Picking from the predefined list
-        (1, Custom <$> arbitrary) -- Picking a custom accidental
-      ]
+    arbitrary =
+        frequency
+            [ (10, elements allAccidentals), -- Picking from the predefined list
+              (1, Custom <$> arbitrary) -- Picking a custom accidental
+            ]
 
 -- Newtype wrapper for specific accidental strings
 newtype AccidentalString
-  = AccidentalString String
-  deriving (Show)
+    = AccidentalString String
+    deriving (Show)
 
 -- Arbitrary instance for AccidentalString (QuickCheck)
 instance Arbitrary AccidentalString where
-  arbitrary =
-    AccidentalString
-      <$> elements
-        [ "ff",
-          "tqf",
-          "f",
-          "qf",
-          "",
-          "n",
-          "qs",
-          "s",
-          "tqs",
-          "ss",
-          "sharp",
-          "flat",
-          "natural",
-          "quartersharp",
-          "semisharp",
-          "quarterflat",
-          "semiflat",
-          "♭",
-          "♯",
-          "♮",
-          "𝄫",
-          "𝄪",
-          "𝄳",
-          "𝄲"
-        ]
+    arbitrary =
+        AccidentalString
+            <$> elements
+                [ "ff",
+                  "tqf",
+                  "f",
+                  "qf",
+                  "",
+                  "n",
+                  "qs",
+                  "s",
+                  "tqs",
+                  "ss",
+                  "sharp",
+                  "flat",
+                  "natural",
+                  "quartersharp",
+                  "semisharp",
+                  "quarterflat",
+                  "semiflat",
+                  "♭",
+                  "♯",
+                  "♮",
+                  "𝄫",
+                  "𝄪",
+                  "𝄳",
+                  "𝄲"
+                ]

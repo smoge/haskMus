@@ -1,12 +1,11 @@
-module Rtm.Parser
-  ( rtmParser,
+module Rtm.Parser (
+    rtmParser,
     parseRtm,
-  )
-where
+) where
 
 import Rtm.Common (Rtm, gap, printRtm, rtm', scalar, vector)
-import Text.Parsec
-  ( ParseError,
+import Text.Parsec (
+    ParseError,
     char,
     digit,
     lookAhead,
@@ -19,7 +18,7 @@ import Text.Parsec
     spaces,
     try,
     (<|>),
-  )
+ )
 import Text.Parsec.String (Parser)
 
 -- Consume spaces before and after the parser.
@@ -28,46 +27,46 @@ spaced p = spaces *> p <* spaces
 
 signedNumber :: Parser Int
 signedNumber = spaced $ do
-  sign <- option '+' (oneOf "+-")
-  num <- read <$> many1 digit
-  if num > 0 && num <= 20
-    then pure $ if sign == '-' then (-num) else num
-    else fail "Number out of range (1-20)"
+    sign <- option '+' (oneOf "+-")
+    num <- read <$> many1 digit
+    if num > 0 && num <= 20
+        then pure $ if sign == '-' then (-num) else num
+        else fail "Number out of range (1-20)"
 
 elemParser :: Parser Rtm
 elemParser = spaced $ try divParser <|> try restParser <|> try noteParser
 
 divParser :: Parser Rtm
 divParser = spaced $ do
-  _ <- char '('
-  num <- signedNumber
-  _ <- spaces
-  _ <- char '('
-  elems <- manyTill (spaces_ >> elemParser) (lookAhead (char ')'))
-  _ <- char ')'
-  _ <- char ')'
-  pure $ vector num elems
+    _ <- char '('
+    num <- signedNumber
+    _ <- spaces
+    _ <- char '('
+    elems <- manyTill (spaces_ >> elemParser) (lookAhead (char ')'))
+    _ <- char ')'
+    _ <- char ')'
+    pure $ vector num elems
 
 noteParser :: Parser Rtm
 noteParser = do
-  num <- signedNumber
-  if num > 0
-    then pure $ scalar num
-    else fail "Non-positive note encountered"
+    num <- signedNumber
+    if num > 0
+        then pure $ scalar num
+        else fail "Non-positive note encountered"
 
 restParser :: Parser Rtm
 restParser = do
-  num <- signedNumber
-  if num < 0
-    then pure $ gap (-num)
-    else fail "Non-negative rest encountered"
+    num <- signedNumber
+    if num < 0
+        then pure $ gap (-num)
+        else fail "Non-negative rest encountered"
 
 rtmParser :: Parser Rtm
 rtmParser = spaced $ do
-  _ <- char '('
-  elems <- spaced $ many1 (elemParser <* spaces_)
-  _ <- char ')'
-  pure $ rtm' elems
+    _ <- char '('
+    elems <- spaced $ many1 (elemParser <* spaces_)
+    _ <- char ')'
+    pure $ rtm' elems
 
 spaces_ :: Parser ()
 spaces_ = skipMany (char ' ')

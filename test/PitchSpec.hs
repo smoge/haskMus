@@ -10,11 +10,11 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  describe "PitchClass operations" $ do
-    it "can view noteName and accidental from a PitchClass" $ do
-      let c = PitchClass C Natural
-      c ^. noteName `shouldBe` C
-      c ^. accidental `shouldBe` Natural
+    describe "PitchClass operations" $ do
+        it "can view noteName and accidental from a PitchClass" $ do
+            let c = PitchClass C Natural
+            c ^. noteName `shouldBe` C
+            c ^. accidental `shouldBe` Natural
 
 {-  it "can modify the accidental of a PitchClass" $ do
     let c = PitchClass C Natural
