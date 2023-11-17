@@ -13,9 +13,11 @@ import Pitch.Pitch
 import Text.Parsec
 import Text.Parsec.String
 
+
 -- Consume spaces before and after the parser.
 spaced :: Parser a -> Parser a
 spaced p = spaces *> p <* spaces
+
 
 pitchClassParser :: Parser PitchClass
 pitchClassParser =
@@ -54,6 +56,7 @@ pitchClassParser =
         <|> try (string "a" >> pure (PitchClass A Natural))
         <|> try (string "b" >> pure (PitchClass B Natural))
 
+
 octaveParser :: Parser Octave
 octaveParser = do
     _ <- spaces
@@ -62,6 +65,7 @@ octaveParser = do
     _ <- spaces
     let octs = length upOctaves - length downOctaves
     pure (Octave (octs + 4))
+
 
 -- Parser for pitches
 pitchParser :: Parser Pitch
@@ -73,11 +77,14 @@ pitchParser = spaced $ do
     _ <- spaces
     pure $ mkPitch' pc oct
 
+
 parsePitch :: String -> Either ParseError Pitch
 parsePitch = parse pitchParser ""
 
+
 pitchesParser :: Parser [Pitch]
 pitchesParser = spaced $ sepEndBy pitchParser spaces
+
 
 parsePitches :: String -> Either ParseError [Pitch]
 parsePitches = parse pitchesParser ""

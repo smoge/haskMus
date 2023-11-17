@@ -40,7 +40,7 @@ library
 
   build-depends:
     , base                               >=4.17.2 && <4.20
-    , containers
+        , containers
     , data-default
     , data-default-class
     , data-default-instances-containers
@@ -59,7 +59,7 @@ library
     , template-haskell
     , text
     , vector-space
-
+    
   --    , rando
   --    , random-fu
   --  , bimap >= 0.5.0 && < 0.6

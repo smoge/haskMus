@@ -8,10 +8,10 @@ node_modules/
 dist/
 
 assets/**
+schema/**
+Data/**
 
-
-
-
+musicxml/*
 
 # Compiled Java class files
 *.class
