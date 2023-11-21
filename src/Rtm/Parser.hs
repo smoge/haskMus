@@ -21,6 +21,7 @@ import Text.Parsec (
  )
 import Text.Parsec.String (Parser)
 
+
 -- Consume spaces before and after the parser.
 spaced :: Parser a -> Parser a
 spaced p = spaces *> p <* spaces
