@@ -6,7 +6,7 @@ comma-style: trailing
 import-export-style: trailing
 indent-wheres: true
 record-brace-space: true
-newlines-between-decls: 2
+newlines-between-decls: 1
 haddock-style: multi-line
 haddock-style-module: null
 let-style: inline
