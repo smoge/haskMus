@@ -4,7 +4,7 @@
 - group: { name: generalise, enabled: true }
 
 # - arguments: [ --color, --cross, --refactor, -XQuasiQuotes]
-- arguments: [ --cross, --refactor]
+- arguments: [ --cross, --refactor, --refactor, --color, -XQuasiQuotes]
 #
   # XQuasiQuotes --color,
 
