@@ -61,10 +61,10 @@ newtype Octave = Octave {unOctave :: Int}
 -- deriving instance Data Pitch
 
 mkPitch :: NoteName -> Accidental -> Octave -> Pitch
-mkPitch nn acc o = Pitch nn acc o
+mkPitch = Pitch
 
 mkPitch' :: PitchClass -> Octave -> Pitch
-mkPitch' pc o = Pitch (pc ^. noteName) (pc ^. accidental) o
+mkPitch' pc = Pitch (pc ^. noteName) (pc ^. accidental)
 
 data SomeNote = forall notename. (IsNoteName notename) => SomeNote notename
 

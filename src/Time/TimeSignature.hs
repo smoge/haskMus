@@ -41,7 +41,7 @@ instance HasDur TimeSignature where
     toDur = timeSigToDur
 
     setDur :: TimeSignature -> Dur -> TimeSignature
-    setDur ts d = durToTimeSig (denominator $ unDur $ toDur ts) d
+    setDur ts = durToTimeSig (denominator $ unDur $ toDur ts)
 
 timeSigToDur :: TimeSignature -> Dur
 timeSigToDur (TimeSignature n d) = Dur $ n % d

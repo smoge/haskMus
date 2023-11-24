@@ -21,7 +21,6 @@ import Text.Parsec (
  )
 import Text.Parsec.String (Parser)
 
-
 -- Consume spaces before and after the parser.
 spaced :: Parser a -> Parser a
 spaced p = spaces *> p <* spaces
@@ -75,11 +74,11 @@ spaces_ = skipMany (char ' ')
 parseRtm :: String -> Either ParseError Rtm
 parseRtm = parse rtmParser ""
 
-{-
--- Tests
 
+-- Tests
 test_01 :: IO ()
 test_01 = do
+
     let input = "(1 -1 (1 (-1 -1 1)))"
     case parseRtm input of
         Left err -> print err
@@ -105,4 +104,4 @@ test_04 = do
     case parseRtm input of
         Left err -> print err
         Right tree -> printRtm tree
- -}
+ 
