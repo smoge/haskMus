@@ -26,10 +26,17 @@ clean:
 # Format Haskell project with fourmolu
 format:
     @echo "Formating the Haskell project (fourmolu)..."
-    fourmolu -i ./src/*/*
-    fourmolu -i ./test/*
+    fourmolu -i ./src/*/*.hs
+    fourmolu -i ./src/*.hs
+
+# Format Haskell project with
+format2:
+    @echo "Formating the Haskell project..."
+    ormolu -i ./src/*.hs
+    ormolu -i ./src/*/*.hs
+
 
 # docs
 # stack haddock --haddock-arguments --theme="./my.css"
 docs:
-    stack haddock 
+    stack haddock

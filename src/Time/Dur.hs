@@ -2,10 +2,10 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Time.Dur (
-    Dur (..),
-    (%/),
-    HasDur (..),
-    normalizeDurList,
+  Dur (..),
+  (%/),
+  HasDur (..),
+  normalizeDurList,
 ) where
 
 import Control.Lens
@@ -14,15 +14,15 @@ import Data.Default
 import Data.Ratio
 
 newtype Dur = Dur
-    { unDur :: Rational
-    }
-    deriving (Eq, Ord, Num, Fractional, Real, Data)
+  { unDur :: Rational
+  }
+  deriving (Eq, Ord, Num, Fractional, Real, Data)
 
 makeLenses ''Dur
 
 instance Show Dur where
-    show :: Dur -> String
-    show (Dur x) = "Dur (" <> show x <> ")"
+  show :: Dur -> String
+  show (Dur x) = "Dur (" <> show x <> ")"
 
 -- instance Show Dur where
 --   showsPrec d (Dur x) = showParen (d > 10) $ showString "Dur " . showsPrec 11 x
@@ -32,7 +32,7 @@ instance Show Dur where
  Dur (1 % 1)
 -}
 instance Default Dur where
-    def = Dur (1 % 1)
+  def = Dur (1 % 1)
 
 infix 7 %/
 
@@ -43,17 +43,17 @@ dur :: Rational -> Dur
 dur = Dur
 
 class HasDur a where
-    toDur :: a -> Dur
-    setDur :: a -> Dur -> a
+  toDur :: a -> Dur
+  setDur :: a -> Dur -> a
 
 instance HasDur Dur where
-    toDur = id
-    setDur a _ = Dur (unDur a)
+  toDur = id
+  setDur a _ = Dur (unDur a)
 
 normalizeDurList :: (HasDur a) => [a] -> [Dur]
 normalizeDurList durations = fmap (\x -> toDur x / toDur total) durations
-    where
-        total = sum $ fmap toDur durations
+  where
+    total = sum $ fmap toDur durations
 
 -- !FIX
 -- (|/) :: (HasDur a, Real b) => [a] -> b -> [a]
