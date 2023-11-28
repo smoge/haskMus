@@ -1,10 +1,3 @@
 cradle:
-  cabal:
-    - path: "src"
-      component: "lib:haskMus"
-
-    - path: "app/Main.hs"
-      component: "haskMus:exe:haskMus-exe"
-
-    - path: "test"
-      component: "haskMus:test:haskMus-test"
+  stack:
+    component: "haskMus:lib"

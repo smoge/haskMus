@@ -1,13 +1,10 @@
-{-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Pitch.Parser where
 
-import Control.Lens
-import Language.Haskell.TH
-import Language.Haskell.TH.Quote
-import Language.Haskell.TH.Syntax
+--import Control.Lens
+--import Language.Haskell.TH
+--import Language.Haskell.TH.Quote
+--import Language.Haskell.TH.Syntax
 import Pitch.Accidental
 import Pitch.Pitch
 import Text.Parsec
@@ -57,21 +54,15 @@ pitchClassParser =
 octaveParser :: Parser Octave
 
 octaveParser = do
-  _ <- spaces
   upOctaves <- many (char '\'')
   downOctaves <- many (char ',')
-  _ <- spaces
   let octs = length upOctaves - length downOctaves
   pure (Octave (octs + 4))
 
--- Parser for pitches
 pitchParser :: Parser Pitch
 pitchParser = spaced $ do
-  _ <- spaces
   pc <- pitchClassParser
-  oct <- octaveParser
-  _ <- spaces
-  pure $ mkPitch' pc oct
+  mkPitch' pc <$> octaveParser
 
 parsePitch :: String -> Either ParseError Pitch
 parsePitch = parse pitchParser ""
@@ -81,11 +72,3 @@ pitchesParser = spaced $ sepEndBy pitchParser spaces
 
 parsePitches :: String -> Either ParseError [Pitch]
 parsePitches = parse pitchesParser ""
-
--- implemenmt state monad for octave
-
--- runState (do { x <- get; put (x+3); modify (*5); return 9 }) 100
-
---  execState (do { x <- get; put (x+3); modify (*5); return 9 }) 100
-
---  evalState (do { x <- get; put (x+3); modify (*5); return 9 }) 100
