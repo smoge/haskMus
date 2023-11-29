@@ -3,7 +3,7 @@ module Util.Fraction (
     unsplitFraction,
 ) where
 
-import Data.Ratio
+--import Data.Ratio 
 
 splitFraction :: Rational -> (Integer, Rational)
 splitFraction x = (wholePart, fractionalPart)
