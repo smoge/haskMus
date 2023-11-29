@@ -39,9 +39,9 @@ isValidRtm $ rtm' [s 1, g 3, 2 |: [s 1, g 1, s 1], s 1]
 ------------------------------------------------------------------------------------------------}
 
 data RtmLabel
-    = RtmScalar Int
-    | RtmGap Int
-    | RtmVector Int
+    = RtmScalar !Int
+    | RtmGap !Int
+    | RtmVector !Int
     | RtmCons
     deriving (Eq, Show, Data)
 
@@ -97,13 +97,13 @@ isValidVector _ = False
 -- | Check if an Rtm is valid.
 isValidRtm :: Rtm -> Bool
 isValidRtm = isValidRtm' True
-    where
-        isValidRtm' _ (Node (RtmScalar num) []) = isValidScalar (Node (RtmScalar num) [])
-        isValidRtm' _ (Node (RtmGap num) []) = isValidGap (Node (RtmGap num) [])
-        isValidRtm' _ (Node (RtmVector num) cs) = isValidVector (Node (RtmVector num) cs) && all (isValidRtm' False) cs
-        isValidRtm' True (Node RtmCons cs) = all (isValidRtm' False) cs -- Only valid if isRoot is True
-        isValidRtm' False (Node RtmCons _) = False -- Cons not allowed in descendants
-        isValidRtm' _ _ = False
+  where
+    isValidRtm' _ (Node (RtmScalar num) []) = isValidScalar (Node (RtmScalar num) [])
+    isValidRtm' _ (Node (RtmGap num) []) = isValidGap (Node (RtmGap num) [])
+    isValidRtm' _ (Node (RtmVector num) cs) = isValidVector (Node (RtmVector num) cs) && all (isValidRtm' False) cs
+    isValidRtm' True (Node RtmCons cs) = all (isValidRtm' False) cs -- Only valid if isRoot is True
+    isValidRtm' False (Node RtmCons _) = False -- Cons not allowed in descendants
+    isValidRtm' _ _ = False
 
 -- | Print an RTM to standard output.
 printRtm :: Rtm -> IO ()
@@ -119,26 +119,26 @@ rtmDepth (Node _ subs) = 1 + maximum (fmap rtmDepth subs)
 -}
 collapseRtmGaps :: Rtm -> Rtm
 collapseRtmGaps (Node z children) = Node z (processChildren children)
-    where
-        processChildren [] = []
-        processChildren (Node (RtmGap y) [] : xs) =
-            let (rests, remainder) = span isRest xs
-                total_ = y + sum (fmap getRestValue rests)
-             in Node (RtmGap total_) [] : processChildren remainder
-        processChildren (x : xs) = collapseRtmGaps x : processChildren xs
+  where
+    processChildren [] = []
+    processChildren (Node (RtmGap y) [] : xs) =
+        let (rests, remainder) = span isRest xs
+            total_ = y + sum (fmap getRestValue rests)
+         in Node (RtmGap total_) [] : processChildren remainder
+    processChildren (x : xs) = collapseRtmGaps x : processChildren xs
 
-        isRest (Node (RtmGap _) []) = True
-        isRest _ = False
+    isRest (Node (RtmGap _) []) = True
+    isRest _ = False
 
-        getRestValue (Node (RtmGap x) []) = x
-        getRestValue _ = 0 -- shouldn't happen, but to make it exhaustive
+    getRestValue (Node (RtmGap x) []) = x
+    getRestValue _ = 0 -- shouldn't happen, but to make it exhaustive
 
 -- | Remove gaps from an Rtm.
 noRtmGaps :: Rtm -> Rtm
 noRtmGaps = fmap noGap
-    where
-        noGap (RtmGap num) = RtmScalar num
-        noGap x = x
+  where
+    noGap (RtmGap num) = RtmScalar num
+    noGap x = x
 
 -- | Count the number of scalar nodes in an Rtm.
 countRtmScalars :: Rtm -> Int
@@ -151,12 +151,12 @@ countRtmScalars (Node _ children) = sum (fmap countRtmScalars children)
 -}
 extractIntsFromLabels :: [RtmLabel] -> [Int]
 extractIntsFromLabels = mapMaybe extractInt
-    where
-        extractInt :: RtmLabel -> Maybe Int
-        extractInt (RtmScalar n) = Just n
-        extractInt (RtmGap n) = Just n
-        extractInt (RtmVector n) = Just n
-        extractInt _ = Nothing -- RtmCons, or any other non-int-carrying label
+  where
+    extractInt :: RtmLabel -> Maybe Int
+    extractInt (RtmScalar n) = Just n
+    extractInt (RtmGap n) = Just n
+    extractInt (RtmVector n) = Just n
+    extractInt _ = Nothing -- RtmCons, or any other non-int-carrying label
 
 -- | Set the integer value of an RtmLabel.
 setRtmLabelInt :: Int -> RtmLabel -> RtmLabel
@@ -168,12 +168,12 @@ setRtmLabelInt _ x = x -- RtmCons
 -- | Reconstruct a list of RtmLabels from a list of Ints while retaining the position of RtmCons labels.
 reconstructLabelsFromInts :: [Int] -> [RtmLabel] -> [RtmLabel]
 reconstructLabelsFromInts ints = snd . foldl insertInt (ints, [])
-    where
-        insertInt :: ([Int], [RtmLabel]) -> RtmLabel -> ([Int], [RtmLabel])
-        insertInt (n : ns, ls) (RtmScalar _) = (ns, ls <> [RtmScalar n])
-        insertInt (n : ns, ls) (RtmGap _) = (ns, ls <> [RtmGap n])
-        insertInt (n : ns, ls) (RtmVector _) = (ns, ls <> [RtmVector n])
-        insertInt (ns, ls) rtmConsLabel = (ns, ls <> [rtmConsLabel]) -- RtmCons or any other label type
+  where
+    insertInt :: ([Int], [RtmLabel]) -> RtmLabel -> ([Int], [RtmLabel])
+    insertInt (n : ns, ls) (RtmScalar _) = (ns, ls <> [RtmScalar n])
+    insertInt (n : ns, ls) (RtmGap _) = (ns, ls <> [RtmGap n])
+    insertInt (n : ns, ls) (RtmVector _) = (ns, ls <> [RtmVector n])
+    insertInt (ns, ls) rtmConsLabel = (ns, ls <> [rtmConsLabel]) -- RtmCons or any other label type
 
 -- | An example Rtm.
 example :: Rtm
