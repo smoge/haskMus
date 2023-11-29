@@ -13,14 +13,14 @@ import Rtm.Parser (parseRtm)
 -}
 rtm :: QuasiQuoter
 rtm =
-  QuasiQuoter
-    { quoteExp = rtmToExp,
-      quotePat = \_ -> fail "Pattern quoting not supported for rtm QQ.",
-      quoteType = \_ -> fail "Type quoting not supported for rtm QQ.",
-      quoteDec = \_ -> fail "Declaration quoting not supported for rtm QQ."
-    }
+    QuasiQuoter
+        { quoteExp = rtmToExp
+        , quotePat = \_ -> fail "Pattern quoting not supported for rtm QQ."
+        , quoteType = \_ -> fail "Type quoting not supported for rtm QQ."
+        , quoteDec = \_ -> fail "Declaration quoting not supported for rtm QQ."
+        }
 
 rtmToExp :: (MonadFail m, Quote m) => String -> m Exp
 rtmToExp s = case Rtm.Parser.parseRtm s of
-  Left err -> fail $ "Parse error: " <> show err
-  Right tree -> dataToExpQ (const Nothing) tree
+    Left err -> fail $ "Parse error: " <> show err
+    Right tree -> dataToExpQ (const Nothing) tree

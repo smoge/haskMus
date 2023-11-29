@@ -224,7 +224,7 @@ accidentalToSemitones ThreeQuartersSharp = 3 % 2
 accidentalToSemitones DoubleSharp = 2
 accidentalToSemitones (Custom r) = r
 
---XML--------------------------------------------------------------------------
+-- XML--------------------------------------------------------------------------
 
 accidental_XML_alter :: Accidental -> T.Text
 accidental_XML_alter DoubleFlat = T.pack "-2"
@@ -447,24 +447,24 @@ addAccidental acc delta
     | newSemitone == 3 % 2 = ThreeQuartersSharp
     | newSemitone == 2 = DoubleSharp
     | otherwise = (Custom newSemitone)
-    where
-        currentSemitone = accidentalToSemitones acc
-        newSemitone = currentSemitone + delta
+  where
+    currentSemitone = accidentalToSemitones acc
+    newSemitone = currentSemitone + delta
 
 invertAccidental :: Accidental -> Accidental
 invertAccidental = negate
 
 allAccidentals :: [Accidental]
 allAccidentals =
-    [ DoubleFlat,
-      ThreeQuartersFlat,
-      Flat,
-      QuarterFlat,
-      Natural,
-      QuarterSharp,
-      Sharp,
-      ThreeQuartersSharp,
-      DoubleSharp
+    [ DoubleFlat
+    , ThreeQuartersFlat
+    , Flat
+    , QuarterFlat
+    , Natural
+    , QuarterSharp
+    , Sharp
+    , ThreeQuartersSharp
+    , DoubleSharp
     ]
 
 allSemitones :: [Rational]

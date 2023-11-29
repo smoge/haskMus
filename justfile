@@ -28,12 +28,12 @@ format:
     @echo "Formating the Haskell project (fourmolu)..."
     fourmolu -i ./src/*/*.hs
     fourmolu -i ./src/*.hs
-
-# Format Haskell project with
+#
+## Format Haskell project with
 format2:
-    @echo "Formating the Haskell project..."
-    ormolu -i ./src/*.hs
-    ormolu -i ./src/*/*.hs
+   @echo "Formating the Haskell project..."
+   ormolu -i ./src/*.hs
+   ormolu -i ./src/*/*.hs
 
 
 # docs

@@ -1,11 +1,11 @@
 module Pitch.Parser (
-    parsePitches
+    parsePitches,
 ) where
 
---import Control.Lens
---import Language.Haskell.TH
---import Language.Haskell.TH.Quote
---import Language.Haskell.TH.Syntax
+-- import Control.Lens
+-- import Language.Haskell.TH
+-- import Language.Haskell.TH.Quote
+-- import Language.Haskell.TH.Syntax
 import Pitch.Accidental
 import Pitch.Pitch
 import Text.Parsec

@@ -17,8 +17,8 @@ import Data.Ratio
 import Time.Dur
 
 data TimeSignature = TimeSignature
-    { upper :: Integer,
-      lower :: Integer
+    { upper :: Integer
+    , lower :: Integer
     }
     deriving (Eq, Ord)
 
@@ -52,15 +52,15 @@ durToTimeSig preferredDenominator d
         TimeSignature numeratorRatio denominatorRatio
     | otherwise =
         TimeSignature (numeratorRatio * multiplier) preferredDenominator'
-    where
-        preferredDenominator' = toInteger preferredDenominator
-        numeratorRatio = numerator $ unDur d
-        denominatorRatio = denominator $ unDur d
-        multiplier = preferredDenominator' `quot` denominatorRatio
+  where
+    preferredDenominator' = toInteger preferredDenominator
+    numeratorRatio = numerator $ unDur d
+    denominatorRatio = denominator $ unDur d
+    multiplier = preferredDenominator' `quot` denominatorRatio
 
 durToTimeSig8 :: Dur -> TimeSignature
 durToTimeSig8 durat
     | den < 8 = durToTimeSig (8 :: Integer) durat
     | otherwise = durToTimeSig den durat
-    where
-        den = (denominator . unDur) durat
+  where
+    den = (denominator . unDur) durat
