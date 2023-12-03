@@ -1,3 +1,9 @@
+
+{-# LANGUAGE DeriveLift #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell #-}
+
+
 module Pitch.Parser (
     parsePitches,
 ) where
@@ -7,6 +13,7 @@ module Pitch.Parser (
 -- import Language.Haskell.TH.Quote
 -- import Language.Haskell.TH.Syntax
 import Pitch.Accidental
+    ( Accidental(Natural, QuarterFlat, QuarterSharp, Flat, Sharp) )
 import Pitch.Pitch
 import Text.Parsec
 import Text.Parsec.String
