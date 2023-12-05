@@ -160,7 +160,7 @@ executable haskMus-exe
     -Wall -Wcompat -Widentities -Wincomplete-record-updates
     -Wincomplete-uni-patterns -Wmissing-export-lists
     -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
-    -threaded -rtsopts -with-rtsopts=-N
+
 
 test-suite haskMus-test
   type:               exitcode-stdio-1.0
@@ -222,8 +222,7 @@ test-suite haskMus-test
     -Wall -Wcompat -Widentities -Wincomplete-record-updates
     -Wincomplete-uni-patterns -Wmissing-export-lists
     -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
-    -threaded -rtsopts -with-rtsopts=-N
-
+   
 source-repository head
   type:     git
   location: https://github.com/smoge/haskMus

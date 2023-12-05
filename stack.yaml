@@ -13,3 +13,6 @@ packages:
 
 ghc-options:
   '$everything': -haddock
+
+urls:
+  latest-snapshot: https://www.stackage.org/download/snapshots.json
