@@ -31,6 +31,7 @@ library
     Rtm.Parser
     Rtm.QuasiQuoter
     Rtm.Shape
+    Text.XML.Writer
     Time.Dur
     Time.Duration
     Time.SimpleDuration
@@ -38,7 +39,6 @@ library
     ToXML
     Util.Fraction
     Util.MathDuration
-    Text.XML.Writer
 
   build-depends:
     , base                               >=4.17.2 && <4.20

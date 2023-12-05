@@ -1,7 +1,7 @@
 # Git push all repos
 # git push -u gh-origin main
 push:
-    git push -u origin main
+    git push -u origin $(git rev-parse --abbrev-ref HEAD)
 
 # Stack build file-watch
 build:
@@ -15,26 +15,22 @@ test:
 make_ci:
     haskell-ci github haskMus.cabal
 
+# Build the project
+build_w:
+    stack build --fast --file-watch
+
 # Make cabal package version bounds
 cabal_bounds:
     cabal gen-bounds
 
 # Clean the project
 clean:
-    stack clean
+    stack clean --full
     
 # Format Haskell project with fourmolu
 format:
     @echo "Formating the Haskell project (fourmolu)..."
-    fourmolu -i ./src/*/*.hs
-    fourmolu -i ./src/*.hs
-#
-## Format Haskell project with
-format2:
-   @echo "Formating the Haskell project..."
-   ormolu -i ./src/*.hs
-   ormolu -i ./src/*/*.hs
-
+    find ./src -name '*.hs' | xargs fourmolu -i
 
 # docs
 # stack haddock --haddock-arguments --theme="./my.css"
