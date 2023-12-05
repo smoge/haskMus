@@ -105,7 +105,6 @@ library
     TypeFamilies
     TypeOperators
     TypeSynonymInstances
-    TypeSynonymInstances
     UnicodeSyntax
 
   ghc-options:
@@ -152,8 +151,6 @@ executable haskMus-exe
     TypeApplications
     TypeFamilies
     TypeOperators
-    TypeSynonymInstances
-    TypeSynonymInstances
     UnicodeSyntax
 
   ghc-options:
@@ -214,8 +211,6 @@ test-suite haskMus-test
     TypeApplications
     TypeFamilies
     TypeOperators
-    TypeSynonymInstances
-    TypeSynonymInstances
     UnicodeSyntax
 
   ghc-options:
