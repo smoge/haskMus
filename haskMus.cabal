@@ -65,6 +65,7 @@ library
     , vector-space
     , xml-conduit
     , xml-types
+    , neat-interpolation
 
   --    , rando
   --    , random-fu
