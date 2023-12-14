@@ -68,9 +68,9 @@ document ::
     Document
 document name children =
     Document
-        { documentPrologue = Prologue def def def,
-          documentRoot = Element name def (render children),
-          documentEpilogue = def
+        { documentPrologue = Prologue def def def
+        , documentRoot = Element name def (render children)
+        , documentEpilogue = def
         }
 
 -- | Create a simple Document starting with a root element with attributes.
@@ -84,9 +84,9 @@ documentA ::
     Document
 documentA name attrs children =
     Document
-        { documentPrologue = Prologue def def def,
-          documentRoot = Element name (M.fromList attrs) (render children),
-          documentEpilogue = def
+        { documentPrologue = Prologue def def def
+        , documentRoot = Element name (M.fromList attrs) (render children)
+        , documentEpilogue = def
         }
 
 -- | Create a simple Document starting with a root element with a doctype.
@@ -100,9 +100,9 @@ documentD ::
     Document
 documentD name dt children =
     Document
-        { documentPrologue = Prologue def dt def,
-          documentRoot = Element name def (render children),
-          documentEpilogue = def
+        { documentPrologue = Prologue def dt def
+        , documentRoot = Element name def (render children)
+        , documentEpilogue = def
         }
 
 -- | Create a simple Document starting with a root element with attributes and doctype.
@@ -118,14 +118,14 @@ documentAD ::
     Document
 documentAD name attrs dt children =
     Document
-        { documentPrologue = Prologue def dt def,
-          documentRoot = Element name (M.fromList attrs) (render children),
-          documentEpilogue = def
+        { documentPrologue = Prologue def dt def
+        , documentRoot = Element name (M.fromList attrs) (render children)
+        , documentEpilogue = def
         }
 
 -- | Render document using xml-conduit's pretty-printer.
 pprint :: Document -> IO ()
-pprint = TL.putStrLn . renderText def {rsPretty = True}
+pprint = TL.putStrLn . renderText def{rsPretty = True}
 
 -- | Convert collected nodes to a list of child nodes.
 render :: XML -> [Node]
@@ -200,7 +200,7 @@ yields 'Nothing' as a prefix and children will
 revert to en empty namespace.
 -}
 (!:) :: Text -> Name -> Name
-pref !: name = name {namePrefix = Just pref}
+pref !: name = name{namePrefix = Just pref}
 
 {- | Provide instances for this class to use your data
 as "XML" nodes.
@@ -266,7 +266,7 @@ soap ::
 soap header body = document (sn "Envelope") $ do
     node . NodeElement $! Element (sn "Header") def headerContent
     element (sn "Body") (toXML body)
-    where
-        sn n = Name n (Just ns) (Just "soapenv")
-        ns = "http://schemas.xmlsoap.org/soap/envelope/"
-        headerContent = render (toXML header)
+  where
+    sn n = Name n (Just ns) (Just "soapenv")
+    ns = "http://schemas.xmlsoap.org/soap/envelope/"
+    headerContent = render (toXML header)
