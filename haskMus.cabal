@@ -39,6 +39,7 @@ library
         ToXML
         Util.Fraction
         Util.MathDuration
+        Data.WAVE
 
     build-depends:
         , base                               >=4.17.2 && <4.20

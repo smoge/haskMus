@@ -31,7 +31,7 @@ import Data.Bits
 import qualified Data.ByteString.Lazy as BS
 import Data.Char
 import Data.Int
-import Data.List
+import Data.List hiding (words)
 import Data.Word
 import System.IO
 
@@ -95,7 +95,7 @@ sampleToDouble v =
       minb = fromIntegral (minBound :: WAVESample)
    in if v >= 0
         then fromIntegral v / maxb
-        else -(fromIntegral v) / minb
+        else-fromIntegral v / minb
 
 -- | Utility routine for working with audio data in floating
 --  point format.
@@ -108,14 +108,14 @@ doubleToSample v =
         else (fromIntegral . ceiling . (* minb)) (min (-v) 1)
 
 bs_to_string :: BS.ByteString -> String
-bs_to_string b = map (chr . fromIntegral) (BS.unpack b)
+bs_to_string b = fmap (chr . fromIntegral) (BS.unpack b)
 
 match :: Handle -> String -> IO ()
 match h s = do
   b <- BS.hGet h (length s)
   unless
     (bs_to_string b == s)
-    (error ("mismatched format string '" ++ s ++ "'"))
+    (error ("mismatched format string '" <> (s <> "'")))
 
 convert_nbytes_lend :: (Num a) => [Word8] -> a
 convert_nbytes_lend bs =
@@ -126,7 +126,7 @@ convert_nbytes_lend bs =
 get_nbytes_lend :: Handle -> Int -> IO Int
 get_nbytes_lend h n = do
   bytes <- BS.hGet h n
-  return (convert_nbytes_lend (BS.unpack bytes))
+  pure (convert_nbytes_lend (BS.unpack bytes))
 
 get_word_lend :: Handle -> IO Int
 get_word_lend h = get_nbytes_lend h 4
@@ -149,7 +149,7 @@ get_wave_header h = do
   byte_rate <- get_word_lend h
   block_align <- get_halfword_lend h
   bits_per_sample <- get_halfword_lend h
-  return
+  pure
     ( WAVERawHeader
         { rawNumChannels = num_channels,
           rawSampleRate = frame_rate,
@@ -178,14 +178,14 @@ get_wave_data h hd = do
   samples <- case bytes_per_sample of
     1 -> do
       bytes <- BS.hGet h count
-      return (map convert_byte (BS.unpack bytes))
+      pure (fmap convert_byte (BS.unpack bytes))
     n | n <= 4 -> do
       bytes <- BS.hGet h (count * n)
       let words = collect n (BS.unpack bytes)
-      return (map (convert_multibyte n) words)
+      pure (fmap (convert_multibyte n) words)
     _ -> error "max 32 bits per sample for now"
-  let samples' = map (mask bits_per_sample) samples
-  return
+  let samples' = fmap (mask bits_per_sample) samples
+  pure
     ( hd {rawFrames = Just frames},
       collect (rawNumChannels hd) samples'
     )
@@ -198,7 +198,24 @@ get_wave_data h hd = do
       (`shift` (32 - 8 * n))
         . (convert_nbytes_lend :: [Word8] -> WAVESample)
     mask bits v =
-      (v .&. (((1 `shift` bits) - 1) `shift` (32 - bits)))
+      v .&. (((1 `shift` bits) - 1) `shift` (32 - bits))
+
+--cook_header :: WAVERawHeader -> WAVEHeader
+--cook_header
+--  ( WAVERawHeader
+--      { rawNumChannels = nc,
+--        rawSampleRate = sr,
+--        rawBitsPerSample = bps,
+--        rawBlockAlign = ba,
+--        rawFrames = Just s
+--      }
+--    ) =
+--    WAVEHeader
+--      { waveNumChannels = nc,
+--        waveFrameRate = sr,
+--        waveBitsPerSample = bps,
+--        waveFrames = Just s
+--      }
 
 cook_header :: WAVERawHeader -> WAVEHeader
 cook_header
@@ -216,10 +233,25 @@ cook_header
         waveBitsPerSample = bps,
         waveFrames = Just s
       }
+cook_header
+  ( WAVERawHeader
+      { rawNumChannels = nc,
+        rawSampleRate = sr,
+        rawBitsPerSample = bps,
+        rawBlockAlign = ba,
+        rawFrames = Nothing
+      }
+    ) =
+    WAVEHeader
+      { waveNumChannels = nc,
+        waveFrameRate = sr,
+        waveBitsPerSample = bps,
+        waveFrames = Nothing
+      }
 
 get_chunks :: Handle -> Maybe WAVERawHeader -> Maybe WAVESamples -> IO WAVE
 get_chunks _ (Just hd) (Just s) =
-  return
+  pure
     WAVE
       { waveHeader = cook_header hd,
         waveSamples = s
@@ -230,7 +262,7 @@ get_chunks h mh ms = do
   where
     get_chunk_header = do
       bs <- BS.hGet h 4
-      return (bs_to_string bs)
+      pure (bs_to_string bs)
     process_chunk "fmt " Nothing Nothing = do
       nh <- get_wave_header h
       get_chunks h (Just nh) ms
@@ -253,8 +285,7 @@ hGetWAVE h = do
   match h "RIFF"
   size <- get_word_lend h
   match h "WAVE"
-  wav <- get_chunks h Nothing Nothing
-  return wav
+  get_chunks h Nothing Nothing
 
 -- | Read the WAVE file at the given path and return the audio data.
 getWAVEFile :: String -> IO WAVE
@@ -262,13 +293,13 @@ getWAVEFile fn = do
   h <- openFile fn ReadMode
   wav <- hGetWAVE h
   hClose h
-  return wav
+  pure wav
 
 unconvert_nbytes_lend :: Int -> Int -> [Word8]
 unconvert_nbytes_lend 0 _ = []
 unconvert_nbytes_lend n v =
-  (fromIntegral (v .&. 255))
-    : (unconvert_nbytes_lend (n - 1) (v `shift` (-8)))
+  fromIntegral (v .&. 255)
+    : unconvert_nbytes_lend (n - 1) (v `shift` (-8))
 
 put_nbytes_lend :: Handle -> Int -> Int -> IO ()
 put_nbytes_lend h n v = do
@@ -276,10 +307,10 @@ put_nbytes_lend h n v = do
   BS.hPut h bytes
 
 put_word_lend :: Handle -> Int -> IO ()
-put_word_lend h v = put_nbytes_lend h 4 v
+put_word_lend h = put_nbytes_lend h 4
 
 put_halfword_lend :: Handle -> Int -> IO ()
-put_halfword_lend h v = put_nbytes_lend h 2 v
+put_halfword_lend h = put_nbytes_lend h 2
 
 put_wave_header :: Handle -> WAVEHeader -> IO ()
 put_wave_header h hd = do
@@ -301,10 +332,10 @@ put_wave_data h hd sa = do
   when
     (nb <= 0 || nb > 4)
     (error "supported sample sizes 1..32 bits for now")
-  let saa = map ((flip shift) (8 * nb - 32)) sa
+  let saa = fmap (flip shift (8 * nb - 32)) sa
   let ba =
         if nb == 1
-          then map (fromIntegral . (.&. 255) . (+ 128)) saa
+          then fmap (fromIntegral . (.&. 255) . (+ 128)) saa
           else concatMap (unconvert_nbytes_lend nb . fromIntegral) saa
   let bytes = BS.pack ba
   BS.hPut h bytes
