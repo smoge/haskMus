@@ -244,8 +244,8 @@ get_wave_data h hd = do
             pure (fmap convert_byte (BS.unpack bytes))
         n | n <= 4 -> do
             bytes <- BS.hGet h (count * n)
-            let words = collect n (BS.unpack bytes)
-            pure (fmap (convert_multibyte n) words)
+            let wordsS = collect n (BS.unpack bytes)
+            pure (fmap (convert_multibyte n) wordsS)
         _ -> error "max 32 bits per sample for now"
     let samples' = fmap (mask bits_per_sample) samples
     pure
@@ -379,9 +379,9 @@ get_chunks h mh ms = do
         get_chunks h (Just nh') (Just nd)
     process_chunk "data" _ _ =
         error "no fmt chunk or duplicate data chunk in WAVE"
-    process_chunk _ nh ms = do
+    process_chunk _ nh msS = do
         skip_chunk h
-        get_chunks h nh ms
+        get_chunks h nh msS
 
 -- | Read the WAVE file at the given handle and return the audio data.
 hGetWAVE :: Handle -> IO WAVE
@@ -404,8 +404,8 @@ getWAVEFile fn = do
 unconvert_nbytes_lend :: Int -> Int -> [Word8]
 unconvert_nbytes_lend 0 _ = []
 unconvert_nbytes_lend n v =
-    fromIntegral (v .&. 255) :
-    unconvert_nbytes_lend (n - 1) (v `shift` (-8))
+    fromIntegral (v .&. 255)
+        : unconvert_nbytes_lend (n - 1) (v `shift` (-8))
 
 put_nbytes_lend :: Handle -> Int -> Int -> IO ()
 put_nbytes_lend h n v = do
