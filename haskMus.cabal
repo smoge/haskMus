@@ -3,7 +3,7 @@ name:          haskMus
 version:       0.1.0.0
 synopsis:      algorithm composition toolkit in haskell
 description:
-  Algorithm composition toolkit library and DSL designed creation, manipulation, of music structures.
+    Algorithm composition toolkit library and DSL designed creation, manipulation, of music structures.
 
 homepage:      https://github.com/smoge/haskMus#readme
 license:       GPL-3.0-or-later
@@ -21,204 +21,205 @@ build-type:    Simple
 tested-with:   GHC ==9.4.7 || ==9.6.3 || ==9.8.1
 
 library
-  hs-source-dirs:     src
-  exposed-modules:
-    Pitch.Accidental
-    Pitch.Parser
-    Pitch.Pitch
-    Pitch.QuasiQuoter
-    Rtm.Common
-    Rtm.Parser
-    Rtm.QuasiQuoter
-    Rtm.Shape
-    Text.XML.Writer
-    Time.Dur
-    Time.Duration
-    Time.SimpleDuration
-    Time.TimeSignature
-    ToXML
-    Util.Fraction
-    Util.MathDuration
+    hs-source-dirs:     src
+    exposed-modules:
+        Pitch.Accidental
+        Pitch.Parser
+        Pitch.Pitch
+        Pitch.QuasiQuoter
+        Rtm.Common
+        Rtm.Parser
+        Rtm.QuasiQuoter
+        Rtm.Shape
+        Text.XML.Writer
+        Time.Dur
+        Time.Duration
+        Time.SimpleDuration
+        Time.TimeSignature
+        ToXML
+        Util.Fraction
+        Util.MathDuration
 
-  build-depends:
-    , base                               >=4.17.2 && <4.20
-    , containers
-    , data-default
-    , data-default-class
-    , data-default-instances-containers
-    , data-default-instances-dlist
-    , data-default-instances-old-locale
-    , dlist
-    , doctest
-    , fgl
-    , hspec
-    , HUnit
-    , lens
-    , linear
-    , mtl
-    , parsec
-    , pretty-simple
-    , QuickCheck
-    , random-shuffle
-    , template-haskell
-    , text
-    , vector-space
-    , xml-conduit
-    , xml-types
-    , neat-interpolation
+    build-depends:
+        , base                               >=4.17.2 && <4.20
+        , bytestring
+        , containers
+        , data-default
+        , data-default-class
+        , data-default-instances-containers
+        , data-default-instances-dlist
+        , data-default-instances-old-locale
+        , dlist
+        , doctest
+        , fgl
+        , hspec
+        , HUnit
+        , lens
+        , linear
+        , mtl
+        , neat-interpolation
+        , parseargs
+        , parsec
+        , pretty-simple
+        , QuickCheck
+        , random-shuffle
+        , template-haskell
+        , text
+        , vector-space
+        , xml-conduit
+        , xml-types
 
-  --    , rando
-  --    , random-fu
-  --  , bimap >= 0.5.0 && < 0.6
-  --  , markov-chain >= 0.0.3 && < 0.1
-  --, witch
-  default-language:   Haskell2010
-  default-extensions:
-    AllowAmbiguousTypes
-    DataKinds
-    DefaultSignatures
-    DeriveDataTypeable
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
-    DisambiguateRecordFields
-    DuplicateRecordFields
-    ExistentialQuantification
-    FlexibleContexts
-    FlexibleInstances
-    GADTSyntax
-    GADTs
-    GeneralizedNewtypeDeriving
-    InstanceSigs
-    LambdaCase
-    OverloadedLists
-    OverloadedStrings
-    PolyKinds
-    PostfixOperators
-    QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TemplateHaskell
-    TupleSections
-    TypeApplications
-    TypeFamilies
-    TypeOperators
-    TypeSynonymInstances
-    UnicodeSyntax
+    --    , rando
+    --    , random-fu
+    --  , bimap >= 0.5.0 && < 0.6
+    --  , markov-chain >= 0.0.3 && < 0.1
+    --, witch
+    default-language:   Haskell2010
+    default-extensions:
+        AllowAmbiguousTypes
+        DataKinds
+        DefaultSignatures
+        DeriveDataTypeable
+        DeriveFunctor
+        DeriveGeneric
+        DeriveLift
+        DeriveTraversable
+        DisambiguateRecordFields
+        DuplicateRecordFields
+        ExistentialQuantification
+        FlexibleContexts
+        FlexibleInstances
+        GADTSyntax
+        GADTs
+        GeneralizedNewtypeDeriving
+        InstanceSigs
+        LambdaCase
+        OverloadedLists
+        OverloadedStrings
+        PolyKinds
+        PostfixOperators
+        QuasiQuotes
+        RankNTypes
+        ScopedTypeVariables
+        StandaloneDeriving
+        TemplateHaskell
+        TupleSections
+        TypeApplications
+        TypeFamilies
+        TypeOperators
+        TypeSynonymInstances
+        UnicodeSyntax
 
-  ghc-options:
-    -Wall -Wcompat -Widentities -Wincomplete-record-updates
-    -Wincomplete-uni-patterns -Wmissing-export-lists
-    -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+    ghc-options:
+        -Wall -Wcompat -Widentities -Wincomplete-record-updates
+        -Wincomplete-uni-patterns -Wmissing-export-lists
+        -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
 
 executable haskMus-exe
-  hs-source-dirs:     app
-  main-is:            Main.hs
-  build-depends:
-    , base
-    , haskMus
+    hs-source-dirs:     app
+    main-is:            Main.hs
+    build-depends:
+        , base
+        , haskMus
 
-  default-language:   Haskell2010
-  default-extensions:
-    AllowAmbiguousTypes
-    DataKinds
-    DefaultSignatures
-    DeriveDataTypeable
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
-    DisambiguateRecordFields
-    DuplicateRecordFields
-    ExistentialQuantification
-    FlexibleContexts
-    FlexibleInstances
-    GADTSyntax
-    GADTs
-    GeneralizedNewtypeDeriving
-    InstanceSigs
-    LambdaCase
-    OverloadedLists
-    OverloadedStrings
-    PolyKinds
-    PostfixOperators
-    QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    TemplateHaskell
-    TupleSections
-    TypeApplications
-    TypeFamilies
-    TypeOperators
-    UnicodeSyntax
+    default-language:   Haskell2010
+    default-extensions:
+        AllowAmbiguousTypes
+        DataKinds
+        DefaultSignatures
+        DeriveDataTypeable
+        DeriveFunctor
+        DeriveGeneric
+        DeriveLift
+        DeriveTraversable
+        DisambiguateRecordFields
+        DuplicateRecordFields
+        ExistentialQuantification
+        FlexibleContexts
+        FlexibleInstances
+        GADTSyntax
+        GADTs
+        GeneralizedNewtypeDeriving
+        InstanceSigs
+        LambdaCase
+        OverloadedLists
+        OverloadedStrings
+        PolyKinds
+        PostfixOperators
+        QuasiQuotes
+        RankNTypes
+        ScopedTypeVariables
+        TemplateHaskell
+        TupleSections
+        TypeApplications
+        TypeFamilies
+        TypeOperators
+        UnicodeSyntax
 
-  ghc-options:
-    -Wall -Wcompat -Widentities -Wincomplete-record-updates
-    -Wincomplete-uni-patterns -Wmissing-export-lists
-    -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
-
+    ghc-options:
+        -Wall -Wcompat -Widentities -Wincomplete-record-updates
+        -Wincomplete-uni-patterns -Wmissing-export-lists
+        -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
 
 test-suite haskMus-test
-  type:               exitcode-stdio-1.0
-  hs-source-dirs:     test
-  main-is:            Test.hs
-  other-modules:
-    AccidentalProperties
-    PitchProperties
-    PitchSpec
+    type:               exitcode-stdio-1.0
+    hs-source-dirs:     test
+    main-is:            Test.hs
+    other-modules:
+        AccidentalProperties
+        PitchProperties
+        PitchSpec
 
-  build-depends:
-    , base                        >=4.17.2 && <4.20
-    , haskMus
-    , hspec
-    , HUnit
-    , lens
-    , QuickCheck
-    , test-framework
-    , test-framework-hunit
-    , test-framework-quickcheck2
+    build-depends:
+        , base                        >=4.17.2 && <4.20
+        , haskMus
+        , hspec
+        , HUnit
+        , lens
+        , QuickCheck
+        , test-framework
+        , test-framework-hunit
+        , test-framework-quickcheck2
 
-  default-language:   Haskell2010
-  default-extensions:
-    AllowAmbiguousTypes
-    DataKinds
-    DefaultSignatures
-    DeriveDataTypeable
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
-    DisambiguateRecordFields
-    DuplicateRecordFields
-    ExistentialQuantification
-    FlexibleContexts
-    FlexibleInstances
-    GADTSyntax
-    GADTs
-    GeneralizedNewtypeDeriving
-    InstanceSigs
-    LambdaCase
-    OverloadedLists
-    OverloadedStrings
-    PolyKinds
-    PostfixOperators
-    QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    TemplateHaskell
-    TupleSections
-    TypeApplications
-    TypeFamilies
-    TypeOperators
-    UnicodeSyntax
+    default-language:   Haskell2010
+    default-extensions:
+        AllowAmbiguousTypes
+        DataKinds
+        DefaultSignatures
+        DeriveDataTypeable
+        DeriveFunctor
+        DeriveGeneric
+        DeriveLift
+        DeriveTraversable
+        DisambiguateRecordFields
+        DuplicateRecordFields
+        ExistentialQuantification
+        FlexibleContexts
+        FlexibleInstances
+        GADTSyntax
+        GADTs
+        GeneralizedNewtypeDeriving
+        InstanceSigs
+        LambdaCase
+        OverloadedLists
+        OverloadedStrings
+        PolyKinds
+        PostfixOperators
+        QuasiQuotes
+        RankNTypes
+        ScopedTypeVariables
+        TemplateHaskell
+        TupleSections
+        TypeApplications
+        TypeFamilies
+        TypeOperators
+        UnicodeSyntax
 
-  ghc-options:
-    -Wall -Wcompat -Widentities -Wincomplete-record-updates
-    -Wincomplete-uni-patterns -Wmissing-export-lists
-    -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
-   
+    ghc-options:
+        -Wall -Wcompat -Widentities -Wincomplete-record-updates
+        -Wincomplete-uni-patterns -Wmissing-export-lists
+        -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+
 source-repository head
-  type:     git
-  location: https://github.com/smoge/haskMus
+    type:     git
+    location: https://github.com/smoge/haskMus

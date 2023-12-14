@@ -4,7 +4,7 @@
 module Time.Duration where
 
 import Control.Lens
-import Data.Data
+import Data.Data (Data)
 import Data.List (sortOn)
 import Data.Ord (comparing)
 import Data.Ratio
@@ -22,9 +22,9 @@ newtype Multiplier = Multiplier {unMultiplier :: Rational}
     deriving (Eq, Show, Ord, Data, Lift)
 
 data Duration = Duration
-    { _division :: Division
-    , _dots :: Dots
-    , _multiplier :: Rational
+    { _division :: !Division
+    , _dots :: !Dots
+    , _multiplier :: !Rational
     }
     deriving (Eq, Show, Data, Lift)
 
@@ -50,6 +50,9 @@ addDotsToDuration :: Duration -> Integer -> Duration
 addDotsToDuration dur m = dur & dots .~ newDots
   where
     newDots = Dots (unDot (dur ^. dots) + m)
+
+infixl 6 +.
+infixl 6 -.
 
 -- | Operator for adding dots to a 'Duration'
 (+.) :: Duration -> Integer -> Duration
