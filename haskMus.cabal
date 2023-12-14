@@ -23,6 +23,7 @@ tested-with:   GHC ==9.4.7 || ==9.6.3 || ==9.8.1
 library
     hs-source-dirs:     src
     exposed-modules:
+        Data.WAVE
         Pitch.Accidental
         Pitch.Parser
         Pitch.Pitch
@@ -39,7 +40,6 @@ library
         ToXML
         Util.Fraction
         Util.MathDuration
-        Data.WAVE
 
     build-depends:
         , base                               >=4.17.2 && <4.20
@@ -53,6 +53,7 @@ library
         , dlist
         , doctest
         , fgl
+        , filepath
         , hspec
         , HUnit
         , lens

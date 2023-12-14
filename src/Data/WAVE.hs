@@ -1,4 +1,6 @@
---- Copyright (C) 2007 Bart Massey
+
+-- Modified from:
+-- Copyright (C) 2007 Bart Massey
 
 {- | This module implements reading and writing of the most
   common kinds of WAVE files.  WAVE files are Microsoft
@@ -31,7 +33,7 @@ import Data.Bits (Bits (shift, (.&.)))
 import qualified Data.ByteString.Lazy as BS
 import Data.Char (chr)
 import Data.Int (Int32, Int8)
-import Data.List hiding (words)
+--import Data.List hiding (words)
 import Data.Word (Word8)
 import System.IO (
     BufferMode (BlockBuffering),
@@ -45,6 +47,11 @@ import System.IO (
     hSetBuffering,
     openFile,
  )
+
+import System.FilePath (FilePath)
+
+--import qualified Data.Text as T
+
 
 {- | For internal use only; the header as it appears on-disk.
   The interface cleans this up to remove redundancy and
@@ -103,6 +110,10 @@ collect n s = h : collect n s'
 
 {- | Utility routine for working with audio data in floating
   point format.
+
+  Convert a sample value to a Double. This function normalizes the sample value
+  to the range -1.0 to 1.0 for ease of use in floating-point computations.
+  
 -}
 sampleToDouble :: WAVESample -> Double
 sampleToDouble v =
@@ -125,6 +136,7 @@ doubleToSample v =
 
 bs_to_string :: BS.ByteString -> String
 bs_to_string b = fmap (chr . fromIntegral) (BS.unpack b)
+
 
 match :: Handle -> String -> IO ()
 match h s = do
@@ -216,23 +228,6 @@ get_wave_data h hd = do
     mask bits v =
         v .&. (((1 `shift` bits) - 1) `shift` (32 - bits))
 
---cook_header :: WAVERawHeader -> WAVEHeader
---cook_header
---  ( WAVERawHeader
---      { rawNumChannels = nc,
---        rawSampleRate = sr,
---        rawBitsPerSample = bps,
---        rawBlockAlign = ba,
---        rawFrames = Just s
---      }
---    ) =
---    WAVEHeader
---      { waveNumChannels = nc,
---        waveFrameRate = sr,
---        waveBitsPerSample = bps,
---        waveFrames = Just s
---      }
-
 cook_header :: WAVERawHeader -> WAVEHeader
 cook_header
     ( WAVERawHeader
@@ -304,7 +299,7 @@ hGetWAVE h = do
     get_chunks h Nothing Nothing
 
 -- | Read the WAVE file at the given path and return the audio data.
-getWAVEFile :: String -> IO WAVE
+getWAVEFile :: FilePath -> IO WAVE
 getWAVEFile fn = do
     h <- openFile fn ReadMode
     wav <- hGetWAVE h
@@ -385,7 +380,7 @@ hPutWAVE h wav = do
     put_wave_data h header (concat samples)
 
 -- | Write the given audio data to the given path as a WAVE file.
-putWAVEFile :: String -> WAVE -> IO ()
+putWAVEFile :: FilePath -> WAVE -> IO ()
 putWAVEFile fn wav = do
     h <- openFile fn WriteMode
     hPutWAVE h wav
