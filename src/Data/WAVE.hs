@@ -1,4 +1,3 @@
-
 -- Modified from:
 -- Copyright (C) 2007 Bart Massey
 
@@ -49,10 +48,7 @@ import System.IO (
     openFile,
  )
 
---import System.FilePath (FilePath)
-
 --import qualified Data.Text as T
-
 
 {- | For internal use only; the header as it appears on-disk.
   The interface cleans this up to remove redundancy and
@@ -72,7 +68,7 @@ data WAVEHeader = WAVEHeader
     { -- | Samples per frame.
       waveNumChannels :: Int
     , -- | Frames per second.
-waveFrameRate :: Int
+      waveFrameRate :: Int
     , -- | Number of
       --  significant bits of left-justified value.
       waveBitsPerSample :: Int
@@ -114,30 +110,28 @@ collect n s = h : collect n s'
 
   Convert a sample value to a Double. This function normalizes the sample value
   to the range -1.0 to 1.0 for ease of use in floating-point computations.
-
 -}
 sampleToDouble :: WAVESample -> Double
 sampleToDouble v =
-    let maxb = fromIntegral (maxBound :: WAVESample)
-        minb = fromIntegral (minBound :: WAVESample)
+    let maxb = toInteger (maxBound :: WAVESample)
+        minb = toInteger (minBound :: WAVESample)
      in if v >= 0
-            then fromIntegral v / maxb
-            else -fromIntegral v / minb
+            then fromInteger (toInteger v) / fromInteger maxb
+            else -fromInteger (toInteger v) / fromInteger minb
 
 {- | Utility routine for working with audio data in floating
   point format.
 -}
 doubleToSample :: Double -> WAVESample
 doubleToSample v =
-    let maxb = fromIntegral (maxBound :: WAVESample)
-        minb = fromIntegral (minBound :: WAVESample)
+    let maxb = toInteger (maxBound :: WAVESample)
+        minb = toInteger (minBound :: WAVESample)
      in if v >= 0
-            then (fromIntegral . floor . (* maxb)) (min v 1)
-            else (fromIntegral . ceiling . (* minb)) (min (-v) 1)
+            then fromInteger (floor (v * fromInteger maxb))
+            else fromInteger (ceiling (v * fromInteger minb))
 
 bs_to_string :: BS.ByteString -> String
 bs_to_string b = fmap (chr . fromIntegral) (BS.unpack b)
-
 
 match :: Handle -> String -> IO ()
 match h s = do
