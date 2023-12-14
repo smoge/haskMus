@@ -96,7 +96,7 @@ bits_to_bytes :: (Integral a) => a -> a
 bits_to_bytes n = (n + 7) `div` 8
 
 collect :: Int -> [a] -> [[a]]
-collect n [] = []
+collect _ [] = []
 collect n s = h : collect n s'
   where
     (h, s') = splitAt n s
@@ -110,7 +110,7 @@ sampleToDouble v =
         minb = fromIntegral (minBound :: WAVESample)
      in if v >= 0
             then fromIntegral v / maxb
-            else -fromIntegral v / minb
+            else-fromIntegral v / minb
 
 {- | Utility routine for working with audio data in floating
   point format.
@@ -348,7 +348,7 @@ put_wave_data h hd sa = do
     when
         (nb <= 0 || nb > 4)
         (error "supported sample sizes 1..32 bits for now")
-    let saa = fmap (flip shift (8 * nb - 32)) sa
+    let saa = fmap (`shift` (8 * nb - 32)) sa
     let ba =
             if nb == 1
                 then fmap (fromIntegral . (.&. 255) . (+ 128)) saa
