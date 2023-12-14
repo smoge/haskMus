@@ -48,7 +48,7 @@ import System.IO (
     openFile,
  )
 
--- TODO 
+-- TODO
 -- Change String to Text
 -- import qualified Data.Text as T
 
@@ -57,12 +57,12 @@ import System.IO (
   make things easier to understand.
 -}
 data WAVERawHeader = WAVERawHeader
-    { rawNumChannels :: Int     -- Number of channels in the audio
-    , rawSampleRate :: Int      -- Sample rate of the audio
-    , rawByteRate :: Int        -- Byte rate of the audio
-    , rawBlockAlign :: Int      -- Block alignment of the audio
-    , rawBitsPerSample :: Int   -- Bits per sample of the audio
-    , rawFrames :: Maybe Int    -- Number of frames in the audio stream (if present)
+    { rawNumChannels :: Int -- Number of channels in the audio
+    , rawSampleRate :: Int -- Sample rate of the audio
+    , rawByteRate :: Int -- Byte rate of the audio
+    , rawBlockAlign :: Int -- Block alignment of the audio
+    , rawBitsPerSample :: Int -- Bits per sample of the audio
+    , rawFrames :: Maybe Int -- Number of frames in the audio stream (if present)
     }
 
 -- | Descriptive information for the audio source.
@@ -95,7 +95,6 @@ convertWordToFloat = wordToFloat
 convertFloatToWord :: Float -> Word32
 convertFloatToWord = floatToWord
 -}
-
 
 {- | Each sample is a left-justified signed integer, with
   significant bits as given in the header.
@@ -147,13 +146,13 @@ doubleToSample v =
             then fromInteger (floor (v * fromInteger maxb))
             else fromInteger (ceiling (v * fromInteger minb))
 
-{-|
+{- |
    Convert a `ByteString` to a `String`.
 -}
 bs_to_string :: BS.ByteString -> String
 bs_to_string b = fmap (chr . fromIntegral) (BS.unpack b)
 
-{-|
+{- |
    Check if the given `Handle` matches the provided string `s`.
    If not, throw an error with a mismatched format string message.
 -}
@@ -164,7 +163,7 @@ match h s = do
         (bs_to_string b == s)
         (error ("mismatched format string '" <> (s <> "'")))
 
-{-|
+{- |
    Convert a list of `Word8` values to a number of type `a`.
    The type `a` must be an instance of the `Num` class.
 -}
@@ -174,7 +173,7 @@ convert_nbytes_lend bs =
   where
     accum a b = 256 * a + fromIntegral b
 
-{-|
+{- |
    Read `n` bytes from the given `Handle`, convert them to a number and return the result.
 -}
 get_nbytes_lend :: Handle -> Int -> IO Int
@@ -182,19 +181,19 @@ get_nbytes_lend h n = do
     bytes <- BS.hGet h n
     pure (convert_nbytes_lend (BS.unpack bytes))
 
-{-|
+{- |
    Read a 4-byte word from the given `Handle` and return the result.
 -}
 get_word_lend :: Handle -> IO Int
 get_word_lend h = get_nbytes_lend h 4
 
-{-|
+{- |
    Read a 2-byte halfword from the given `Handle` and return the result.
 -}
 get_halfword_lend :: Handle -> IO Int
 get_halfword_lend h = get_nbytes_lend h 2
 
-{-|
+{- |
    Read the wave header from the given `Handle` and return it.
 -}
 get_wave_header :: Handle -> IO WAVERawHeader
@@ -295,8 +294,7 @@ cook_header
             , waveFrames = Nothing
             }
 
-
-{- 
+{-
 
 -- Replace get_chunks with attoparsec????
 import Data.Attoparsec.ByteString (Parser, anyWord8, word8, string, take, parseOnly)
@@ -354,7 +352,6 @@ getWAVE bs = parseOnly parseWAVE bs
 
  -}
 
-
 get_chunks :: Handle -> Maybe WAVERawHeader -> Maybe WAVESamples -> IO WAVE
 get_chunks _ (Just hd) (Just s) =
     pure
@@ -404,8 +401,8 @@ getWAVEFile fn = do
 unconvert_nbytes_lend :: Int -> Int -> [Word8]
 unconvert_nbytes_lend 0 _ = []
 unconvert_nbytes_lend n v =
-    fromIntegral (v .&. 255)
-        : unconvert_nbytes_lend (n - 1) (v `shift` (-8))
+    fromIntegral (v .&. 255) :
+    unconvert_nbytes_lend (n - 1) (v `shift` (-8))
 
 put_nbytes_lend :: Handle -> Int -> Int -> IO ()
 put_nbytes_lend h n v = do
