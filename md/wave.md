@@ -1,4 +1,4 @@
-WAVE PCM soundfile format
+# WAVE PCM soundfile format
 
 ------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ sub-chunks \-- a \"fmt \" chunk specifying the data format and a
 \"Canonical form\". Who knows how it really all works.
 
 I use the standard WAVE format as created by the
-[sox](http://www.spies.com/Sox/){target="_top"} program:
+[sox](http://www.spies.com/Sox/) program:
 
 ![Alt text](image-1.png)
 
@@ -63,7 +63,7 @@ I use the standard WAVE format as created by the
                                    number.
     44        *   Data             The actual sound data.
 
-[]{#example}
+### example
 
 As an example, here are the opening 72 bytes of a WAVE file with bytes
 shown as hexadecimal numbers:
