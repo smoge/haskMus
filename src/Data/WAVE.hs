@@ -33,6 +33,7 @@ import Data.Bits (Bits (shift, (.&.)))
 import qualified Data.ByteString.Lazy as BS
 import Data.Char (chr)
 import Data.Int (Int32, Int8)
+
 --import Data.List hiding (words)
 import Data.Word (Word8)
 import System.IO (
@@ -48,7 +49,7 @@ import System.IO (
     openFile,
  )
 
-import System.FilePath (FilePath)
+--import System.FilePath (FilePath)
 
 --import qualified Data.Text as T
 
@@ -71,7 +72,7 @@ data WAVEHeader = WAVEHeader
     { -- | Samples per frame.
       waveNumChannels :: Int
     , -- | Frames per second.
-      waveFrameRate :: Int
+waveFrameRate :: Int
     , -- | Number of
       --  significant bits of left-justified value.
       waveBitsPerSample :: Int
@@ -113,7 +114,7 @@ collect n s = h : collect n s'
 
   Convert a sample value to a Double. This function normalizes the sample value
   to the range -1.0 to 1.0 for ease of use in floating-point computations.
-  
+
 -}
 sampleToDouble :: WAVESample -> Double
 sampleToDouble v =
@@ -121,7 +122,7 @@ sampleToDouble v =
         minb = fromIntegral (minBound :: WAVESample)
      in if v >= 0
             then fromIntegral v / maxb
-            else-fromIntegral v / minb
+            else -fromIntegral v / minb
 
 {- | Utility routine for working with audio data in floating
   point format.
