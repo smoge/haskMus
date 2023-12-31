@@ -1,20 +1,16 @@
-resolver:  nightly-2023-12-11
-#resolver: lts-21.24
+#resolver:  nightly-2023-12-11
+resolver: lts-22.4
 
 packages:
   - .
 
-
 ghc-options:
-  '$everything': -haddock
-
-
+  "$everything": -haddock
 # nix:
-#   enable: true  
+#   enable: true
 
 #   # true by default. Should Nix run in a pure shell?
 #   pure: true
-
 
 #   # Unset by default. You cannot set this option if `packages:`
 #   # is already present and not empty.
