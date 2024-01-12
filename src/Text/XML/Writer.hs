@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 
-{- | Overcome XML insanity, node by node.
+{-| Overcome XML insanity, node by node.
 > {\-# LANGUAGE OverloadedStrings #-\}
 >
 > let doc = document "root" $ do

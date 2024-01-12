@@ -4,7 +4,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 
-{- | The Pitch module defines core types for representing musical pitch:
+{-| The Pitch module defines core types for representing musical pitch:
 
  * 'NoteName' - The letter names of the musical scale (C, D, E etc.)
  * 'Accidental' - Alterations to the pitch like sharps/flats

@@ -22,9 +22,9 @@ newtype Multiplier = Multiplier {unMultiplier :: Rational}
     deriving (Eq, Show, Ord, Data, Lift)
 
 data Duration = Duration
-    { _division :: !Division
-    , _dots :: !Dots
-    , _multiplier :: !Rational
+    { _division :: Division
+    , _dots :: Dots
+    , _multiplier :: Rational
     }
     deriving (Eq, Show, Data, Lift)
 
