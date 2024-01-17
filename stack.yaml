@@ -1,11 +1,16 @@
-#resolver: nightly-2024-01-08
-resolver: lts-22.5
+#resolver: nightly-2024-01-17
+resolver: lts-21.25
+# resolver: lts-22.7
 
 packages:
   - .
 
+# extra-deps:
+#   - vector-space-0.16@sha256:3b93ce68ceb96b173d472b17c89283e5a652a270a40b33f49d65d8b7dd4492e8,2016
+
 ghc-options:
   "$everything": -haddock
+
 # nix:
 #   enable: true
 
