@@ -5,7 +5,7 @@ cabal-install-version: 2.2
 jobs:
 
 -- distribution version (xenial, bionic, focal, jammy)
-distribution: bionic
+distribution: jammy
 
 -- Jobs selection across packages
 jobs-selection: uniform
