@@ -42,7 +42,7 @@ library
         Util.MathDuration
 
     build-depends:
-        , base                               >=4.17.2 && <4.20
+        , base                               >=4.17 && <4.20
         , bytestring
         , containers
         , data-default
@@ -173,7 +173,7 @@ test-suite haskMus-test
         PitchSpec
 
     build-depends:
-        , base                        >=4.17.2 && <4.20
+        , base                        >=4.17 && <4.20
         , haskMus
         , hspec
         , HUnit
