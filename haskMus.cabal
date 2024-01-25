@@ -18,13 +18,14 @@ build-type:    Simple
 -- extra-source-files:  readme.md
 --                      changelog.md
 
-tested-with:   GHC ==9.4.* || ==9.6.*
+tested-with:   GHC ==9.4.8 || ==9.6.4
 
 library
     hs-source-dirs:     src
     exposed-modules:
         Data.WAVE
         Pitch.Accidental
+        Pitch.LilyPitch
         Pitch.Parser
         Pitch.Pitch
         Pitch.QuasiQuoter
