@@ -25,6 +25,19 @@ prop_setAccidental a pc = (pc & accidental .~ a) ^. accidental == a
 prop_setAccidentalPitch :: Accidental -> Pitch -> Bool
 prop_setAccidentalPitch a p = (p & accidental .~ a) ^. accidental == a
 
+instance Arbitrary NoteName where
+  arbitrary = elements [C, D, E, F, G, A, B]
+
+instance Arbitrary PitchClass where
+  arbitrary = PitchClass <$> arbitrary <*> arbitrary
+
+instance Arbitrary Octave where
+  arbitrary :: Gen Octave
+  arbitrary = Octave <$> arbitrary
+
+instance Arbitrary Pitch where
+  arbitrary = Pitch <$> arbitrary <*> arbitrary <*> arbitrary
+
 -- invertAccidental' :: Accidental -> Accidental
 -- invertAccidental' Natural = Natural
 -- invertAccidental' Sharp = Flat
@@ -57,8 +70,8 @@ prop_setAccidentalPitch a p = (p & accidental .~ a) ^. accidental == a
 
 prop_identityAccidentalIsUnchanged :: Accidental -> Bool
 prop_identityAccidentalIsUnchanged a =
-    let modifiedA = a & id
-     in modifiedA == a
+  let modifiedA = a & id
+   in modifiedA == a
 
 -- prop_modifyAccidentalCommutative :: Accidental -> PitchClass -> Bool
 -- prop_modifyAccidentalCommutative a pc =
@@ -67,54 +80,54 @@ prop_identityAccidentalIsUnchanged a =
 --         pc & accidental %~ (\x -> invertAccidental'' (a & accidental .~ x))
 --    in modifiedPC1 == modifiedPC2
 
-return []
-
-runTests :: IO Bool
-runTests = $quickCheckAll
-
 ----------------------------------------------------------------------------- -}
 
 -- QuickCheck MOVE ------------------------------------------------------------
 
 instance Arbitrary Accidental where
-    arbitrary =
-        frequency
-            [ (10, elements allAccidentals), -- Picking from the predefined list
-              (1, Custom <$> arbitrary) -- Picking a custom accidental
-            ]
+  arbitrary =
+    frequency
+      [ (10, elements allAccidentals), -- Picking from the predefined list
+        (1, Custom <$> arbitrary) -- Picking a custom accidental
+      ]
 
 -- Newtype wrapper for specific accidental strings
 newtype AccidentalString
-    = AccidentalString String
-    deriving (Show)
+  = AccidentalString String
+  deriving (Show)
 
 -- Arbitrary instance for AccidentalString (QuickCheck)
 instance Arbitrary AccidentalString where
-    arbitrary =
-        AccidentalString
-            <$> elements
-                [ "ff",
-                  "tqf",
-                  "f",
-                  "qf",
-                  "",
-                  "n",
-                  "qs",
-                  "s",
-                  "tqs",
-                  "ss",
-                  "sharp",
-                  "flat",
-                  "natural",
-                  "quartersharp",
-                  "semisharp",
-                  "quarterflat",
-                  "semiflat",
-                  "♭",
-                  "♯",
-                  "♮",
-                  "𝄫",
-                  "𝄪",
-                  "𝄳",
-                  "𝄲"
-                ]
+  arbitrary =
+    AccidentalString
+      <$> elements
+        [ "ff",
+          "tqf",
+          "f",
+          "qf",
+          "",
+          "n",
+          "qs",
+          "s",
+          "tqs",
+          "ss",
+          "sharp",
+          "flat",
+          "natural",
+          "quartersharp",
+          "semisharp",
+          "quarterflat",
+          "semiflat",
+          "♭",
+          "♯",
+          "♮",
+          "𝄫",
+          "𝄪",
+          "𝄳",
+          "𝄲"
+        ]
+
+return []
+
+runTests :: IO Bool
+runTests = $quickCheckAll
