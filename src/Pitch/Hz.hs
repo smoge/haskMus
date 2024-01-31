@@ -39,7 +39,7 @@ hzToDouble (Hz hz) = 12.0 * logBase 2 (hz / unHz pitchStandard)
 -- | Use `hzToDouble` to convert Hz to `Semitone`.
 --
 -- >>> hzToSemitone (Hz 880.0)
--- Semitone {unSemitone = 12.0}
+-- 12.0 Semitone(s)
 hzToSemitone :: Hz -> Semitone
 hzToSemitone = Semitone . hzToDouble
 
@@ -53,6 +53,6 @@ semitoneToDouble (Semitone n) = n
 -- | Wrap a `Double` as a `Semitone`.
 --
 -- >>> doubleToSemitone 12.0
--- Semitone {unSemitone = 12.0}
+-- 12.0 Semitone(s)
 doubleToSemitone :: Double -> Semitone
 doubleToSemitone = Semitone
