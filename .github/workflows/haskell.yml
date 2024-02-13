@@ -2,42 +2,42 @@ name: Haskell CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches: [ main ]
 
 jobs:
-  build:
-
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-haskell@v1
-      with:
-        ghc-version: '9.4.8'
-        cabal-version: '3.2'
+    - uses: actions/checkout@v2
+      name: Checkout code
 
-    - name: Cache
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-cabal
+    - name: Setup Haskell
+      uses: actions/setup-haskell@v1.1
       with:
-        path: ~/.cabal
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
+        ghc-version: '9.0.1' # Specify the GHC version
+        cabal-version: '3.4'
+
+    - name: Cache Stack
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.stack
+          .stack-work
+        key: ${{ runner.os }}-stack-${{ hashFiles('**/*.cabal', '**/stack.yaml', '**/stack.yaml.lock') }}
         restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+          ${{ runner.os }}-stack-
 
-    - name: Install dependencies
-      run: |
-        cabal update
-        cabal build --only-dependencies --enable-tests --enable-benchmarks
-    - name: Build
-      run: cabal build --enable-tests --enable-benchmarks all
+    - name: Build project
+      run: stack build --test --bench --no-run-tests --no-run-benchmarks
+
     - name: Run tests
-      run: cabal test all
+      run: stack test
+
+    # Optional: Add a step for linting if you're using HLint or a similar tool
+    - name: Lint
+      run: stack exec hlint .
+
+    # Optional: Add steps for additional checks like code formatting
