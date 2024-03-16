@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 module Rtm.Parser
   ( rtmParser,
     parseRtm,

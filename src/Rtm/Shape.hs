@@ -7,7 +7,9 @@ import Rtm.Common
 import System.Random.Shuffle (shuffleM)
 
 -- | Tree structure that holds placeholders for the shape of the tree
-data ShapeTree a = ShapeLeaf | ShapeNode a [ShapeTree a]
+data ShapeTree a where
+  ShapeLeaf :: ShapeTree a
+  ShapeNode :: a -> [ShapeTree a] -> ShapeTree a
   deriving (Functor, Show)
 
 -- Function to extract the shape of an Rtm

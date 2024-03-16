@@ -1,5 +1,3 @@
--- Modified from:
--- Copyright (C) 2007 Bart Massey
 
 -- | This module implements reading and writing of the most
 --  common kinds of WAVE files.  WAVE files are Microsoft
@@ -54,14 +52,14 @@ import System.IO
 -- | For internal use only; the header as it appears on-disk.
 --  The interface cleans this up to remove redundancy and
 --  make things easier to understand.
-data WAVERawHeader = WAVERawHeader
-  { rawNumChannels :: Int, -- Number of channels in the audio
-    rawSampleRate :: Int, -- Sample rate of the audio
-    rawByteRate :: Int, -- Byte rate of the audio
-    rawBlockAlign :: Int, -- Block alignment of the audio
-    rawBitsPerSample :: Int, -- Bits per sample of the audio
-    rawFrames :: Maybe Int -- Number of frames in the audio stream (if present)
-  }
+data WAVERawHeader where
+  WAVERawHeader :: {rawNumChannels :: Int,
+                      rawSampleRate :: Int,
+                      rawByteRate :: Int,
+                      rawBlockAlign :: Int,
+                      rawBitsPerSample :: Int,
+                      rawFrames :: Maybe Int} ->
+                     WAVERawHeader
 
 -- | Descriptive information for the audio source.
 data WAVEHeader = WAVEHeader
@@ -128,7 +126,7 @@ sampleToDouble v =
       minb = toInteger (minBound :: WAVESample)
    in if v >= 0
         then fromInteger (toInteger v) / fromInteger maxb
-        else -fromInteger (toInteger v) / fromInteger minb
+        else - (fromInteger (toInteger v) / fromInteger minb)
 
 -- | Utility routine for working with audio data in floating
 --  point format.
