@@ -1,4 +1,3 @@
-
 -- | This module implements reading and writing of the most
 --  common kinds of WAVE files.  WAVE files are Microsoft
 --  RIFF audio sample files originally based on the AIFF
@@ -53,13 +52,15 @@ import System.IO
 --  The interface cleans this up to remove redundancy and
 --  make things easier to understand.
 data WAVERawHeader where
-  WAVERawHeader :: {rawNumChannels :: Int,
-                      rawSampleRate :: Int,
-                      rawByteRate :: Int,
-                      rawBlockAlign :: Int,
-                      rawBitsPerSample :: Int,
-                      rawFrames :: Maybe Int} ->
-                     WAVERawHeader
+  WAVERawHeader ::
+    { rawNumChannels :: Int,
+      rawSampleRate :: Int,
+      rawByteRate :: Int,
+      rawBlockAlign :: Int,
+      rawBitsPerSample :: Int,
+      rawFrames :: Maybe Int
+    } ->
+    WAVERawHeader
 
 -- | Descriptive information for the audio source.
 data WAVEHeader = WAVEHeader
@@ -126,7 +127,7 @@ sampleToDouble v =
       minb = toInteger (minBound :: WAVESample)
    in if v >= 0
         then fromInteger (toInteger v) / fromInteger maxb
-        else - (fromInteger (toInteger v) / fromInteger minb)
+        else -(fromInteger (toInteger v) / fromInteger minb)
 
 -- | Utility routine for working with audio data in floating
 --  point format.
