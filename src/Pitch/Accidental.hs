@@ -14,17 +14,17 @@ import Data.String
 import qualified Data.Text as T
 import Language.Haskell.TH.Syntax (Lift)
 
-data Accidental
-  = DoubleFlat
-  | ThreeQuartersFlat
-  | Flat
-  | QuarterFlat
-  | Natural
-  | QuarterSharp
-  | Sharp
-  | ThreeQuartersSharp
-  | DoubleSharp
-  | Custom Rational
+data Accidental where
+  DoubleFlat :: Accidental
+  ThreeQuartersFlat :: Accidental
+  Flat :: Accidental
+  QuarterFlat :: Accidental
+  Natural :: Accidental
+  QuarterSharp :: Accidental
+  Sharp :: Accidental
+  ThreeQuartersSharp :: Accidental
+  DoubleSharp :: Accidental
+  Custom :: Rational -> Accidental
   deriving (Eq, Ord, Show, Lift, Data)
 
 -- instance Lift Accidental
