@@ -2,17 +2,18 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Pitch.Parser (
-  parsePitches,
-) where
+module Pitch.Parser
+  ( parsePitches,
+  )
+where
 
 -- import Control.Lens
 -- import Language.Haskell.TH
 -- import Language.Haskell.TH.Quote
 -- import Language.Haskell.TH.Syntax
-import Pitch.Accidental (
-  Accidental (Flat, Natural, QuarterFlat, QuarterSharp, Sharp),
- )
+import Pitch.Accidental
+  ( Accidental (Flat, Natural, QuarterFlat, QuarterSharp, Sharp),
+  )
 import Pitch.Pitch
 import Text.Parsec
 import Text.Parsec.String

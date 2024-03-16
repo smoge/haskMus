@@ -29,16 +29,15 @@ data Accidental
 
 -- instance Lift Accidental
 
-{- |
- >>> map sharpenQ allAccidentals
- >>> map sharpenS allAccidentals
- >>> map flattenQ allAccidentals
- >>> map flattenS allAccidentals
- [ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp,Custom (5 % 2)]
- [Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp,Custom (5 % 2),Custom (3 % 1)]
- [Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp]l
- [Custom ((-3) % 1),Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp]
--}
+-- |
+-- >>> map sharpenQ allAccidentals
+-- >>> map sharpenS allAccidentals
+-- >>> map flattenQ allAccidentals
+-- >>> map flattenS allAccidentals
+-- [ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp,Custom (5 % 2)]
+-- [Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp,Custom (5 % 2),Custom (3 % 1)]
+-- [Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp]l
+-- [Custom ((-3) % 1),Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp]
 sharpenQ :: Accidental -> Accidental
 sharpenQ acc = modifyAccidental acc (+ (1 / 2))
 
@@ -124,23 +123,21 @@ instance AccClass DoubleSharp where
 
 -- >>> read @Accidental "f"
 
-{- | Converts a string to an accidental
- >>>  "ff" ::  Accidental
- >>>  "n" ::  Accidental
- >>>  "quartersharp" ::  Accidental
- >>>  "semiflat" ::  Accidental
- DoubleFlat
- Natural
- QuarterSharp
- QuarterFlat
--}
+-- | Converts a string to an accidental
+-- >>>  "ff" ::  Accidental
+-- >>>  "n" ::  Accidental
+-- >>>  "quartersharp" ::  Accidental
+-- >>>  "semiflat" ::  Accidental
+-- DoubleFlat
+-- Natural
+-- QuarterSharp
+-- QuarterFlat
 
-{- |
- >>> Sharp + Sharp
- >>> Flat + Sharp
- DoubleSharp
- Natural
--}
+-- |
+-- >>> Sharp + Sharp
+-- >>> Flat + Sharp
+-- DoubleSharp
+-- Natural
 instance Num Accidental where
   (+) a b = toAccidental $ accidentalToSemitones a + accidentalToSemitones b
   (-) a b = toAccidental $ accidentalToSemitones a - accidentalToSemitones b
@@ -317,10 +314,9 @@ semitonesToAccidental r
   | r == 2 % 1 = DoubleSharp
   | otherwise = (Custom r)
 
-{- | Converts an accidental to its corresponding LilyPond representation.
- >>>  map accToLily allAccidentals == map  T.pack ["ff","tqf","f","qf","","qs","s","tqs","ss"]
- True
--}
+-- | Converts an accidental to its corresponding LilyPond representation.
+-- >>>  map accToLily allAccidentals == map  T.pack ["ff","tqf","f","qf","","qs","s","tqs","ss"]
+-- True
 accToLily :: Accidental -> T.Text
 accToLily DoubleFlat = T.pack "ff"
 accToLily ThreeQuartersFlat = T.pack "tqf"
@@ -387,10 +383,9 @@ instance IsString Accidental where
     | "custom " `isPrefixOf` str = Custom (read (drop 7 str) :: Rational)
     | otherwise = error $ "Invalid Accidental string: " <> str
 
-{- | Modify the accidental by applying a function to its semitone value. Returns the modified accidental.
- >>> modifyAccidental Sharp (*2)
- DoubleSharp
--}
+-- | Modify the accidental by applying a function to its semitone value. Returns the modified accidental.
+-- >>> modifyAccidental Sharp (*2)
+-- DoubleSharp
 modifyAccidental :: Accidental -> (Rational -> Rational) -> Accidental
 modifyAccidental acc f =
   let newSemitone = f (accidentalToSemitones acc)
@@ -411,13 +406,12 @@ modifyAccidental acc f =
 checkAccidental :: Accidental -> Bool
 checkAccidental acc = semitonesToAccidental (accidentalToSemitones acc) == acc
 
-{- | Modifies an accidental by a given delta (Rational).
-
- >>> addAccidental DoubleFlat (1 % 2)
- >>> addAccidental DoubleSharp (1 % 2)
- ThreeQuartersFlat
- Custom (5 % 2)
--}
+-- | Modifies an accidental by a given delta (Rational).
+--
+-- >>> addAccidental DoubleFlat (1 % 2)
+-- >>> addAccidental DoubleSharp (1 % 2)
+-- ThreeQuartersFlat
+-- Custom (5 % 2)
 addAccidental :: Accidental -> Rational -> Accidental
 addAccidental acc delta
   | newSemitone == -2 = DoubleFlat
@@ -430,24 +424,24 @@ addAccidental acc delta
   | newSemitone == 3 % 2 = ThreeQuartersSharp
   | newSemitone == 2 = DoubleSharp
   | otherwise = (Custom newSemitone)
- where
-  currentSemitone = accidentalToSemitones acc
-  newSemitone = currentSemitone + delta
+  where
+    currentSemitone = accidentalToSemitones acc
+    newSemitone = currentSemitone + delta
 
 invertAccidental :: Accidental -> Accidental
 invertAccidental = negate
 
 allAccidentals :: [Accidental]
 allAccidentals =
-  [ DoubleFlat
-  , ThreeQuartersFlat
-  , Flat
-  , QuarterFlat
-  , Natural
-  , QuarterSharp
-  , Sharp
-  , ThreeQuartersSharp
-  , DoubleSharp
+  [ DoubleFlat,
+    ThreeQuartersFlat,
+    Flat,
+    QuarterFlat,
+    Natural,
+    QuarterSharp,
+    Sharp,
+    ThreeQuartersSharp,
+    DoubleSharp
   ]
 
 allSemitones :: [Rational]

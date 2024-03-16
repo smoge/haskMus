@@ -22,9 +22,9 @@ newtype Multiplier = Multiplier {unMultiplier :: Rational}
   deriving (Eq, Show, Ord, Data, Lift)
 
 data Duration = Duration
-  { _division :: Division
-  , _dots :: Dots
-  , _multiplier :: Rational
+  { _division :: Division,
+    _dots :: Dots,
+    _multiplier :: Rational
   }
   deriving (Eq, Show, Data, Lift)
 
@@ -48,10 +48,11 @@ orderByMusicalSimplicity = sortOn musicalOrderHelper
 -- | Add a specified number of dots to a 'Duration'
 addDotsToDuration :: Duration -> Integer -> Duration
 addDotsToDuration dur m = dur & dots .~ newDots
- where
-  newDots = Dots (unDot (dur ^. dots) + m)
+  where
+    newDots = Dots (unDot (dur ^. dots) + m)
 
 infixl 6 +.
+
 infixl 6 -.
 
 -- | Operator for adding dots to a 'Duration'
@@ -100,33 +101,33 @@ dotsFromMultiplier :: Rational -> Maybe Dots
 dotsFromMultiplier r
   | r < 0 = Nothing -- check for negative rationals
   | otherwise = binarySearch 0 9
- where
-  -- Cache for dotMultiplier, converting each integer to Dots
-  cache = fmap (dotMultiplier . Dots) [0 .. 9]
+  where
+    -- Cache for dotMultiplier, converting each integer to Dots
+    cache = fmap (dotMultiplier . Dots) [0 .. 9]
 
-  binarySearch :: Integer -> Integer -> Maybe Dots
-  binarySearch low high
-    | low > high = Nothing
-    | midMultiplier == r = Just $ Dots mid
-    | midMultiplier < r = binarySearch (mid + 1) high
-    | otherwise = binarySearch low (mid - 1)
-   where
-    mid = (low + high) `div` 2
-    midMultiplier = cache !! fromIntegral mid
+    binarySearch :: Integer -> Integer -> Maybe Dots
+    binarySearch low high
+      | low > high = Nothing
+      | midMultiplier == r = Just $ Dots mid
+      | midMultiplier < r = binarySearch (mid + 1) high
+      | otherwise = binarySearch low (mid - 1)
+      where
+        mid = (low + high) `div` 2
+        midMultiplier = cache !! fromIntegral mid
 
 -- | Get the number of dots corresponding to a given multiplier
 dotsFromMultiplier' :: Rational -> Dots
 dotsFromMultiplier' r = binarySearch 0 9
- where
-  binarySearch :: Integer -> Integer -> Dots
-  binarySearch low high
-    | low > high = error "Invalid multiplier or too many dots"
-    | midMultiplier == r = Dots mid
-    | midMultiplier < r = binarySearch (mid + 1) high
-    | otherwise = binarySearch low (mid - 1)
-   where
-    mid = (low + high) `div` 2
-    midMultiplier = dotMultiplier (Dots mid)
+  where
+    binarySearch :: Integer -> Integer -> Dots
+    binarySearch low high
+      | low > high = error "Invalid multiplier or too many dots"
+      | midMultiplier == r = Dots mid
+      | midMultiplier < r = binarySearch (mid + 1) high
+      | otherwise = binarySearch low (mid - 1)
+      where
+        mid = (low + high) `div` 2
+        midMultiplier = dotMultiplier (Dots mid)
 
 -- | Check if two durations have the same multiplier
 isMEQ :: Duration -> Duration -> Bool

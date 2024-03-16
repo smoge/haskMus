@@ -17,44 +17,44 @@ $(generatePitchVars (Map.keys pitchMap))
 
 allPitches :: [Pitch]
 allPitches =
-  [ "c"
-  , "cis"
-  , "ces"
-  , "cisis"
-  , "ceses"
-  , "d"
-  , "dis"
-  , "des"
-  , "dih___"
-  , "deh'''"
-  , "d__"
-  , "e"
-  , "ees"
-  , "eis"
-  , "eeh"
-  , "feseh"
-  , "eih"
-  , "f"
+  [ "c",
+    "cis",
+    "ces",
+    "cisis",
+    "ceses",
+    "d",
+    "dis",
+    "des",
+    "dih___",
+    "deh'''",
+    "d__",
+    "e",
+    "ees",
+    "eis",
+    "eeh",
+    "feseh",
+    "eih",
+    "f"
   ]
 
 allPitches2 :: [Pitch]
 allPitches2 =
-  [ c
-  , cis
-  , ces
-  , cisis
-  , ceses
-  , d
-  , dis
-  , des
-  , dih___
-  , deh'''
-  , d__
-  , e
-  , ees
-  , eis
-  , eeh
-  , feseh
-  , eih
-  , f
+  [ c,
+    cis,
+    ces,
+    cisis,
+    ceses,
+    d,
+    dis,
+    des,
+    dih___,
+    deh''',
+    d__,
+    e,
+    ees,
+    eis,
+    eeh,
+    feseh,
+    eih,
+    f
   ]

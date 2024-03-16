@@ -1,12 +1,13 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Time.Dur (
-  Dur (..),
-  (%/),
-  HasDur (..),
-  normalizeDurList,
-) where
+module Time.Dur
+  ( Dur (..),
+    (%/),
+    HasDur (..),
+    normalizeDurList,
+  )
+where
 
 import Control.Lens
 import Data.Data (Data)
@@ -27,10 +28,9 @@ instance Show Dur where
 -- instance Show Dur where
 --   showsPrec d (Dur x) = showParen (d > 10) $ showString "Dur " . showsPrec 11 x
 
-{- | Default value for 'Dur'
- >>> def :: Dur
- Dur (1 % 1)
--}
+-- | Default value for 'Dur'
+-- >>> def :: Dur
+-- Dur (1 % 1)
 instance Default Dur where
   def = Dur (1 % 1)
 
@@ -52,8 +52,8 @@ instance HasDur Dur where
 
 normalizeDurList :: (HasDur a) => [a] -> [Dur]
 normalizeDurList durations = fmap (\x -> toDur x / toDur total) durations
- where
-  total = sum $ fmap toDur durations
+  where
+    total = sum $ fmap toDur durations
 
 -- !FIX
 -- (|/) :: (HasDur a, Real b) => [a] -> b -> [a]

@@ -23,8 +23,8 @@ documentMusicXML name attrs children =
   Document
     { documentPrologue =
         Prologue
-          { prologueBefore = []
-          , prologueDoctype =
+          { prologueBefore = [],
+            prologueDoctype =
               Just $
                 Doctype
                   "score-partwise"
@@ -32,11 +32,11 @@ documentMusicXML name attrs children =
                       PublicID
                         "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                         "http://www.musicxml.org/dtds/partwise.dtd"
-                  )
-          , prologueAfter = []
-          }
-    , documentRoot = Element name (M.fromList attrs) (render children)
-    , documentEpilogue = []
+                  ),
+            prologueAfter = []
+          },
+      documentRoot = Element name (M.fromList attrs) (render children),
+      documentEpilogue = []
     }
 
 createMusicXmlDoc :: XML
@@ -85,8 +85,8 @@ main2 = do
 ------------------------------------------------------------
 
 data TimeSignature = TimeSignature
-  { upper :: Integer
-  , lower :: Integer
+  { upper :: Integer,
+    lower :: Integer
   }
   deriving (Eq, Ord)
 
@@ -185,15 +185,15 @@ data ExampleADT
   = NullaryExample
   | UnaryExample String
   | RecordExample
-      { earFoo :: Int
-      , earBar :: Maybe Bool
-      , earBaz :: [Float]
+      { earFoo :: Int,
+        earBar :: Maybe Bool,
+        earBaz :: [Float]
       }
 
 instance ToXML ExampleADT where
   toXML NullaryExample = empty
   toXML (UnaryExample s) = element "unary" $ content (T.pack s)
-  toXML (RecordExample{earFoo = foo, earBar = bar, earBaz = baz}) =
+  toXML (RecordExample {earFoo = foo, earBar = bar, earBaz = baz}) =
     element "record" $ do
       element "foo" $ toXML foo
       element "bar" $ toXML bar
