@@ -8,10 +8,10 @@ newtype Semitone = Semitone {unSemitone :: Double} deriving (Eq, Num, Ord)
 newtype Hz = Hz {unHz :: Double} deriving (Eq, Num, Ord)
 
 instance Show Semitone where
-    show (Semitone n) = show n <> " Semitone(s)"
+  show (Semitone n) = show n <> " Semitone(s)"
 
 instance Show Hz where
-    show (Hz hz) = show hz <> " Hz"
+  show (Hz hz) = show hz <> " Hz"
 
 -- Standard pitch (A4) definition in Hertz.
 pitchStandard :: Hz

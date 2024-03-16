@@ -14,35 +14,35 @@
 >     comment "that's it!"
 -}
 module Text.XML.Writer (
-    -- * Documents
-    document,
-    -- soap,
-    pprint,
+  -- * Documents
+  document,
+  -- soap,
+  pprint,
 
-    -- * Elements
-    XML,
+  -- * Elements
+  XML,
 
-    -- ** Node creation
-    node,
-    instruction,
-    comment,
-    element,
-    elementMaybe,
-    elementA,
-    content,
-    empty,
-    many,
+  -- ** Node creation
+  node,
+  instruction,
+  comment,
+  element,
+  elementMaybe,
+  elementA,
+  content,
+  empty,
+  many,
 
-    -- ** Element helpers
-    render,
-    (!:),
+  -- ** Element helpers
+  render,
+  (!:),
 
-    -- ** Converting data
-    ToXML (..),
-    documentA,
-    documentD,
-    documentAD,
-    soap,
+  -- ** Converting data
+  ToXML (..),
+  documentA,
+  documentD,
+  documentAD,
+  soap,
 ) where
 
 import Control.Monad.Writer.Strict
@@ -61,67 +61,67 @@ type XML = Writer (DL.DList Node) ()
 
 -- | Create a simple Document starting with a root element.
 document ::
-    -- | Root node name
-    Name ->
-    -- | Contents
-    XML ->
-    Document
+  -- | Root node name
+  Name ->
+  -- | Contents
+  XML ->
+  Document
 document name children =
-    Document
-        { documentPrologue = Prologue def def def
-        , documentRoot = Element name def (render children)
-        , documentEpilogue = def
-        }
+  Document
+    { documentPrologue = Prologue def def def
+    , documentRoot = Element name def (render children)
+    , documentEpilogue = def
+    }
 
 -- | Create a simple Document starting with a root element with attributes.
 documentA ::
-    -- | Root node name
-    Name ->
-    -- | Attributes
-    [(Name, Text)] ->
-    -- | Contents
-    XML ->
-    Document
+  -- | Root node name
+  Name ->
+  -- | Attributes
+  [(Name, Text)] ->
+  -- | Contents
+  XML ->
+  Document
 documentA name attrs children =
-    Document
-        { documentPrologue = Prologue def def def
-        , documentRoot = Element name (M.fromList attrs) (render children)
-        , documentEpilogue = def
-        }
+  Document
+    { documentPrologue = Prologue def def def
+    , documentRoot = Element name (M.fromList attrs) (render children)
+    , documentEpilogue = def
+    }
 
 -- | Create a simple Document starting with a root element with a doctype.
 documentD ::
-    -- | Root node name
-    Name ->
-    -- | DOCTYPE
-    Maybe Doctype ->
-    -- | Contents
-    XML ->
-    Document
+  -- | Root node name
+  Name ->
+  -- | DOCTYPE
+  Maybe Doctype ->
+  -- | Contents
+  XML ->
+  Document
 documentD name dt children =
-    Document
-        { documentPrologue = Prologue def dt def
-        , documentRoot = Element name def (render children)
-        , documentEpilogue = def
-        }
+  Document
+    { documentPrologue = Prologue def dt def
+    , documentRoot = Element name def (render children)
+    , documentEpilogue = def
+    }
 
 -- | Create a simple Document starting with a root element with attributes and doctype.
 documentAD ::
-    -- | Root node name
-    Name ->
-    -- | Attributes
-    [(Name, Text)] ->
-    -- | DOCTYPE
-    Maybe Doctype ->
-    -- | Contents
-    XML ->
-    Document
+  -- | Root node name
+  Name ->
+  -- | Attributes
+  [(Name, Text)] ->
+  -- | DOCTYPE
+  Maybe Doctype ->
+  -- | Contents
+  XML ->
+  Document
 documentAD name attrs dt children =
-    Document
-        { documentPrologue = Prologue def dt def
-        , documentRoot = Element name (M.fromList attrs) (render children)
-        , documentEpilogue = def
-        }
+  Document
+    { documentPrologue = Prologue def dt def
+    , documentRoot = Element name (M.fromList attrs) (render children)
+    , documentEpilogue = def
+    }
 
 -- | Render document using xml-conduit's pretty-printer.
 pprint :: Document -> IO ()
@@ -185,12 +185,12 @@ Content nodes tend to glue together:
 > <container>chunkychunk</container>
 -}
 many ::
-    (ToXML a) =>
-    -- | Container element name.
-    Name ->
-    -- | Items to convert.
-    [a] ->
-    XML
+  (ToXML a) =>
+  -- | Container element name.
+  Name ->
+  -- | Items to convert.
+  [a] ->
+  XML
 many n = mapM_ (element n . toXML)
 
 {- | Attach a prefix to a Name.
@@ -206,46 +206,46 @@ pref !: name = name{namePrefix = Just pref}
 as "XML" nodes.
 -}
 class ToXML a where
-    toXML :: a -> XML
+  toXML :: a -> XML
 
 -- | Do nothing.
 instance ToXML () where
-    toXML () = empty
+  toXML () = empty
 
 -- | Insert already prepared nodes.
 instance ToXML XML where
-    toXML = id
+  toXML = id
 
 -- | Don't use [Char] please, it will scare OverloadedStrings.
 instance ToXML Text where
-    toXML = content
+  toXML = content
 
 -- | XML schema uses lower case.
 instance ToXML Bool where
-    toXML True = "true"
-    toXML False = "false"
+  toXML True = "true"
+  toXML False = "false"
 
 instance ToXML Float where
-    toXML = content . T.pack . show
+  toXML = content . T.pack . show
 
 instance ToXML Double where
-    toXML = content . T.pack . show
+  toXML = content . T.pack . show
 
 instance ToXML Int where
-    toXML = content . T.pack . show
+  toXML = content . T.pack . show
 
 instance ToXML Integer where
-    toXML = content . T.pack . show
+  toXML = content . T.pack . show
 
 instance ToXML Char where
-    toXML = content . T.singleton
+  toXML = content . T.singleton
 
 -- | Insert node if available. Otherwise do nothing.
 instance (ToXML a) => ToXML (Maybe a) where
-    toXML = maybe empty toXML
+  toXML = maybe empty toXML
 
 instance IsString XML where
-    fromString = content . T.pack
+  fromString = content . T.pack
 
 {- | Generate a SOAPv1.1 document.
 
@@ -259,14 +259,14 @@ Works great with 'ToXML' class.
 > let doc = soap () (BigData True)
 -}
 soap ::
-    (ToXML h, ToXML b) =>
-    h ->
-    b ->
-    Document
+  (ToXML h, ToXML b) =>
+  h ->
+  b ->
+  Document
 soap header body = document (sn "Envelope") $ do
-    node . NodeElement $! Element (sn "Header") def headerContent
-    element (sn "Body") (toXML body)
-  where
-    sn n = Name n (Just ns) (Just "soapenv")
-    ns = "http://schemas.xmlsoap.org/soap/envelope/"
-    headerContent = render (toXML header)
+  node . NodeElement $! Element (sn "Header") def headerContent
+  element (sn "Body") (toXML body)
+ where
+  sn n = Name n (Just ns) (Just "soapenv")
+  ns = "http://schemas.xmlsoap.org/soap/envelope/"
+  headerContent = render (toXML header)
