@@ -2,6 +2,11 @@
 {-# LANGUAGE DeriveLift #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE OverloadedRecordDot #-}
+{-# LANGUAGE OverloadedStrings #-}
+
+
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 
 -- | The Pitch module defines core types for representing musical pitch:
