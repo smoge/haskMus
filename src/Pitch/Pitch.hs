@@ -1,12 +1,10 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveLift #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE OverloadedStrings #-}
-
-
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 
 -- | The Pitch module defines core types for representing musical pitch:
@@ -32,7 +30,7 @@ import Control.Monad (forM)
 import Data.Char (toLower)
 import Data.Data
 import Data.Fixed (mod')
-import qualified Data.Map as Map
+import Data.Map qualified as Map
 import Data.Maybe (fromMaybe)
 import Data.Ratio ((%))
 import Data.String
@@ -162,6 +160,10 @@ instance NoteClass A where
 instance NoteClass B where
   sayNote = "b"
 
+instance IsNoteName NoteName where
+  toNoteName :: NoteName -> NoteName
+  toNoteName = id
+
 instance IsString NoteName where
   fromString :: String -> NoteName
   fromString "c" = C
@@ -261,6 +263,11 @@ c ^. accidental
 
 c4 = Pitch C Natural (Octave 4)
 
+c4 ^. noteName
+c4 ^. accidental
+
+c4 & octave .~ (Octave 5)
+
 pitchToRational c4
 
 splitFraction $ pitchToRational $  Pitch G QuarterSharp (Octave 5)
@@ -272,6 +279,7 @@ c & accidental .~ Sharp
 --C Sharp
 
 c & accidental %~ (\x -> addAccidental x (1%2))
+
 -- C QuarterSharp
 
 pitchClasses = map (\x -> PitchClass x Natural) [C .. B]
@@ -279,19 +287,25 @@ pitchClasses = map (\x -> PitchClass x Natural) [C .. B]
 -- Changes the accidental of every PitchClass in the list to Flat
 
 pitchClasses & each . accidental .~ Flat
+
 --[C Flat,D Flat,E Flat,F Flat,G Flat,A Flat,B Flat]
 
 -- Checks if 'c' has an accidental of Natural
+
 has (accidental . only Natural) c
+
 --True
 
 -- If the accidental is Natural, change it to Flat.
+
 c & accidental . filtered (== Natural) .~ Flat
+
 C Flat
 
 p = Pitch C Natural (Octave 4)
 
 p ^. noteName
+
 -- C
 
 p ^. accidental

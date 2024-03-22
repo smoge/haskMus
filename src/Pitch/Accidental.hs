@@ -11,7 +11,7 @@ import Data.List (isPrefixOf)
 import Data.Ord (comparing)
 import Data.Ratio
 import Data.String
-import qualified Data.Text as T
+import Data.Text qualified as T
 import Language.Haskell.TH.Syntax (Lift)
 
 data Accidental where

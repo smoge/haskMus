@@ -26,7 +26,7 @@ where
 
 import Control.Monad (unless, when)
 import Data.Bits (Bits (shift, (.&.)))
-import qualified Data.ByteString.Lazy as BS
+import Data.ByteString.Lazy qualified as BS
 import Data.Char (chr)
 import Data.Int (Int32, Int8)
 -- import Data.List hiding (words)

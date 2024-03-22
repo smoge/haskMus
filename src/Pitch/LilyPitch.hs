@@ -4,7 +4,7 @@
 
 module Pitch.LilyPitch where
 
-import qualified Data.Map as Map
+import Data.Map qualified as Map
 import Data.Maybe (fromMaybe)
 import Data.String (IsString, fromString)
 import Pitch.Pitch

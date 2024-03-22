@@ -5,8 +5,8 @@
 
 module ToXML where
 
-import qualified Data.Map.Strict as M
-import qualified Data.Text as T
+import Data.Map.Strict qualified as M
+import Data.Text qualified as T
 import Text.XML
 import Text.XML.Writer
 

@@ -46,13 +46,13 @@ module Text.XML.Writer
 where
 
 import Control.Monad.Writer.Strict
-import qualified Data.DList as DL
+import Data.DList qualified as DL
 import Data.Default
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.String (IsString (..))
 import Data.Text (Text)
-import qualified Data.Text as T
-import qualified Data.Text.Lazy.IO as TL
+import Data.Text qualified as T
+import Data.Text.Lazy.IO qualified as TL
 import Text.XML
 
 -- | Node container to be rendered as children nodes.
