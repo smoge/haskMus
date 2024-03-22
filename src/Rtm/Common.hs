@@ -27,6 +27,7 @@ where
 import Data.Data
 import Data.Maybe (mapMaybe)
 import Data.Tree
+import Safe (maximumDef)
 
 {- ----------------------------------- tests -----------------------------------------------------
 showRtm $ rtm' [s 1, g 3, 2 |: [s 1, g 1, s 1], s 1]
@@ -113,7 +114,7 @@ printRtm = putStrLn . drawTree . fmap show
 -- | Get the depth of an Rtm.
 rtmDepth :: Rtm -> Int
 rtmDepth (Node _ []) = 1
-rtmDepth (Node _ subs) = 1 + maximum (fmap rtmDepth subs)
+rtmDepth (Node _ subs) = 1 + Safe.maximumDef 0 (fmap rtmDepth subs)
 
 -- | Given an Rtm, collapses all gaps in the tree by summing consecutive gaps
 -- and returning a new Rtm with the gaps collapsed.

@@ -4,7 +4,7 @@
 - group: { name: generalise, enabled: true }
 - group: {name: partial, enabled: true}
 
-#- arguments: [ --cross, --refactor, -XQuasiQuotes]
+- arguments: [ --cross, --refactor, -XQuasiQuotes]
 #- arguments: [ --cross, --color, -XQuasiQuotes]
 
 #- extensions:
@@ -14,7 +14,7 @@
 # - ignore: { name: Avoid lambda }
 # - ignore: { name: Redundant lambda }
 # - ignore: { name: Redundant bracket }
-- ignore: { name: Unused LANGUAGE pragma }
+# - ignore: { name: Unused LANGUAGE pragma }
 # - ignore: { name: Eta reduce }
 - ignore: { name: Use camelCase }
 # - ignore: { name: Use guards }
