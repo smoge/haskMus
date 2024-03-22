@@ -391,10 +391,10 @@ modifyAccidental acc f =
   let newSemitone = f (accidentalToSemitones acc)
    in case newSemitone of
         r
-          | r == -2 -> DoubleFlat
-          | r == -3 % 2 -> ThreeQuartersFlat
-          | r == -1 -> Flat
-          | r == -1 % 2 -> QuarterFlat
+          | r == (-2) -> DoubleFlat
+          | r == (-3) % 2 -> ThreeQuartersFlat
+          | r == (-1) -> Flat
+          | r == (-1) % 2 -> QuarterFlat
           | r == 0 -> Natural
           | r == 1 % 2 -> QuarterSharp
           | r == 1 -> Sharp
