@@ -1,35 +1,36 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveLift #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE OverloadedRecordDot #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 
-{- | The Pitch module defines core types for representing musical pitch:
-
- * 'NoteName' - The letter names of the musical scale (C, D, E etc.)
- * 'Accidental' - Alterations to the pitch like sharps/flats
- * 'PitchClass' - Combination of a 'NoteName' and 'Accidental'
- * 'Octave' - The octave number
- * 'Pitch' - Combination of 'PitchClass' and 'Octave'
-
- This module also provides:
-
- * Lenses for accessing the components of pitch-related types
- * Typeclass instances for common pitch operations
- * Utility functions for converting between pitch representations
--}
+-- | The Pitch module defines core types for representing musical pitch:
+--
+-- * 'NoteName' - The letter names of the musical scale (C, D, E etc.)
+-- * 'Accidental' - Alterations to the pitch like sharps/flats
+-- * 'PitchClass' - Combination of a 'NoteName' and 'Accidental'
+-- * 'Octave' - The octave number
+-- * 'Pitch' - Combination of 'PitchClass' and 'Octave'
+--
+-- This module also provides:
+--
+-- * Lenses for accessing the components of pitch-related types
+-- * Typeclass instances for common pitch operations
+-- * Utility functions for converting between pitch representations
 module Pitch.Pitch where
 
 import Control.Applicative
 import Control.Lens hiding (elements)
-
 -- import Test.QuickCheck (Arbitrary (arbitrary), Gen, elements)
 
 import Control.Monad (forM)
 import Data.Char (toLower)
 import Data.Data
 import Data.Fixed (mod')
-import qualified Data.Map as Map
+import Data.Map qualified as Map
 import Data.Maybe (fromMaybe)
 import Data.Ratio ((%))
 import Data.String
@@ -46,17 +47,17 @@ data IntervalBasis = Chromatic | Diatonic
 
 data PitchClass where
   PitchClass ::
-    { _noteName :: NoteName
-    , _accidental :: Accidental
+    { _noteName :: NoteName,
+      _accidental :: Accidental
     } ->
     PitchClass
   deriving (Eq, Lift, Data)
 
 data Pitch where
   Pitch ::
-    { _noteName :: NoteName
-    , _accidental :: Accidental
-    , _octave :: Octave
+    { _noteName :: NoteName,
+      _accidental :: Accidental,
+      _octave :: Octave
     } ->
     Pitch
   deriving (Eq, Lift, Data)
@@ -159,6 +160,10 @@ instance NoteClass A where
 instance NoteClass B where
   sayNote = "b"
 
+instance IsNoteName NoteName where
+  toNoteName :: NoteName -> NoteName
+  toNoteName = id
+
 instance IsString NoteName where
   fromString :: String -> NoteName
   fromString "c" = C
@@ -182,23 +187,23 @@ instance Show Pitch where
 
 -- Functions
 makeLensesFor
-  [ ("PitchClass", "_noteName")
-  , ("PitchClass", "_accidental")
-  , ("Pitch", "_noteName")
-  , ("Pitch", "_accidental")
-  , ("Pitch", "_octave")
+  [ ("PitchClass", "_noteName"),
+    ("PitchClass", "_accidental"),
+    ("Pitch", "_noteName"),
+    ("Pitch", "_accidental"),
+    ("Pitch", "_octave")
   ]
   ''PitchClass
 
 pcToRational :: PitchClass -> Rational
 pcToRational pc = base + acVal
- where
-  base = case Prelude.lookup nm noteNameToRational' of
-    Just val -> val
-    Nothing -> error "NoteName not found"
-  acVal = accidentalToSemitones ac :: Rational
-  nm = pc ^. noteName
-  ac = pc ^. accidental
+  where
+    base = case Prelude.lookup nm noteNameToRational' of
+      Just val -> val
+      Nothing -> error "NoteName not found"
+    acVal = accidentalToSemitones ac :: Rational
+    nm = pc ^. noteName
+    ac = pc ^. accidental
 
 (=~) :: PitchClass -> PitchClass -> Bool
 pc1 =~ pc2 = (pcToRational pc1 `mod'` 12) == (pcToRational pc2 `mod'` 12)
@@ -241,8 +246,8 @@ enharmonicMapping = fmap (\r -> (r, snd <$> enharmonicPCEquivs r))
 
 enharmonics :: PitchClass -> [PitchClass]
 enharmonics pc = fromMaybe [pc] (lookup (pcToRational pc) out)
- where
-  out = enharmonicMapping [pcToRational pc]
+  where
+    out = enharmonicMapping [pcToRational pc]
 
 allEnharmonics :: [[PitchClass]]
 allEnharmonics = fmap enharmonics allPitchClasses
@@ -258,6 +263,11 @@ c ^. accidental
 
 c4 = Pitch C Natural (Octave 4)
 
+c4 ^. noteName
+c4 ^. accidental
+
+c4 & octave .~ (Octave 5)
+
 pitchToRational c4
 
 splitFraction $ pitchToRational $  Pitch G QuarterSharp (Octave 5)
@@ -269,6 +279,7 @@ c & accidental .~ Sharp
 --C Sharp
 
 c & accidental %~ (\x -> addAccidental x (1%2))
+
 -- C QuarterSharp
 
 pitchClasses = map (\x -> PitchClass x Natural) [C .. B]
@@ -276,19 +287,25 @@ pitchClasses = map (\x -> PitchClass x Natural) [C .. B]
 -- Changes the accidental of every PitchClass in the list to Flat
 
 pitchClasses & each . accidental .~ Flat
+
 --[C Flat,D Flat,E Flat,F Flat,G Flat,A Flat,B Flat]
 
 -- Checks if 'c' has an accidental of Natural
+
 has (accidental . only Natural) c
+
 --True
 
 -- If the accidental is Natural, change it to Flat.
+
 c & accidental . filtered (== Natural) .~ Flat
+
 C Flat
 
 p = Pitch C Natural (Octave 4)
 
 p ^. noteName
+
 -- C
 
 p ^. accidental

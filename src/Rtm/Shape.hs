@@ -7,16 +7,18 @@ import Rtm.Common
 import System.Random.Shuffle (shuffleM)
 
 -- | Tree structure that holds placeholders for the shape of the tree
-data ShapeTree a = ShapeLeaf | ShapeNode a [ShapeTree a]
+data ShapeTree a where
+  ShapeLeaf :: ShapeTree a
+  ShapeNode :: a -> [ShapeTree a] -> ShapeTree a
   deriving (Functor, Show)
 
 -- Function to extract the shape of an Rtm
 extractShape :: Rtm -> (ShapeTree (), [RtmLabel])
 extractShape = go
- where
-  go (Node label children) =
-    let (childShapes, childValues) = unzip (fmap go children)
-     in (ShapeNode () childShapes, label : concat childValues)
+  where
+    go (Node label children) =
+      let (childShapes, childValues) = unzip (fmap go children)
+       in (ShapeNode () childShapes, label : concat childValues)
 
 -- | Reconstruct an Rtm from its shape and a list of values
 reconstruct :: ShapeTree () -> [RtmLabel] -> Rtm
@@ -24,16 +26,16 @@ reconstruct sh vs = fst $ rHelper sh vs
 
 rHelper :: ShapeTree () -> [RtmLabel] -> (Rtm, [RtmLabel])
 rHelper = go
- where
-  go (ShapeNode _ cs) (val : vs) =
-    let (children, remainingVs) = foldl goChildren ([], vs) cs
-     in (Node val children, remainingVs)
-  go ShapeLeaf vs = (Node (head vs) [], tail vs)
-  go (ShapeNode _ _) [] = error "Not enough values to match the shape"
+  where
+    go (ShapeNode _ cs) (val : vs) =
+      let (children, remainingVs) = foldl goChildren ([], vs) cs
+       in (Node val children, remainingVs)
+    go ShapeLeaf vs = (Node (head vs) [], tail vs)
+    go (ShapeNode _ _) [] = error "Not enough values to match the shape"
 
-  goChildren (cs, vs) z =
-    let (child, newVs) = go z vs
-     in (cs <> [child], newVs)
+    goChildren (cs, vs) z =
+      let (child, newVs) = go z vs
+       in (cs <> [child], newVs)
 
 -- ====== TESTS ======= --
 

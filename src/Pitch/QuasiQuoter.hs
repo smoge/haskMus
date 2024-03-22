@@ -9,10 +9,10 @@ import Pitch.Parser (parsePitches)
 pitch :: QuasiQuoter
 pitch =
   QuasiQuoter
-    { quoteExp = parsePitchesToExp
-    , quotePat = \_ -> fail "Pattern quoting not supported for parsePitches QQ."
-    , quoteType = \_ -> fail "Type quoting not supported for parsePitches QQ."
-    , quoteDec = \_ -> fail "Declaration quoting not supported for parsePitches QQ."
+    { quoteExp = parsePitchesToExp,
+      quotePat = \_ -> fail "Pattern quoting not supported for parsePitches QQ.",
+      quoteType = \_ -> fail "Type quoting not supported for parsePitches QQ.",
+      quoteDec = \_ -> fail "Declaration quoting not supported for parsePitches QQ."
     }
 
 -- Convert a string to a [Pitch] Exp

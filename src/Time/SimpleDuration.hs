@@ -25,8 +25,8 @@ newtype Dots = Dots {unDots :: Integer} deriving (Eq, Show, Enum, Ord, Data, Lif
 -- | Represents a duration with division, dots, and multiplier.
 data SimpleDuration = SimpleDuration
   { -- | The division value of the duration.
-    _division :: Division
-  , -- | The dots value of the duration.
+    _division :: Division,
+    -- | The dots value of the duration.
     _dots :: Dots
   }
   deriving (Eq, Show, Data, Lift)

@@ -1,48 +1,47 @@
 module TestXml where
 
-import Text.XML.Light
-
 -- import Language.Haskell.TH
 -- import Language.Haskell.TH.Quote
 import Data.Data
 import Data.Maybe
+import Text.XML.Light
 
 -- Create a MusicXML note element with a single note
 createNoteElement :: Element
 createNoteElement =
   Element
-    { elName = QName "note" Nothing Nothing
-    , elAttribs = []
-    , elLine = Nothing
-    , elContent =
+    { elName = QName "note" Nothing Nothing,
+      elAttribs = [],
+      elLine = Nothing,
+      elContent =
         [ Elem $
             Element
-              { elName = QName "pitch" Nothing Nothing
-              , elAttribs = []
-              , elLine = Nothing
-              , elContent =
+              { elName = QName "pitch" Nothing Nothing,
+                elAttribs = [],
+                elLine = Nothing,
+                elContent =
                   [ Elem $
                       Element
-                        { elName = QName "step" Nothing Nothing
-                        , elAttribs = []
-                        , elLine = Nothing
-                        , elContent = [Text $ CData CDataText "C" Nothing]
-                        }
-                  , Elem $
+                        { elName = QName "step" Nothing Nothing,
+                          elAttribs = [],
+                          elLine = Nothing,
+                          elContent = [Text $ CData CDataText "C" Nothing]
+                        },
+                    Elem $
                       Element
-                        { elName = QName "octave" Nothing Nothing
-                        , elAttribs = []
-                        , elLine = Nothing
-                        , elContent = [Text $ CData CDataText "4" Nothing]
+                        { elName = QName "octave" Nothing Nothing,
+                          elAttribs = [],
+                          elLine = Nothing,
+                          elContent = [Text $ CData CDataText "4" Nothing]
                         }
                   ]
-              }
-        , Elem $
+              },
+          Elem $
             Element
-              { elName = QName "duration" Nothing Nothing
-              , elAttribs = []
-              , elLine = Nothing
-              , elContent = [Text $ CData CDataText "4" Nothing]
+              { elName = QName "duration" Nothing Nothing,
+                elAttribs = [],
+                elLine = Nothing,
+                elContent = [Text $ CData CDataText "4" Nothing]
               }
         ]
     }
@@ -51,16 +50,16 @@ createNoteElement =
 createMusicXMLPart :: Element
 createMusicXMLPart =
   Element
-    { elName = QName "part" Nothing Nothing
-    , elAttribs = [Attr (QName "id" Nothing Nothing) "P1"]
-    , elLine = Nothing
-    , elContent =
+    { elName = QName "part" Nothing Nothing,
+      elAttribs = [Attr (QName "id" Nothing Nothing) "P1"],
+      elLine = Nothing,
+      elContent =
         [ Elem $
             Element
-              { elName = QName "measure" Nothing Nothing
-              , elAttribs = [Attr (QName "number" Nothing Nothing) "1"]
-              , elLine = Nothing
-              , elContent = [Elem createNoteElement]
+              { elName = QName "measure" Nothing Nothing,
+                elAttribs = [Attr (QName "number" Nothing Nothing) "1"],
+                elLine = Nothing,
+                elContent = [Elem createNoteElement]
               }
         ]
     }
@@ -69,18 +68,18 @@ createMusicXMLPart =
 createMusicXMLScore :: Element
 createMusicXMLScore =
   Element
-    { elName = QName "score-partwise" Nothing Nothing
-    , elAttribs = [Attr (QName "version" Nothing Nothing) "3.0"]
-    , elLine = Nothing
-    , elContent =
+    { elName = QName "score-partwise" Nothing Nothing,
+      elAttribs = [Attr (QName "version" Nothing Nothing) "3.0"],
+      elLine = Nothing,
+      elContent =
         [ Elem $
             Element
-              { elName = QName "part-list" Nothing Nothing
-              , elAttribs = []
-              , elLine = Nothing
-              , elContent = []
-              }
-        , Elem createMusicXMLPart
+              { elName = QName "part-list" Nothing Nothing,
+                elAttribs = [],
+                elLine = Nothing,
+                elContent = []
+              },
+          Elem createMusicXMLPart
         ]
     }
 

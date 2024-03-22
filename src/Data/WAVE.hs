@@ -1,80 +1,77 @@
--- Modified from:
--- Copyright (C) 2007 Bart Massey
-
-{- | This module implements reading and writing of the most
-  common kinds of WAVE files.  WAVE files are Microsoft
-  RIFF audio sample files originally based on the AIFF
-  format, and commonly have the .wav filename extension.
-  This module currently supports reading and writing
-  single-section little-endian PCM audio files containing
-  up to 32-bit samples encoded according to the well-known WAVE
-  sample encoding.  The interface audio stream format is a
-  list of frames of 32-bit (`Int32`) left-justified signed
-  PCM samples; each frame has one sample per channel.  The
-  audio reader and writer are sufficiently lazy that files
-  larger than memory can be processed.
--}
-module Data.WAVE (
-  WAVE (..),
-  WAVEHeader (..),
-  WAVESample,
-  WAVESamples,
-  hGetWAVE,
-  getWAVEFile,
-  hPutWAVE,
-  putWAVEFile,
-  sampleToDouble,
-  doubleToSample,
-) where
+-- | This module implements reading and writing of the most
+--  common kinds of WAVE files.  WAVE files are Microsoft
+--  RIFF audio sample files originally based on the AIFF
+--  format, and commonly have the .wav filename extension.
+--  This module currently supports reading and writing
+--  single-section little-endian PCM audio files containing
+--  up to 32-bit samples encoded according to the well-known WAVE
+--  sample encoding.  The interface audio stream format is a
+--  list of frames of 32-bit (`Int32`) left-justified signed
+--  PCM samples; each frame has one sample per channel.  The
+--  audio reader and writer are sufficiently lazy that files
+--  larger than memory can be processed.
+module Data.WAVE
+  ( WAVE (..),
+    WAVEHeader (..),
+    WAVESample,
+    WAVESamples,
+    hGetWAVE,
+    getWAVEFile,
+    hPutWAVE,
+    putWAVEFile,
+    sampleToDouble,
+    doubleToSample,
+  )
+where
 
 import Control.Monad (unless, when)
 import Data.Bits (Bits (shift, (.&.)))
-import qualified Data.ByteString.Lazy as BS
+import Data.ByteString.Lazy qualified as BS
 import Data.Char (chr)
 import Data.Int (Int32, Int8)
-
 -- import Data.List hiding (words)
 import Data.Word (Word8)
-import System.IO (
-  BufferMode (BlockBuffering),
-  Handle,
-  IOMode (ReadMode, WriteMode),
-  SeekMode (RelativeSeek),
-  hClose,
-  hPutStr,
-  hSeek,
-  hSetBinaryMode,
-  hSetBuffering,
-  openFile,
- )
+import System.IO
+  ( BufferMode (BlockBuffering),
+    Handle,
+    IOMode (ReadMode, WriteMode),
+    SeekMode (RelativeSeek),
+    hClose,
+    hPutStr,
+    hSeek,
+    hSetBinaryMode,
+    hSetBuffering,
+    openFile,
+  )
 
 -- TODO
 -- Change String to Text
 -- import qualified Data.Text as T
 
-{- | For internal use only; the header as it appears on-disk.
-  The interface cleans this up to remove redundancy and
-  make things easier to understand.
--}
-data WAVERawHeader = WAVERawHeader
-  { rawNumChannels :: Int -- Number of channels in the audio
-  , rawSampleRate :: Int -- Sample rate of the audio
-  , rawByteRate :: Int -- Byte rate of the audio
-  , rawBlockAlign :: Int -- Block alignment of the audio
-  , rawBitsPerSample :: Int -- Bits per sample of the audio
-  , rawFrames :: Maybe Int -- Number of frames in the audio stream (if present)
-  }
+-- | For internal use only; the header as it appears on-disk.
+--  The interface cleans this up to remove redundancy and
+--  make things easier to understand.
+data WAVERawHeader where
+  WAVERawHeader ::
+    { rawNumChannels :: Int,
+      rawSampleRate :: Int,
+      rawByteRate :: Int,
+      rawBlockAlign :: Int,
+      rawBitsPerSample :: Int,
+      rawFrames :: Maybe Int
+    } ->
+    WAVERawHeader
 
 -- | Descriptive information for the audio source.
 data WAVEHeader = WAVEHeader
   { -- | Samples per frame.
-    waveNumChannels :: Int
-  , -- | Frames per second.
-    waveFrameRate :: Int
-  , -- | Number of
+    waveNumChannels :: Int,
+    -- | Frames per second.
+    waveFrameRate :: Int,
+    -- | Number of
     --  significant bits of left-justified value.
-    waveBitsPerSample :: Int
-  , -- | If present,
+    waveBitsPerSample :: Int,
+    -- | If present,
     --  number of frames in the stream.
     --  Otherwise, can be (inefficiently)
     --  inferred from the length of the
@@ -96,20 +93,18 @@ convertFloatToWord :: Float -> Word32
 convertFloatToWord = floatToWord
 -}
 
-{- | Each sample is a left-justified signed integer, with
-  significant bits as given in the header.
--}
+-- | Each sample is a left-justified signed integer, with
+--  significant bits as given in the header.
 type WAVESample = Int32
 
-{- | A stream is a list of frames, each of which is a list of
-  samples with one sample per channel.
--}
+-- | A stream is a list of frames, each of which is a list of
+--  samples with one sample per channel.
 type WAVESamples = [[WAVESample]]
 
 -- | The header and stream read or written.
 data WAVE = WAVE
-  { waveHeader :: WAVEHeader
-  , waveSamples :: WAVESamples
+  { waveHeader :: WAVEHeader,
+    waveSamples :: WAVESamples
   }
 
 bits_to_bytes :: (Integral a) => a -> a
@@ -118,26 +113,24 @@ bits_to_bytes n = (n + 7) `div` 8
 collect :: Int -> [a] -> [[a]]
 collect _ [] = []
 collect n s = h : collect n s'
- where
-  (h, s') = splitAt n s
+  where
+    (h, s') = splitAt n s
 
-{- | Utility routine for working with audio data in floating
-  point format.
-
-  Convert a sample value to a Double. This function normalizes the sample value
-  to the range -1.0 to 1.0 for ease of use in floating-point computations.
--}
+-- | Utility routine for working with audio data in floating
+--  point format.
+--
+--  Convert a sample value to a Double. This function normalizes the sample value
+--  to the range -1.0 to 1.0 for ease of use in floating-point computations.
 sampleToDouble :: WAVESample -> Double
 sampleToDouble v =
   let maxb = toInteger (maxBound :: WAVESample)
       minb = toInteger (minBound :: WAVESample)
    in if v >= 0
         then fromInteger (toInteger v) / fromInteger maxb
-        else -fromInteger (toInteger v) / fromInteger minb
+        else -(fromInteger (toInteger v) / fromInteger minb)
 
-{- | Utility routine for working with audio data in floating
-  point format.
--}
+-- | Utility routine for working with audio data in floating
+--  point format.
 doubleToSample :: Double -> WAVESample
 doubleToSample v =
   let maxb = toInteger (maxBound :: WAVESample)
@@ -146,16 +139,14 @@ doubleToSample v =
         then fromInteger (floor (v * fromInteger maxb))
         else fromInteger (ceiling (v * fromInteger minb))
 
-{- |
-   Convert a `ByteString` to a `String`.
--}
+-- |
+--   Convert a `ByteString` to a `String`.
 bs_to_string :: BS.ByteString -> String
 bs_to_string b = fmap (chr . fromIntegral) (BS.unpack b)
 
-{- |
-   Check if the given `Handle` matches the provided string `s`.
-   If not, throw an error with a mismatched format string message.
--}
+-- |
+--   Check if the given `Handle` matches the provided string `s`.
+--   If not, throw an error with a mismatched format string message.
 match :: Handle -> String -> IO ()
 match h s = do
   b <- BS.hGet h (length s)
@@ -163,39 +154,34 @@ match h s = do
     (bs_to_string b == s)
     (error ("mismatched format string '" <> (s <> "'")))
 
-{- |
-   Convert a list of `Word8` values to a number of type `a`.
-   The type `a` must be an instance of the `Num` class.
--}
+-- |
+--   Convert a list of `Word8` values to a number of type `a`.
+--   The type `a` must be an instance of the `Num` class.
 convert_nbytes_lend :: (Num a) => [Word8] -> a
 convert_nbytes_lend bs =
   foldl accum 0 (reverse bs)
- where
-  accum a b = 256 * a + fromIntegral b
+  where
+    accum a b = 256 * a + fromIntegral b
 
-{- |
-   Read `n` bytes from the given `Handle`, convert them to a number and return the result.
--}
+-- |
+--   Read `n` bytes from the given `Handle`, convert them to a number and return the result.
 get_nbytes_lend :: Handle -> Int -> IO Int
 get_nbytes_lend h n = do
   bytes <- BS.hGet h n
   pure (convert_nbytes_lend (BS.unpack bytes))
 
-{- |
-   Read a 4-byte word from the given `Handle` and return the result.
--}
+-- |
+--   Read a 4-byte word from the given `Handle` and return the result.
 get_word_lend :: Handle -> IO Int
 get_word_lend h = get_nbytes_lend h 4
 
-{- |
-   Read a 2-byte halfword from the given `Handle` and return the result.
--}
+-- |
+--   Read a 2-byte halfword from the given `Handle` and return the result.
 get_halfword_lend :: Handle -> IO Int
 get_halfword_lend h = get_nbytes_lend h 2
 
-{- |
-   Read the wave header from the given `Handle` and return it.
--}
+-- |
+--   Read the wave header from the given `Handle` and return it.
 get_wave_header :: Handle -> IO WAVERawHeader
 get_wave_header h = do
   size <- get_word_lend h
@@ -213,12 +199,12 @@ get_wave_header h = do
   bits_per_sample <- get_halfword_lend h
   pure
     ( WAVERawHeader
-        { rawNumChannels = num_channels
-        , rawSampleRate = frame_rate
-        , rawByteRate = byte_rate
-        , rawBlockAlign = block_align
-        , rawBitsPerSample = bits_per_sample
-        , rawFrames = Nothing
+        { rawNumChannels = num_channels,
+          rawSampleRate = frame_rate,
+          rawByteRate = byte_rate,
+          rawBlockAlign = block_align,
+          rawBitsPerSample = bits_per_sample,
+          rawFrames = Nothing
         }
     )
 
@@ -248,50 +234,50 @@ get_wave_data h hd = do
     _ -> error "max 32 bits per sample for now"
   let samples' = fmap (mask bits_per_sample) samples
   pure
-    ( hd{rawFrames = Just frames}
-    , collect (rawNumChannels hd) samples'
+    ( hd {rawFrames = Just frames},
+      collect (rawNumChannels hd) samples'
     )
- where
-  convert_byte =
-    (`shift` 24)
-      . (fromIntegral :: Int8 -> WAVESample)
-      . (fromIntegral :: Word8 -> Int8)
-  convert_multibyte n =
-    (`shift` (32 - 8 * n))
-      . (convert_nbytes_lend :: [Word8] -> WAVESample)
-  mask bits v =
-    v .&. (((1 `shift` bits) - 1) `shift` (32 - bits))
+  where
+    convert_byte =
+      (`shift` 24)
+        . (fromIntegral :: Int8 -> WAVESample)
+        . (fromIntegral :: Word8 -> Int8)
+    convert_multibyte n =
+      (`shift` (32 - 8 * n))
+        . (convert_nbytes_lend :: [Word8] -> WAVESample)
+    mask bits v =
+      v .&. (((1 `shift` bits) - 1) `shift` (32 - bits))
 
 cook_header :: WAVERawHeader -> WAVEHeader
 cook_header
   ( WAVERawHeader
-      { rawNumChannels = nc
-      , rawSampleRate = sr
-      , rawBitsPerSample = bps
-      , rawBlockAlign = ba
-      , rawFrames = Just s
+      { rawNumChannels = nc,
+        rawSampleRate = sr,
+        rawBitsPerSample = bps,
+        rawBlockAlign = ba,
+        rawFrames = Just s
       }
     ) =
     WAVEHeader
-      { waveNumChannels = nc
-      , waveFrameRate = sr
-      , waveBitsPerSample = bps
-      , waveFrames = Just s
+      { waveNumChannels = nc,
+        waveFrameRate = sr,
+        waveBitsPerSample = bps,
+        waveFrames = Just s
       }
 cook_header
   ( WAVERawHeader
-      { rawNumChannels = nc
-      , rawSampleRate = sr
-      , rawBitsPerSample = bps
-      , rawBlockAlign = ba
-      , rawFrames = Nothing
+      { rawNumChannels = nc,
+        rawSampleRate = sr,
+        rawBitsPerSample = bps,
+        rawBlockAlign = ba,
+        rawFrames = Nothing
       }
     ) =
     WAVEHeader
-      { waveNumChannels = nc
-      , waveFrameRate = sr
-      , waveBitsPerSample = bps
-      , waveFrames = Nothing
+      { waveNumChannels = nc,
+        waveFrameRate = sr,
+        waveBitsPerSample = bps,
+        waveFrames = Nothing
       }
 
 {-
@@ -356,29 +342,29 @@ get_chunks :: Handle -> Maybe WAVERawHeader -> Maybe WAVESamples -> IO WAVE
 get_chunks _ (Just hd) (Just s) =
   pure
     WAVE
-      { waveHeader = cook_header hd
-      , waveSamples = s
+      { waveHeader = cook_header hd,
+        waveSamples = s
       }
 get_chunks h mh ms = do
   s <- get_chunk_header
   process_chunk s mh ms
- where
-  get_chunk_header = do
-    bs <- BS.hGet h 4
-    pure (bs_to_string bs)
-  process_chunk "fmt " Nothing Nothing = do
-    nh <- get_wave_header h
-    get_chunks h (Just nh) ms
-  process_chunk "fmt " _ _ =
-    error "duplicate fmt chunk in WAVE"
-  process_chunk "data" (Just nh) Nothing = do
-    (nh', nd) <- get_wave_data h nh
-    get_chunks h (Just nh') (Just nd)
-  process_chunk "data" _ _ =
-    error "no fmt chunk or duplicate data chunk in WAVE"
-  process_chunk _ nh msS = do
-    skip_chunk h
-    get_chunks h nh msS
+  where
+    get_chunk_header = do
+      bs <- BS.hGet h 4
+      pure (bs_to_string bs)
+    process_chunk "fmt " Nothing Nothing = do
+      nh <- get_wave_header h
+      get_chunks h (Just nh) ms
+    process_chunk "fmt " _ _ =
+      error "duplicate fmt chunk in WAVE"
+    process_chunk "data" (Just nh) Nothing = do
+      (nh', nd) <- get_wave_data h nh
+      get_chunks h (Just nh') (Just nd)
+    process_chunk "data" _ _ =
+      error "no fmt chunk or duplicate data chunk in WAVE"
+    process_chunk _ nh msS = do
+      skip_chunk h
+      get_chunks h nh msS
 
 -- | Read the WAVE file at the given handle and return the audio data.
 hGetWAVE :: Handle -> IO WAVE
@@ -401,8 +387,8 @@ getWAVEFile fn = do
 unconvert_nbytes_lend :: Int -> Int -> [Word8]
 unconvert_nbytes_lend 0 _ = []
 unconvert_nbytes_lend n v =
-  fromIntegral (v .&. 255) :
-  unconvert_nbytes_lend (n - 1) (v `shift` (-8))
+  fromIntegral (v .&. 255)
+    : unconvert_nbytes_lend (n - 1) (v `shift` (-8))
 
 put_nbytes_lend :: Handle -> Int -> Int -> IO ()
 put_nbytes_lend h n v = do
