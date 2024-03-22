@@ -8,7 +8,7 @@ build:
     stack build --fast --file-watch
 
 # Stack test file-watch
-test: 
+test:
     stack test --file-watch
 
 # Make GitHub CI from cabal file
@@ -26,7 +26,6 @@ cabal_bounds:
 # Clean the project
 clean:
     stack clean --full
-    
 # Format Haskell project with fourmolu
 format:
     @echo "Formating the Haskell project (ormolu)..."
@@ -36,3 +35,9 @@ format:
 # stack haddock --haddock-arguments --theme="./my.css"
 docs:
     stack haddock
+
+# Generate graph
+graphmod:
+    find ./src -name '*.hs' | xargs graphmod -q -a  | xdot - &
+    find ./src -name '*.hs' | xargs graphmod -q -p  | xdot - &
+
