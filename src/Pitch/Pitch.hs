@@ -219,10 +219,10 @@ noteNameToRational name = case Prelude.lookup name noteNameToRational' of
 pitchToRational :: Pitch -> Rational
 pitchToRational (Pitch nm ac oct) = pcToRational (PitchClass nm ac) + fromIntegral (unOctave oct + 1) * 12
 
-rationalToFloat :: Rational -> Float
+rationalToFloat :: Rational -> Double
 rationalToFloat = fromRational
 
-pitchToFloat :: Pitch -> Float
+pitchToFloat :: Pitch -> Double
 pitchToFloat = rationalToFloat . pitchToRational
 
 allPitchClasses :: [PitchClass]
@@ -258,12 +258,15 @@ allEnharmonicsMapping = zip allPitchClasses allEnharmonics
 {- ---------------------------- playground -----------------------------------
 
 c = PitchClass C Natural
+
 c ^. noteName
+
 c ^. accidental
 
 c4 = Pitch C Natural (Octave 4)
 
 c4 ^. noteName
+
 c4 ^. accidental
 
 c4 & octave .~ (Octave 5)

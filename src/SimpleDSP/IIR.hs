@@ -44,7 +44,7 @@ data IIRParams = IIRParams
   deriving (Show)
 
 -- | A low-pass filter using cutoff frequency and resonance.
-lowPassFilter :: Float -> Float -> IIRParams
+{- lowPassFilter :: Float -> Float -> IIRParams
 lowPassFilter freq q =
   IIRParams
     { b0,
@@ -57,8 +57,22 @@ lowPassFilter freq q =
   where
     b0 = (1 - cos w0) / 2
     w0 = calcW0 freq
-    α = calcAQ w0 q
+    α = calcAQ w0 q -}
 
+-- Functions optimized for better structure and readability
+lowPassFilter :: Float -> Float -> IIRParams
+lowPassFilter freq q =
+  let w0 = calcW0 freq
+      α = calcAQ w0 q
+      cosW0 = cos w0
+      b0Coeff = (1 - cosW0) / 2
+      a0Coeff = 1 + α
+      a1Coeff = (-2) * cosW0
+      a2Coeff = 1 - α
+  in IIRParams { b0 = b0Coeff, b1 = 1 - cosW0, b2 = b0Coeff, a0 = a0Coeff, a1 = a1Coeff, a2 = a2Coeff }
+
+
+{-
 highPassFilter :: Float -> Float -> IIRParams
 highPassFilter freq q =
   IIRParams
@@ -72,9 +86,26 @@ highPassFilter freq q =
   where
     b0 = (1 + cos w0) / 2
     w0 = calcW0 freq
-    α = calcAQ w0 q
+    α = calcAQ w0 q -}
+
+{-# INLINE highPassFilter #-}
+highPassFilter :: Float -> Float -> IIRParams
+highPassFilter freq q =
+  let w0 = calcW0 freq
+      α = calcAQ w0 q
+      cosW0 = cos w0
+      --sinW0 = sin w0
+      b0Coeff = (1 + cosW0) / 2
+      a0Coeff = 1 + α
+      a1Coeff = (-2) * cosW0
+      a2Coeff = 1 - α
+  in IIRParams { b0 = b0Coeff, b1 = (-1) * (1 + cosW0), b2 = b0Coeff, a0 = a0Coeff, a1 = a1Coeff, a2 = a2Coeff }
+
+
 
 -- | BPF (constant skirt gain, peak gain = Q)
+
+{-# INLINE bandPassSkirtFilter #-}
 bandPassSkirtFilter :: Float -> Float -> IIRParams
 bandPassSkirtFilter freq q =
   IIRParams
@@ -90,6 +121,8 @@ bandPassSkirtFilter freq q =
     w0 = calcW0 freq
     α = calcAQ w0 q
 
+
+{-# INLINE bandPassFilter #-}
 bandPassFilter :: Float -> Float -> IIRParams
 bandPassFilter freq q =
   IIRParams
@@ -104,7 +137,7 @@ bandPassFilter freq q =
     w0 = calcW0 freq
     α = calcAQ w0 q
 
-notchFilter :: Float -> Float -> IIRParams
+{- notchFilter :: Float -> Float -> IIRParams
 notchFilter freq q =
   IIRParams
     { b0 = 1,
@@ -116,10 +149,22 @@ notchFilter freq q =
     }
   where
     w0 = calcW0 freq
-    α = calcAQ w0 q
+    α = calcAQ w0 q -}
 
-lowShelfFilter :: Float -> Float -> IIRParams
-lowShelfFilter freq q =
+notchFilter :: Float -> Float -> IIRParams
+notchFilter freq q =
+  let w0 = calcW0 freq
+      α = calcAQ w0 q
+      cosW0 = cos w0
+      b1Coeff = (-2) * cosW0
+      a0Coeff = 1 + α
+      a1Coeff = (-2) * cosW0
+      a2Coeff = 1 - α
+  in IIRParams { b0 = 1, b1 = b1Coeff, b2 = 1, a0 = a0Coeff, a1 = a1Coeff, a2 = a2Coeff }
+
+
+-- lowShelfFilter :: Float -> Float -> IIRParams
+{- lowShelfFilter freq q =
   IIRParams
     { b0 = bigA * ((bigA + 1) - (bigA - 1) * cos w0 + bigAsq),
       b1 = 2 * bigA * ((bigA - 1) - (bigA + 1) * cos w0),
@@ -131,7 +176,23 @@ lowShelfFilter freq q =
   where
     bigAsq = 2 * sqrt bigA * α
     w0 = calcW0 freq
-    α = calcAQ w0 q
+    α = calcAQ w0 q -}
+
+lowShelfFilter :: Float -> Float -> IIRParams
+lowShelfFilter freq q =
+  let w0 = calcW0 freq
+      α = calcAQ w0 q
+      bigA' = exp (log 10 * (α / 40))
+      bigAsq = 2 * sqrt bigA' * α
+      cosW0 = cos w0
+      a0Coeff = bigA' + 1 + (bigA' - 1) * cosW0 + bigAsq
+      b0Coeff = bigA' * (a0Coeff - (bigA' - 1) * cosW0)
+      b1Coeff = 2 * bigA' * ((bigA' - 1) - (bigA' + 1) * cosW0)
+      b2Coeff = bigA' * (a0Coeff - (bigA' - 1) * cosW0 - bigAsq)
+      a1Coeff = (-2) * ((bigA' - 1) + (bigA' + 1) * cosW0)
+      a2Coeff = bigA' + 1 + (bigA' - 1) * cosW0 - bigAsq
+  in IIRParams { b0 = b0Coeff, b1 = b1Coeff, b2 = b2Coeff, a0 = a0Coeff, a1 = a1Coeff, a2 = a2Coeff }
+
 
 highShelfFilter :: Float -> Float -> IIRParams
 highShelfFilter freq q =

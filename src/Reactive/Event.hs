@@ -1,4 +1,5 @@
 {-# LANGUAGE RecursiveDo #-}
+
 {-# HLINT ignore "Use zipWithFrom" #-}
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
@@ -86,8 +87,13 @@ filterJust :: Event (Maybe a) -> Event a
 filterJust = E . fmap join . unE
 
 -- Apply a behavior of functions to an event of values
-apply :: Behavior (a -> b) -> Event a -> Event b
+{- apply :: Behavior (a -> b) -> Event a -> Event b
 apply (B fs) = E . zipWith (\f mx -> fmap f mx) fs . unE
+ -}
+
+apply :: Behavior (a -> b) -> Event a -> Event b
+apply (B fs) (E xs) = E $ zipWith fmap fs xs
+
 
 -- Moment and accumulation
 
