@@ -45,6 +45,7 @@ library
         SimpleDSP.IIR
         SimpleDSP.IO
         SimpleDSP.Samples
+        Reactive.Event
 
     build-depends:
         , base                               >=4.17 && <4.20
@@ -79,6 +80,7 @@ library
         , transformers
         , vector
         , safe
+        , these
     --    , rando
     --    , random-fu
     --  , bimap >= 0.5.0 && < 0.6
