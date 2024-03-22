@@ -130,9 +130,10 @@ library
         StrictData
 
     ghc-options:
-        -Wall -Wcompat -Widentities -Wincomplete-record-updates
+        -Wall -O2 -funbox-strict-fields -fforce-recomp -Wcompat -Widentities -Wincomplete-record-updates
         -Wincomplete-uni-patterns -Wmissing-export-lists
         -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+        -fdiagnostics-color=always -fprint-typechecker-elaboration -msse4.2
 
 executable haskMus-exe
     hs-source-dirs:     app
@@ -176,6 +177,7 @@ executable haskMus-exe
         UnicodeSyntax
 
     ghc-options:
+        -O2 -funbox-strict-fields -fforce-recomp
         -Wall -Wcompat -Widentities -Wincomplete-record-updates
         -Wincomplete-uni-patterns -Wmissing-export-lists
         -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
