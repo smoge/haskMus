@@ -1,17 +1,23 @@
 #resolver: nightly-2024-02-11
 #resolver: lts-21.25
-resolver: lts-22.12
+resolver: lts-22.13
 
 
 packages:
   - .
 
+#ghc-options:
+#  "$locals": -prof -fprof-auto
+
+
 # extra-deps:
 #   - vector-space-0.16@sha256:3b93ce68ceb96b173d472b17c89283e5a652a270a40b33f49d65d8b7dd4492e8,2016
 #   - MemoTrie-0.6.11@sha256:edda47de940a047237c395a85ac3216db6d25888002293853d7eebd01beb5da6,1516
 
-ghc-options:
-  "$everything": -haddock
+#ghc-options:
+#  "$everything": -haddock
+
+
 # nix:
 #   enable: true
 

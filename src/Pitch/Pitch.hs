@@ -207,8 +207,13 @@ pitchToRational (Pitch nm ac oct) = pcToRational (PitchClass nm ac) + fromIntegr
 rationalToFloat :: Rational -> Float
 rationalToFloat = fromRational
 
-pitchToFloat :: Pitch -> Float
+{- pitchToFloat :: Pitch -> Float
 pitchToFloat = rationalToFloat . pitchToRational
+-}
+
+pitchToFloat :: Pitch -> Float
+pitchToFloat (Pitch nm ac oct) = fromRational $ pcToRational (PitchClass nm ac) + fromIntegral (unOctave oct + 1) * 12
+
 
 allPitchClasses :: [PitchClass]
 allPitchClasses = liftA2 PitchClass [C, D, E, F, G, A, B] allAccidentals
