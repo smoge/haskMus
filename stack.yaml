@@ -17,6 +17,7 @@ packages:
 #ghc-options:
 #  "$everything": -haddock
 
+notify-if-nix-on-path: false
 
 # nix:
 #   enable: true

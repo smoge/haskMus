@@ -246,3 +246,6 @@ md/Allen's Interval Algebra_files/Unsatisfiable.png
 md/Allen's Interval Algebra_files/valid-xhtml10-blue.png
 md/Allen's Interval Algebra_files/vcss-blue.png
 .gitignore
+haskMus-benchmarks.eventlog
+bench.html
+.gitignore
