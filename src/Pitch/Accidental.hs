@@ -6,16 +6,16 @@
 
 module Pitch.Accidental where
 
-import           Data.Data
-import           Data.List (isPrefixOf)
-import           qualified Data.Map as Map
-import           Data.Ord (comparing)
-import           Data.Ratio
-import           Data.String
+import Data.Data
+import Data.List (isPrefixOf)
+import qualified Data.Map as Map
+import Data.Ord (comparing)
+import Data.Ratio
+import Data.String
 import qualified Data.Text as T
-import           Language.Haskell.TH.Syntax (Lift, lift)
-import           Text.Parsec
-import           Text.Parsec.String (Parser)
+import Language.Haskell.TH.Syntax (Lift, lift)
+import Text.Parsec
+import Text.Parsec.String (Parser)
 
 data Accidental
     = DoubleFlat
@@ -45,18 +45,16 @@ instance Lift Accidental where
  -}
 instance Lift Accidental where
     lift = \case
-        DoubleFlat -> [| DoubleFlat |]
-        ThreeQuartersFlat -> [| ThreeQuartersFlat |]
-        Flat -> [| Flat |]
-        QuarterFlat -> [| QuarterFlat |]
-        Natural -> [| Natural |]
-        QuarterSharp -> [| QuarterSharp |]
-        Sharp -> [| Sharp |]
-        ThreeQuartersSharp -> [| ThreeQuartersSharp |]
-        DoubleSharp -> [| DoubleSharp |]
-        Custom r -> [| Custom r |]
-
-
+        DoubleFlat -> [|DoubleFlat|]
+        ThreeQuartersFlat -> [|ThreeQuartersFlat|]
+        Flat -> [|Flat|]
+        QuarterFlat -> [|QuarterFlat|]
+        Natural -> [|Natural|]
+        QuarterSharp -> [|QuarterSharp|]
+        Sharp -> [|Sharp|]
+        ThreeQuartersSharp -> [|ThreeQuartersSharp|]
+        DoubleSharp -> [|DoubleSharp|]
+        Custom r -> [|Custom r|]
 
 -- instance LifsemitonesToAccidental ((+ 1) $ accidentalToSemitones acc)
 
@@ -70,8 +68,6 @@ instance Lift Accidental where
  [Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp]l
  [Custom ((-3) % 1),Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp]
 -}
-
-
 sharpenQ :: Accidental -> Accidental
 sharpenQ acc = modifyAccidental acc (+ (1 / 2))
 
@@ -356,7 +352,6 @@ semitonesToAccidental r
  True
 -}
 
-
 -- accToLily :: Accidental -> T.Text
 -- accToLily DoubleFlat = T.pack "ff"
 -- accToLily ThreeQuartersFlat = T.pack "tqf"
@@ -368,9 +363,6 @@ semitonesToAccidental r
 -- accToLily ThreeQuartersSharp = T.pack "tqs"
 -- accToLily DoubleSharp = T.pack "ss"
 -- accToLily (Custom r) = T.pack $ show r
-
-
-
 
 -- LilyPond representation of accidentals
 accToLily :: Accidental -> T.Text
@@ -385,7 +377,6 @@ accToLily = \case
     ThreeQuartersSharp -> "tqs"
     DoubleSharp -> "ss"
     Custom r -> T.pack $ show r
-
 
 instance Read Accidental where
     readsPrec _ value =
@@ -445,6 +436,7 @@ instance IsString Accidental where
  >>> modifyAccidental Sharp (*2)
  DoubleSharp
 -}
+
 {- modifyAccidental :: Accidental -> (Rational -> Rational) -> Accidental
 modifyAccidental acc f =
     let newSemitone = f (accidentalToSemitones acc)
@@ -464,7 +456,6 @@ modifyAccidental acc f =
 modifyAccidental :: Accidental -> (Rational -> Rational) -> Accidental
 modifyAccidental acc f = semitonesToAccidental (f $ accidentalToSemitones acc)
 
-
 -- | Checks whether an accidental is equal to its corresponding semitone offset.
 checkAccidental :: Accidental -> Bool
 checkAccidental acc = semitonesToAccidental (accidentalToSemitones acc) == acc
@@ -476,8 +467,6 @@ checkAccidental acc = semitonesToAccidental (accidentalToSemitones acc) == acc
  ThreeQuartersFlat
  Custom (5 % 2)
 -}
-
-
 accidentalToSemitones :: Accidental -> Rational
 accidentalToSemitones acc = case acc of
     DoubleFlat -> -2
@@ -496,9 +485,9 @@ addAccidental acc delta =
     let currentSemitone = accidentalToSemitones acc
         newSemitone = currentSemitone + delta
         accidentalMap = Map.fromList [(-2, DoubleFlat), ((-3) % 2, ThreeQuartersFlat), (-1, Flat), ((-1) % 2, QuarterFlat), (0, Natural), (1 % 2, QuarterSharp), (1, Sharp), (3 % 2, ThreeQuartersSharp), (2, DoubleSharp)]
-    in case Map.lookup newSemitone accidentalMap of
-        Just result -> result
-        Nothing -> Custom newSemitone
+     in case Map.lookup newSemitone accidentalMap of
+            Just result -> result
+            Nothing -> Custom newSemitone
 
 invertAccidental :: Accidental -> Accidental
 invertAccidental = negate
