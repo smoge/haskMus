@@ -13,7 +13,9 @@ import           Data.Ord (comparing)
 import           Data.Ratio
 import           Data.String
 import qualified Data.Text as T
-import           Language.Haskell.TH.Syntax (Lift)
+import           Language.Haskell.TH.Syntax (Lift, lift)
+import           Text.Parsec
+import           Text.Parsec.String (Parser)
 
 data Accidental
     = DoubleFlat
@@ -26,20 +28,37 @@ data Accidental
     | ThreeQuartersSharp
     | DoubleSharp
     | Custom Rational
-    deriving (Eq, Ord, Show, Lift, Data)
+    deriving (Eq, Ord, Show, Data, Typeable)
 
--- instance Lift Accidental
+
+instance Lift Accidental where
+    lift DoubleFlat = [| DoubleFlat |]
+    lift ThreeQuartersFlat = [| ThreeQuartersFlat |]
+    lift Flat = [| Flat |]
+    lift QuarterFlat = [| QuarterFlat |]
+    lift Natural = [| Natural |]
+    lift QuarterSharp = [| QuarterSharp |]
+    lift Sharp = [| Sharp |]
+    lift ThreeQuartersSharp = [| ThreeQuartersSharp |]
+    lift DoubleSharp = [| DoubleSharp |]
+    lift (Custom r) = [| Custom r |]
+
+
+
+-- instance LifsemitonesToAccidental ((+ 1) $ accidentalToSemitones acc)
 
 {- |
- >>> map sharpenQ allAccidentals
+ >>> map sharpesemitonesToAccidental ((+ ((-1) % 2)) $ accidentalToSemitones acc)
  >>> map sharpenS allAccidentals
  >>> map flattenQ allAccidentals
- >>> map flattenS allAccidentals
+ >>> map flattesemitonesToAccidental ((+ (-1)) $ accidentalToSemitones acc)
  [ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp,Custom (5 % 2)]
  [Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp,Custom (5 % 2),Custom (3 % 1)]
  [Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp]l
  [Custom ((-3) % 1),Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp]
 -}
+
+
 sharpenQ :: Accidental -> Accidental
 sharpenQ acc = modifyAccidental acc (+ (1 / 2))
 
