@@ -41,8 +41,13 @@ data SimpleDuration = SimpleDuration
 
 makeLenses ''SimpleDuration
 
+-- mkDivision :: Integer -> Maybe Division
+-- mkDivision x = if x > 0 && isPowerOfTwo' x then Just (Division x) else Nothing
+
 mkDivision :: Integer -> Maybe Division
-mkDivision x = if x > 0 && isPowerOfTwo' x then Just (Division x) else Nothing
+mkDivision x
+    | x > 0 && isPowerOfTwo' x = Just (Division x)
+    | otherwise = Nothing
 
 mkDots :: Integer -> Maybe Dots
 mkDots x = if x >= 0 then Just (Dots x) else Nothing
@@ -50,6 +55,13 @@ mkDots x = if x >= 0 then Just (Dots x) else Nothing
 mkSimpleDuration :: Integer -> Integer -> Maybe SimpleDuration
 mkSimpleDuration divValue dotsValue =
     SimpleDuration <$> mkDivision divValue <*> mkDots dotsValue
+
+{- mkSimpleDuration :: Integer -> Integer -> Maybe SimpleDuration
+mkSimpleDuration divValue dotsValue = do
+    division_ <- mkDivision divValue
+    dots_ <- mkDots dotsValue
+    pure $ SimpleDuration division_ dots_
+ -}
 
 divisionParser :: Parser Integer
 divisionParser = read <$> many1 digit

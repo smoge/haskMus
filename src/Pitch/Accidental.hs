@@ -6,13 +6,14 @@
 
 module Pitch.Accidental where
 
-import Data.Data
-import Data.List (isPrefixOf)
-import Data.Ord (comparing)
-import Data.Ratio
-import Data.String
+import           Data.Data
+import           Data.List (isPrefixOf)
+import           qualified Data.Map as Map
+import           Data.Ord (comparing)
+import           Data.Ratio
+import           Data.String
 import qualified Data.Text as T
-import Language.Haskell.TH.Syntax (Lift)
+import           Language.Haskell.TH.Syntax (Lift)
 
 data Accidental
     = DoubleFlat
@@ -194,7 +195,7 @@ instance Bounded Accidental where
     minBound = DoubleFlat
     maxBound = DoubleSharp
 
--- | Converts an accidental to its corresponding semitone offset as a rational number.
+{- -- | Converts an accidental to its corresponding semitone offset as a rational number.
 accidentalToSemitones :: Accidental -> Rational
 accidentalToSemitones DoubleFlat = -2
 accidentalToSemitones ThreeQuartersFlat = (-3) % 2
@@ -206,7 +207,7 @@ accidentalToSemitones Sharp = 1
 accidentalToSemitones ThreeQuartersSharp = 3 % 2
 accidentalToSemitones DoubleSharp = 2
 accidentalToSemitones (Custom r) = r
-
+ -}
 -- XML--------------------------------------------------------------------------
 
 accidental_XML_alter :: Accidental -> T.Text
@@ -391,7 +392,7 @@ instance IsString Accidental where
  >>> modifyAccidental Sharp (*2)
  DoubleSharp
 -}
-modifyAccidental :: Accidental -> (Rational -> Rational) -> Accidental
+{- modifyAccidental :: Accidental -> (Rational -> Rational) -> Accidental
 modifyAccidental acc f =
     let newSemitone = f (accidentalToSemitones acc)
      in case newSemitone of
@@ -406,6 +407,10 @@ modifyAccidental acc f =
                 | r == 3 % 2 -> ThreeQuartersSharp
                 | r == 2 -> DoubleSharp
                 | otherwise -> (Custom r)
+ -}
+modifyAccidental :: Accidental -> (Rational -> Rational) -> Accidental
+modifyAccidental acc f = semitonesToAccidental (f $ accidentalToSemitones acc)
+
 
 -- | Checks whether an accidental is equal to its corresponding semitone offset.
 checkAccidental :: Accidental -> Bool
@@ -418,21 +423,29 @@ checkAccidental acc = semitonesToAccidental (accidentalToSemitones acc) == acc
  ThreeQuartersFlat
  Custom (5 % 2)
 -}
+
+
+accidentalToSemitones :: Accidental -> Rational
+accidentalToSemitones acc = case acc of
+    DoubleFlat -> -2
+    ThreeQuartersFlat -> (-3) % 2
+    Flat -> -1
+    QuarterFlat -> (-1) % 2
+    Natural -> 0
+    QuarterSharp -> 1 % 2
+    Sharp -> 1
+    ThreeQuartersSharp -> 3 % 2
+    DoubleSharp -> 2
+    Custom x -> x
+
 addAccidental :: Accidental -> Rational -> Accidental
-addAccidental acc delta
-    | newSemitone == -2 = DoubleFlat
-    | newSemitone == (-3) % 2 = ThreeQuartersFlat
-    | newSemitone == -1 = Flat
-    | newSemitone == (-1) % 2 = QuarterFlat
-    | newSemitone == 0 = Natural
-    | newSemitone == 1 % 2 = QuarterSharp
-    | newSemitone == 1 = Sharp
-    | newSemitone == 3 % 2 = ThreeQuartersSharp
-    | newSemitone == 2 = DoubleSharp
-    | otherwise = (Custom newSemitone)
-  where
-    currentSemitone = accidentalToSemitones acc
-    newSemitone = currentSemitone + delta
+addAccidental acc delta =
+    let currentSemitone = accidentalToSemitones acc
+        newSemitone = currentSemitone + delta
+        accidentalMap = Map.fromList [(-2, DoubleFlat), ((-3) % 2, ThreeQuartersFlat), (-1, Flat), ((-1) % 2, QuarterFlat), (0, Natural), (1 % 2, QuarterSharp), (1, Sharp), (3 % 2, ThreeQuartersSharp), (2, DoubleSharp)]
+    in case Map.lookup newSemitone accidentalMap of
+        Just result -> result
+        Nothing -> Custom newSemitone
 
 invertAccidental :: Accidental -> Accidental
 invertAccidental = negate
