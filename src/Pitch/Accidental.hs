@@ -30,7 +30,7 @@ data Accidental
     | Custom Rational
     deriving (Eq, Ord, Show, Data, Typeable)
 
-
+{-
 instance Lift Accidental where
     lift DoubleFlat = [| DoubleFlat |]
     lift ThreeQuartersFlat = [| ThreeQuartersFlat |]
@@ -42,6 +42,19 @@ instance Lift Accidental where
     lift ThreeQuartersSharp = [| ThreeQuartersSharp |]
     lift DoubleSharp = [| DoubleSharp |]
     lift (Custom r) = [| Custom r |]
+ -}
+instance Lift Accidental where
+    lift = \case
+        DoubleFlat -> [| DoubleFlat |]
+        ThreeQuartersFlat -> [| ThreeQuartersFlat |]
+        Flat -> [| Flat |]
+        QuarterFlat -> [| QuarterFlat |]
+        Natural -> [| Natural |]
+        QuarterSharp -> [| QuarterSharp |]
+        Sharp -> [| Sharp |]
+        ThreeQuartersSharp -> [| ThreeQuartersSharp |]
+        DoubleSharp -> [| DoubleSharp |]
+        Custom r -> [| Custom r |]
 
 
 
@@ -164,6 +177,7 @@ instance AccClass DoubleSharp where
 instance Num Accidental where
     (+) a b = toAccidental $ accidentalToSemitones a + accidentalToSemitones b
     (-) a b = toAccidental $ accidentalToSemitones a - accidentalToSemitones b
+    (*) :: Accidental -> Accidental -> Accidental
     (*) a b = toAccidental $ accidentalToSemitones a * accidentalToSemitones b
     abs a = toAccidental $ abs (accidentalToSemitones a)
     signum a =
@@ -338,20 +352,40 @@ semitonesToAccidental r
     | otherwise = (Custom r)
 
 {- | Converts an accidental to its corresponding LilyPond representation.
- >>>  map accToLily allAccidentals == map  T.pack ["ff","tqf","f","qf","","qs","s","tqs","ss"]
+ map accToLily allAccidentals == map  T.pack ["ff","tqf","f","qf","","qs","s","tqs","ss"]
  True
 -}
+
+
+-- accToLily :: Accidental -> T.Text
+-- accToLily DoubleFlat = T.pack "ff"
+-- accToLily ThreeQuartersFlat = T.pack "tqf"
+-- accToLily Flat = T.pack "f"
+-- accToLily QuarterFlat = T.pack "qf"
+-- accToLily Natural = T.pack ""
+-- accToLily QuarterSharp = T.pack "qs"
+-- accToLily Sharp = T.pack "s"
+-- accToLily ThreeQuartersSharp = T.pack "tqs"
+-- accToLily DoubleSharp = T.pack "ss"
+-- accToLily (Custom r) = T.pack $ show r
+
+
+
+
+-- LilyPond representation of accidentals
 accToLily :: Accidental -> T.Text
-accToLily DoubleFlat = T.pack "ff"
-accToLily ThreeQuartersFlat = T.pack "tqf"
-accToLily Flat = T.pack "f"
-accToLily QuarterFlat = T.pack "qf"
-accToLily Natural = T.pack ""
-accToLily QuarterSharp = T.pack "qs"
-accToLily Sharp = T.pack "s"
-accToLily ThreeQuartersSharp = T.pack "tqs"
-accToLily DoubleSharp = T.pack "ss"
-accToLily (Custom r) = T.pack $ show r
+accToLily = \case
+    DoubleFlat -> "ff"
+    ThreeQuartersFlat -> "tqf"
+    Flat -> "f"
+    QuarterFlat -> "qf"
+    Natural -> ""
+    QuarterSharp -> "qs"
+    Sharp -> "s"
+    ThreeQuartersSharp -> "tqs"
+    DoubleSharp -> "ss"
+    Custom r -> T.pack $ show r
+
 
 instance Read Accidental where
     readsPrec _ value =
