@@ -237,27 +237,28 @@ allPCRationals = fmap pcToRational allPitchClasses
 
 enharmonicPCEquivs :: Rational -> [(Rational, PitchClass)]
 enharmonicPCEquivs val =
-  [(v, pc) | pc <- liftA2 PitchClass [C, D, E, F, G, A, B] allAccidentals, let v = pcToRational pc, v `mod'` 12 == val `mod'` 12]
+  [(v, pc) | pc <- allPitchClasses, let v = pcToRational pc, v `mod'` 12 == val `mod'` 12]
 
 enharmonicPCEquivs' :: PitchClass -> [(Rational, PitchClass)]
 enharmonicPCEquivs' pc =
-  [(v, pc') | pc' <- liftA2 PitchClass [C, D, E, F, G, A, B] allAccidentals, let v = pcToRational pc', v `mod'` 12 == pcToRational pc `mod'` 12]
+  [(v, pc') | pc' <- allPitchClasses, let v = pcToRational pc', v `mod'` 12 == pcToRational pc `mod'` 12]
 
 type EnharmonicMapping = [(Rational, [PitchClass])]
 
 enharmonicMapping :: [Rational] -> EnharmonicMapping
-enharmonicMapping = fmap (\r -> (r, snd <$> enharmonicPCEquivs r))
+enharmonicMapping = map (\r -> (r, fmap snd (enharmonicPCEquivs r)))
 
 enharmonics :: PitchClass -> [PitchClass]
-enharmonics pc = fromMaybe [pc] (lookup (pcToRational pc) out)
+enharmonics pc = fromMaybe [pc] (lookup (pcToRational pc) enharmonicMap)
   where
-    out = enharmonicMapping [pcToRational pc]
+    enharmonicMap = enharmonicMapping allPCRationals
 
 allEnharmonics :: [[PitchClass]]
 allEnharmonics = fmap enharmonics allPitchClasses
 
 allEnharmonicsMapping :: [(PitchClass, [PitchClass])]
 allEnharmonicsMapping = zip allPitchClasses allEnharmonics
+
 
 {- ---------------------------- playground -----------------------------------
 
