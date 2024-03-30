@@ -1,4 +1,4 @@
-{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE NamedFieldPuns, ImportQualifiedPost #-}
 -- | This module implements IIR filter.
 --
 --  See: http://shepazu.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html

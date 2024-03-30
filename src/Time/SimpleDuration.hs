@@ -4,16 +4,24 @@
 
 module Time.SimpleDuration where
 
-import Control.Lens
-import Data.Data
+import Control.Lens (makeLenses)
+import Data.Data (Data)
 import Data.List (sortOn)
 import Data.Ord (comparing)
-import Data.Ratio
-import Language.Haskell.TH
-import Language.Haskell.TH.Quote
-import Language.Haskell.TH.Syntax
-import Text.Parsec
-import Text.Parsec.String
+import Data.Ratio ()
+import Language.Haskell.TH ()
+import Language.Haskell.TH.Quote ()
+import Language.Haskell.TH.Syntax (Lift)
+import Text.Parsec (
+    ParseError,
+    char,
+    digit,
+    many,
+    many1,
+    parse,
+    parserFail,
+ )
+import Text.Parsec.String (Parser)
 import Util.MathDuration (isPowerOfTwo')
 
 -- | Represents a musical division.
