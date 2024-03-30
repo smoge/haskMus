@@ -1,5 +1,5 @@
 cabal-version: 2.2
-name:          haskMus  
+name:          haskMus
 version:       0.1.0.0
 synopsis:      algorithm composition toolkit in haskell
 description:
@@ -18,7 +18,7 @@ build-type:    Simple
 -- extra-source-files:  readme.md
 --                      changelog.md
 
-tested-with:   GHC ==9.4.8 || ==9.6.4
+tested-with:   GHC ==9.4.* || ==9.6.*
 
 library
     hs-source-dirs:     src
@@ -42,10 +42,13 @@ library
         ToXML
         Util.Fraction
         Util.MathDuration
-        Util.Tree
+        SimpleDSP.IIR
+        SimpleDSP.IO
+        SimpleDSP.Samples
+
 
     build-depends:
-        , base                               >=4.17 && <4.20
+          base                               >=4.17 && <4.20
         , bytestring
         , containers
         , data-default
@@ -68,7 +71,12 @@ library
         , text
         , xml-conduit
         , xml-types
-    --, vector-space
+        , typed-process
+        , transformers
+        , vector
+        , safe
+        , these
+         --, vector-space
     --    , rando
     --    , random-fu
     --  , bimap >= 0.5.0 && < 0.6
@@ -109,11 +117,19 @@ library
         TypeOperators
         TypeSynonymInstances
         UnicodeSyntax
+        BlockArguments
+        ImportQualifiedPost
+        LambdaCase
+        PartialTypeSignatures
+        OverloadedStrings
+        OverloadedRecordDot
+        StrictData
 
     ghc-options:
         -Wall -Wcompat -Widentities -Wincomplete-record-updates
-        -Wincomplete-uni-patterns -Wmissing-export-lists -threaded -with-rtsopts=-N
+        -Wincomplete-uni-patterns -Wmissing-export-lists
         -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+        -fdiagnostics-color=always -fprint-typechecker-elaboration -msse4.2
 
 executable haskMus-exe
     hs-source-dirs:     app
@@ -157,6 +173,7 @@ executable haskMus-exe
         UnicodeSyntax
 
     ghc-options:
+        -O2 -funbox-strict-fields -fforce-recomp
         -Wall -Wcompat -Widentities -Wincomplete-record-updates
         -Wincomplete-uni-patterns -Wmissing-export-lists -threaded -with-rtsopts=-N
         -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
