@@ -28,15 +28,15 @@ data IntervalBasis = Chromatic | Diatonic
     deriving (Eq, Ord, Show, Enum)
 
 data PitchClass = PitchClass
-    { _noteName :: NoteName
-    , _accidental :: Accidental
+    { _noteName :: !NoteName
+    , _accidental :: !Accidental
     }
     deriving (Eq, Lift, Data)
 
 data Pitch = Pitch
-    { _noteName :: NoteName
-    , _accidental :: Accidental
-    , _octave :: Octave
+    { _noteName :: !NoteName
+    , _accidental :: !Accidental
+    , _octave :: !Octave
     }
     deriving (Eq, Lift, Data)
 
