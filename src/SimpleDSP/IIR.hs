@@ -1,8 +1,10 @@
 {-# LANGUAGE NamedFieldPuns #-}
--- | This module implements IIR filter.
---
---  See: http://shepazu.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html
---   Or: https://www.w3.org/TR/audio-eq-cookbook/
+
+{- | This module implements IIR filter.
+
+  See: http://shepazu.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html
+   Or: https://www.w3.org/TR/audio-eq-cookbook/
+-}
 module SimpleDSP.IIR (
     -- * Usage
     filterSamples,
@@ -27,7 +29,7 @@ module SimpleDSP.IIR (
 
 import Control.Monad.Trans.State.Strict (StateT (..))
 import Data.Functor.Identity (Identity (runIdentity))
-import Data.Vector.Storable qualified as SV
+import qualified Data.Vector.Storable as SV
 import GHC.Float (powerFloat)
 import SimpleDSP.Samples
 
@@ -181,7 +183,7 @@ filterSamplesState params = SV.mapM doApplyIIR
     doApplyIIR :: Float -> StateT IIRState m Float
     doApplyIIR curSample = StateT \curState -> do
         let newState = applyIIR params curSample curState
-        pure (newState.y0, newState)
+        pure (newState . y0, newState)
 
 filterSamples :: IIRParams -> Samples -> IIRState -> (Samples, IIRState)
 filterSamples params samples = runIdentity . runStateT (filterSamplesState @Identity params samples)
@@ -204,15 +206,13 @@ mkRMSInfo params =
 
 updateInfo :: RMSInfo -> Samples -> RMSInfo
 updateInfo info samples =
-    let (state, newVolume) = SV.foldl' doUpdateInfo (info.state, info.rmsVolume) samples
+    let (state, newVolume) = SV.foldl' doUpdateInfo (info . state, info . rmsVolume) samples
         (rmsVolume, rmsDecay)
-            | newVolume > info.rmsVolume = (newVolume, newVolume / 4)
-            | otherwise = (newVolume - info.rmsDecay, info.rmsDecay)
-     in RMSInfo{state, params = info.params, rmsVolume, rmsDecay}
+            | newVolume > info . rmsVolume = (newVolume, newVolume / 4)
+            | otherwise = (newVolume - info . rmsDecay, info . rmsDecay)
+     in RMSInfo{state, params = info . params, rmsVolume, rmsDecay}
   where
     doUpdateInfo (prevState, prevVolume) sample =
-        let
-            newState = applyIIR info.params sample prevState
-            curVolume = newState.y0 * newState.y0
-         in
-            (newState, max prevVolume curVolume)
+        let newState = applyIIR info . params sample prevState
+            curVolume = newState . y0 * newState . y0
+         in (newState, max prevVolume curVolume)
