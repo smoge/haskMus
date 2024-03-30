@@ -201,13 +201,24 @@ pcToRational pc = base + acVal
 (=~) :: PitchClass -> PitchClass -> Bool
 pc1 =~ pc2 = (pcToRational pc1 `mod'` 12) == (pcToRational pc2 `mod'` 12)
 
+noteNameToRationalMap :: Map.Map NoteName Rational
+noteNameToRationalMap = Map.fromList [(C, 0), (D, 2), (E, 4), (F, 5), (G, 7), (A, 9), (B, 11)]
+
+
+
+noteNameToRational :: NoteName -> Rational
+noteNameToRational name = fromMaybe (error ("NoteName " <> show name <> " not found")) (Map.lookup name noteNameToRationalMap)
+
+
 noteNameToRational' :: [(NoteName, Rational)]
 noteNameToRational' = [(C, 0), (D, 2), (E, 4), (F, 5), (G, 7), (A, 9), (B, 11)]
 
+{-
 noteNameToRational :: NoteName -> Rational
 noteNameToRational name = case Prelude.lookup name noteNameToRational' of
   Just val -> val
   Nothing -> error ("NoteName " <> show name <> " not found")
+ -}
 
 pitchToRational :: Pitch -> Rational
 pitchToRational (Pitch nm ac oct) = pcToRational (PitchClass nm ac) + fromIntegral (unOctave oct + 1) * 12
