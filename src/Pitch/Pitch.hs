@@ -172,6 +172,8 @@ makeLensesFor
     ]
     ''PitchClass
 
+
+{-# INLINE pcToRational #-}
 pcToRational :: PitchClass -> Rational
 pcToRational pc = base + acVal
   where
@@ -201,9 +203,11 @@ noteNameToRational name = case Prelude.lookup name noteNameToRational' of
   Nothing -> error ("NoteName " <> show name <> " not found")
  -}
 
+{-# INLINE pitchToRational #-}
 pitchToRational :: Pitch -> Rational
 pitchToRational (Pitch nm ac oct) = pcToRational (PitchClass nm ac) + fromIntegral (unOctave oct + 1) * 12
 
+{-# INLINE rationalToFloat #-}
 rationalToFloat :: Rational -> Float
 rationalToFloat = fromRational
 
@@ -211,6 +215,7 @@ rationalToFloat = fromRational
 pitchToFloat = rationalToFloat . pitchToRational
 -}
 
+{-# INLINE pitchToFloat #-}
 pitchToFloat :: Pitch -> Float
 pitchToFloat (Pitch nm ac oct) = fromRational $ pcToRational (PitchClass nm ac) + fromIntegral (unOctave oct + 1) * 12
 
