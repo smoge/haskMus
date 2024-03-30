@@ -4,23 +4,25 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 
--- | The Pitch module defines core types for representing musical pitch:
---
--- * 'NoteName' - The letter names of the musical scale (C, D, E etc.)
--- * 'Accidental' - Alterations to the pitch like sharps/flats
--- * 'PitchClass' - Combination of a 'NoteName' and 'Accidental'
--- * 'Octave' - The octave number
--- * 'Pitch' - Combination of 'PitchClass' and 'Octave'
---
--- This module also provides:
---
--- * Lenses for accessing the components of pitch-related types
--- * Typeclass instances for common pitch operations
--- * Utility functions for converting between pitch representations
+{- | The Pitch module defines core types for representing musical pitch:
+
+ * 'NoteName' - The letter names of the musical scale (C, D, E etc.)
+ * 'Accidental' - Alterations to the pitch like sharps/flats
+ * 'PitchClass' - Combination of a 'NoteName' and 'Accidental'
+ * 'Octave' - The octave number
+ * 'Pitch' - Combination of 'PitchClass' and 'Octave'
+
+ This module also provides:
+
+ * Lenses for accessing the components of pitch-related types
+ * Typeclass instances for common pitch operations
+ * Utility functions for converting between pitch representations
+-}
 module Pitch.Pitch where
 
 import Control.Applicative
 import Control.Lens hiding (elements)
+
 -- import Test.QuickCheck (Arbitrary (arbitrary), Gen, elements)
 
 import Control.Monad (forM)
@@ -37,30 +39,30 @@ import Pitch.Accidental
 import Util.Fraction (splitFraction)
 
 data NoteName = C | D | E | F | G | A | B
-  deriving (Eq, Ord, Show, Enum, Bounded, Lift, Data)
+    deriving (Eq, Ord, Show, Enum, Bounded, Lift, Data)
 
 data IntervalBasis = Chromatic | Diatonic
-  deriving (Eq, Ord, Show, Enum)
+    deriving (Eq, Ord, Show, Enum)
 
 data PitchClass where
-  PitchClass ::
-    { _noteName :: NoteName,
-      _accidental :: Accidental
-    } ->
-    PitchClass
-  deriving (Eq, Lift, Data)
+    PitchClass ::
+        { _noteName :: NoteName
+        , _accidental :: Accidental
+        } ->
+        PitchClass
+    deriving (Eq, Lift, Data)
 
 data Pitch where
-  Pitch ::
-    { _noteName :: NoteName,
-      _accidental :: Accidental,
-      _octave :: Octave
-    } ->
-    Pitch
-  deriving (Eq, Lift, Data)
+    Pitch ::
+        { _noteName :: NoteName
+        , _accidental :: Accidental
+        , _octave :: Octave
+        } ->
+        Pitch
+    deriving (Eq, Lift, Data)
 
 newtype Octave = Octave {unOctave :: Int}
-  deriving (Eq, Ord, Lift, Data)
+    deriving (Eq, Ord, Lift, Data)
 
 -- deriving instance Data Pitch
 
@@ -77,22 +79,22 @@ data SomeNote = forall notename. (IsNoteName notename) => SomeNote notename
 -------------------------------------------------------------------------------------
 
 class NoteClass (noteName :: NoteName) where
-  sayNote :: String
+    sayNote :: String
 
 class IsNoteName a where
-  toNoteName :: a -> NoteName
+    toNoteName :: a -> NoteName
 
 class HasNoteName a where
-  noteName :: Lens' a NoteName
+    noteName :: Lens' a NoteName
 
 class HasAccidental a where
-  accidental :: Lens' a Accidental
+    accidental :: Lens' a Accidental
 
 class HasPitchClass a where
-  pitchClass :: Lens' a PitchClass
+    pitchClass :: Lens' a PitchClass
 
 class HasOctave a where
-  octave :: Lens' a Octave
+    octave :: Lens' a Octave
 
 -------------------------------------------------------------------------------------
 -- Instances
@@ -100,100 +102,100 @@ class HasOctave a where
 
 -- | Typeclass instance for retrieving the note name of a Pitch.
 instance HasNoteName Pitch where
-  -- \| Extracts the note name from a Pitch and applies a function to it.
-  noteName f (Pitch nn acc o) = (\nn' -> Pitch nn' acc o) <$> f nn
+    -- \| Extracts the note name from a Pitch and applies a function to it.
+    noteName f (Pitch nn acc o) = (\nn' -> Pitch nn' acc o) <$> f nn
 
 instance HasOctave Pitch where
-  octave f (Pitch nn acc o) = (Pitch nn acc) <$> f o
+    octave f (Pitch nn acc o) = (Pitch nn acc) <$> f o
 
 -- | Typeclass that represents a type with an accidental.
 instance HasAccidental Pitch where
-  -- \| Modifies the accidental of a Pitch using the provided function.
-  accidental f (Pitch nn acc o) = (\acc' -> Pitch nn acc' o) <$> f acc
+    -- \| Modifies the accidental of a Pitch using the provided function.
+    accidental f (Pitch nn acc o) = (\acc' -> Pitch nn acc' o) <$> f acc
 
 -- | Typeclass that represents a type with a pitch class.
 instance HasPitchClass Pitch where
-  -- \| Lens that focuses on the pitch class of a Pitch.
-  pitchClass :: Lens' Pitch PitchClass
-  pitchClass f (Pitch nn acc o) = (\(PitchClass nn' acc') -> Pitch nn' acc' o) <$> f (PitchClass nn acc)
+    -- \| Lens that focuses on the pitch class of a Pitch.
+    pitchClass :: Lens' Pitch PitchClass
+    pitchClass f (Pitch nn acc o) = (\(PitchClass nn' acc') -> Pitch nn' acc' o) <$> f (PitchClass nn acc)
 
 -- | Typeclass that represents a type with a note name.
 instance HasNoteName PitchClass where
-  -- \| Modifies the note name of a PitchClass using the provided function.
-  noteName f (PitchClass nn acc) = (`PitchClass` acc) <$> f nn
+    -- \| Modifies the note name of a PitchClass using the provided function.
+    noteName f (PitchClass nn acc) = (`PitchClass` acc) <$> f nn
 
 -- | Typeclass that represents a type with an accidental.
 instance HasAccidental PitchClass where
-  -- \| Modifies the accidental of a PitchClass using the provided function.
-  accidental f (PitchClass nn acc) = PitchClass nn <$> f acc
+    -- \| Modifies the accidental of a PitchClass using the provided function.
+    accidental f (PitchClass nn acc) = PitchClass nn <$> f acc
 
 -- | Typeclass that represents a type that can be converted to a NoteName.
 instance IsNoteName SomeNote where
-  -- \| Converts a SomeNote to a NoteName.
-  toNoteName :: SomeNote -> NoteName
-  toNoteName (SomeNote nn) = toNoteName nn
+    -- \| Converts a SomeNote to a NoteName.
+    toNoteName :: SomeNote -> NoteName
+    toNoteName (SomeNote nn) = toNoteName nn
 
 instance Show SomeNote where
-  show = show . toNoteName
+    show = show . toNoteName
 
 instance NoteClass C where
-  sayNote = "c"
+    sayNote = "c"
 
 instance NoteClass D where
-  sayNote = "d"
+    sayNote = "d"
 
 instance NoteClass E where
-  sayNote = "e"
+    sayNote = "e"
 
 instance NoteClass F where
-  sayNote = "f"
+    sayNote = "f"
 
 instance NoteClass G where
-  sayNote = "g"
+    sayNote = "g"
 
 instance NoteClass A where
-  sayNote = "a"
+    sayNote = "a"
 
 instance NoteClass B where
-  sayNote = "b"
+    sayNote = "b"
 
 instance IsString NoteName where
-  fromString :: String -> NoteName
-  fromString "c" = C
-  fromString "d" = D
-  fromString "e" = E
-  fromString "f" = F
-  fromString "g" = G
-  fromString "a" = A
-  fromString "b" = B
-  fromString s = error $ "Invalid NoteName string: " <> s
+    fromString :: String -> NoteName
+    fromString "c" = C
+    fromString "d" = D
+    fromString "e" = E
+    fromString "f" = F
+    fromString "g" = G
+    fromString "a" = A
+    fromString "b" = B
+    fromString s = error $ "Invalid NoteName string: " <> s
 
 instance Show PitchClass where
-  show (PitchClass name acc) = show name <> " " <> show acc
+    show (PitchClass name acc) = show name <> " " <> show acc
 
 instance Show Octave where
-  show (Octave o) = "Octave " <> show o
+    show (Octave o) = "Octave " <> show o
 
 instance Show Pitch where
-  show :: Pitch -> String
-  show (Pitch name acc oct) = show name <> " " <> show acc <> " " <> show oct
+    show :: Pitch -> String
+    show (Pitch name acc oct) = show name <> " " <> show acc <> " " <> show oct
 
 -- Functions
 makeLensesFor
-  [ ("PitchClass", "_noteName"),
-    ("PitchClass", "_accidental"),
-    ("Pitch", "_noteName"),
-    ("Pitch", "_accidental"),
-    ("Pitch", "_octave")
-  ]
-  ''PitchClass
+    [ ("PitchClass", "_noteName")
+    , ("PitchClass", "_accidental")
+    , ("Pitch", "_noteName")
+    , ("Pitch", "_accidental")
+    , ("Pitch", "_octave")
+    ]
+    ''PitchClass
 
 pcToRational :: PitchClass -> Rational
 pcToRational pc = base + acVal
   where
     base = case Prelude.lookup nm noteNameToRational' of
-      Just val -> val
-      Nothing -> error "NoteName not found"
+        Just val -> val
+        Nothing -> error "NoteName not found"
     acVal = accidentalToSemitones ac :: Rational
     nm = pc ^. noteName
     ac = pc ^. accidental
@@ -204,11 +206,8 @@ pc1 =~ pc2 = (pcToRational pc1 `mod'` 12) == (pcToRational pc2 `mod'` 12)
 noteNameToRationalMap :: Map.Map NoteName Rational
 noteNameToRationalMap = Map.fromList [(C, 0), (D, 2), (E, 4), (F, 5), (G, 7), (A, 9), (B, 11)]
 
-
-
 noteNameToRational :: NoteName -> Rational
 noteNameToRational name = fromMaybe (error ("NoteName " <> show name <> " not found")) (Map.lookup name noteNameToRationalMap)
-
 
 noteNameToRational' :: [(NoteName, Rational)]
 noteNameToRational' = [(C, 0), (D, 2), (E, 4), (F, 5), (G, 7), (A, 9), (B, 11)]
@@ -237,11 +236,11 @@ allPCRationals = fmap pcToRational allPitchClasses
 
 enharmonicPCEquivs :: Rational -> [(Rational, PitchClass)]
 enharmonicPCEquivs val =
-  [(v, pc) | pc <- allPitchClasses, let v = pcToRational pc, v `mod'` 12 == val `mod'` 12]
+    [(v, pc) | pc <- allPitchClasses, let v = pcToRational pc, v `mod'` 12 == val `mod'` 12]
 
 enharmonicPCEquivs' :: PitchClass -> [(Rational, PitchClass)]
 enharmonicPCEquivs' pc =
-  [(v, pc') | pc' <- allPitchClasses, let v = pcToRational pc', v `mod'` 12 == pcToRational pc `mod'` 12]
+    [(v, pc') | pc' <- allPitchClasses, let v = pcToRational pc', v `mod'` 12 == pcToRational pc `mod'` 12]
 
 type EnharmonicMapping = [(Rational, [PitchClass])]
 
@@ -258,7 +257,6 @@ allEnharmonics = fmap enharmonics allPitchClasses
 
 allEnharmonicsMapping :: [(PitchClass, [PitchClass])]
 allEnharmonicsMapping = zip allPitchClasses allEnharmonics
-
 
 {- ---------------------------- playground -----------------------------------
 
@@ -362,20 +360,20 @@ createPitchMap = foldr (Map.union . createPitchesForNote) Map.empty
 
 createPitchesForNote :: NoteName -> Map.Map String Pitch
 createPitchesForNote note = Map.fromList $ do
-  acc <- [Natural, Sharp, Flat, QuarterSharp, QuarterFlat, ThreeQuartersFlat, ThreeQuartersSharp, DoubleFlat, DoubleSharp]
-  let modifier = case acc of
-        Sharp -> "is"
-        Flat -> "es"
-        QuarterSharp -> "ih"
-        QuarterFlat -> "eh"
-        Natural -> ""
-        ThreeQuartersFlat -> "eseh"
-        ThreeQuartersSharp -> "isih"
-        DoubleFlat -> "eses"
-        DoubleSharp -> "isis"
-        _ -> ""
-  (octaveSuffix, oct) <- [("", 4), ("'", 5), ("''", 6), ("'''", 7), ("_", 3), ("__", 2), ("___", 1)]
-  pure (fmap toLower (show note) <> modifier <> octaveSuffix, Pitch note acc (Octave oct))
+    acc <- [Natural, Sharp, Flat, QuarterSharp, QuarterFlat, ThreeQuartersFlat, ThreeQuartersSharp, DoubleFlat, DoubleSharp]
+    let modifier = case acc of
+            Sharp -> "is"
+            Flat -> "es"
+            QuarterSharp -> "ih"
+            QuarterFlat -> "eh"
+            Natural -> ""
+            ThreeQuartersFlat -> "eseh"
+            ThreeQuartersSharp -> "isih"
+            DoubleFlat -> "eses"
+            DoubleSharp -> "isis"
+            _ -> ""
+    (octaveSuffix, oct) <- [("", 4), ("'", 5), ("''", 6), ("'''", 7), ("_", 3), ("__", 2), ("___", 1)]
+    pure (fmap toLower (show note) <> modifier <> octaveSuffix, Pitch note acc (Octave oct))
 
 -- Create pitch map
 pitchMap :: Map.Map String Pitch
@@ -386,7 +384,7 @@ concatForM xs action = concat <$> forM xs action
 
 generatePitchVars :: [String] -> Q [Dec]
 generatePitchVars pitchNames =
-  concatForM pitchNames $ \name -> do
-    let varName = mkName name
-    let pitchVal = AppE (VarE 'fromString) (LitE (StringL name))
-    pure [SigD varName (ConT ''Pitch), ValD (VarP varName) (NormalB pitchVal) []]
+    concatForM pitchNames $ \name -> do
+        let varName = mkName name
+        let pitchVal = AppE (VarE 'fromString) (LitE (StringL name))
+        pure [SigD varName (ConT ''Pitch), ValD (VarP varName) (NormalB pitchVal) []]

@@ -1,7 +1,7 @@
 -- Modified from:
 -- Copyright (C) 2007 Bart Massey
 
-{-| This module implements reading and writing of the most
+{- | This module implements reading and writing of the most
   common kinds of WAVE files.  WAVE files are Microsoft
   RIFF audio sample files originally based on the AIFF
   format, and commonly have the .wav filename extension.
@@ -67,19 +67,19 @@ data WAVERawHeader = WAVERawHeader
 
 -- | Descriptive information for the audio source.
 data WAVEHeader = WAVEHeader
-    { waveNumChannels :: Int
-    -- ^ Samples per frame.
-    , waveFrameRate :: Int
-    -- ^ Frames per second.
-    , waveBitsPerSample :: Int
-    -- ^ Number of
-    --  significant bits of left-justified value.
-    , waveFrames :: Maybe Int
-    -- ^ If present,
-    --  number of frames in the stream.
-    --  Otherwise, can be (inefficiently)
-    --  inferred from the length of the
-    --  stream.
+    { -- | Samples per frame.
+      waveNumChannels :: Int
+    , -- | Frames per second.
+      waveFrameRate :: Int
+    , -- | Number of
+      --  significant bits of left-justified value.
+      waveBitsPerSample :: Int
+    , -- | If present,
+      --  number of frames in the stream.
+      --  Otherwise, can be (inefficiently)
+      --  inferred from the length of the
+      --  stream.
+      waveFrames :: Maybe Int
     }
 
 {-
@@ -401,8 +401,8 @@ getWAVEFile fn = do
 unconvert_nbytes_lend :: Int -> Int -> [Word8]
 unconvert_nbytes_lend 0 _ = []
 unconvert_nbytes_lend n v =
-    fromIntegral (v .&. 255)
-        : unconvert_nbytes_lend (n - 1) (v `shift` (-8))
+    fromIntegral (v .&. 255) :
+    unconvert_nbytes_lend (n - 1) (v `shift` (-8))
 
 put_nbytes_lend :: Handle -> Int -> Int -> IO ()
 put_nbytes_lend h n v = do

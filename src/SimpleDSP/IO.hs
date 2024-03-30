@@ -1,7 +1,6 @@
 {-# LANGUAGE ImportQualifiedPost #-}
+
 -- | This module contains the logic to load a sound file.
-
-
 module SimpleDSP.IO where
 
 import Data.ByteString (toStrict)
