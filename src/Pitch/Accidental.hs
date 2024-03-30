@@ -4,18 +4,18 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
-module Pitch.Accidental where
+module Pitch.Accidental  where
 
-import Data.Data
-import Data.List (isPrefixOf)
+import           Data.Data
+import           Data.List (isPrefixOf)
 import qualified Data.Map as Map
-import Data.Ord (comparing)
-import Data.Ratio
-import Data.String
+import           Data.Ord (comparing)
+import           Data.Ratio
+import           Data.String
 import qualified Data.Text as T
-import Language.Haskell.TH.Syntax (Lift, lift)
-import Text.Parsec
-import Text.Parsec.String (Parser)
+import           Language.Haskell.TH.Syntax (Lift, lift)
+import           Text.Parsec
+import           Text.Parsec.String (Parser)
 
 data Accidental
     = DoubleFlat

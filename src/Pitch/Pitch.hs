@@ -20,23 +20,23 @@
 -}
 module Pitch.Pitch where
 
-import Control.Applicative
-import Control.Lens hiding (elements)
+import           Control.Applicative
+import           Control.Lens hiding (elements)
 
 -- import Test.QuickCheck (Arbitrary (arbitrary), Gen, elements)
 
-import Control.Monad (forM)
-import Data.Char (toLower)
-import Data.Data
-import Data.Fixed (mod')
+import           Control.Monad (forM)
+import           Data.Char (toLower)
+import           Data.Data
+import           Data.Fixed (mod')
 import qualified Data.Map as Map
-import Data.Maybe (fromMaybe)
-import Data.Ratio ((%))
-import Data.String
-import Language.Haskell.TH
-import Language.Haskell.TH.Syntax
-import Pitch.Accidental
-import Util.Fraction (splitFraction)
+import           Data.Maybe (fromMaybe)
+import           Data.Ratio ((%))
+import           Data.String
+import           Language.Haskell.TH
+import           Language.Haskell.TH.Syntax
+import           Pitch.Accidental
+import           Util.Fraction (splitFraction)
 
 data NoteName = C | D | E | F | G | A | B
     deriving (Eq, Ord, Show, Enum, Bounded, Lift, Data)
@@ -358,6 +358,7 @@ notes = [C, D, E, F, G, A, B]
 createPitchMap :: [NoteName] -> Map.Map String Pitch
 createPitchMap = foldr (Map.union . createPitchesForNote) Map.empty
 
+
 createPitchesForNote :: NoteName -> Map.Map String Pitch
 createPitchesForNote note = Map.fromList $ do
     acc <- [Natural, Sharp, Flat, QuarterSharp, QuarterFlat, ThreeQuartersFlat, ThreeQuartersSharp, DoubleFlat, DoubleSharp]
@@ -382,9 +383,17 @@ pitchMap = createPitchMap notes
 concatForM :: (Monad m) => [a] -> (a -> m [b]) -> m [b]
 concatForM xs action = concat <$> forM xs action
 
-generatePitchVars :: [String] -> Q [Dec]
+{- generatePitchVars :: [String] -> Q [Dec]
 generatePitchVars pitchNames =
     concatForM pitchNames $ \name -> do
         let varName = mkName name
         let pitchVal = AppE (VarE 'fromString) (LitE (StringL name))
         pure [SigD varName (ConT ''Pitch), ValD (VarP varName) (NormalB pitchVal) []]
+ -}
+
+
+generatePitchVars :: [String] -> Q [Dec]
+generatePitchVars pitchNames = concatForM pitchNames $ \name -> do
+    let varName = mkName name
+        pitchVal = AppE (VarE 'fromString) (LitE (StringL name))
+    pure [SigD varName (ConT ''Pitch), ValD (VarP varName) (NormalB pitchVal) []]
