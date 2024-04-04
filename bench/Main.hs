@@ -6,7 +6,7 @@ import Criterion.Main
 import Pitch.Accidental
 import Pitch.Parser
 import Pitch.Pitch
-
+import qualified Data.Text as T
 
 -- Benchmark the pitchToFloat function
 benchmarkPitchToFloat :: Benchmark
@@ -36,14 +36,15 @@ benchmarkParsePitches :: Benchmark
 benchmarkParsePitches =
   bgroup
     "parsePitches"
-    [ bench "c d e f d" $ whnf parsePitches "c d e f d",
-      bench "cqs' cqf,  gqs''" $ whnf parsePitches "cqs' cqf,  gqs''"
+    [ bench "c d e f d" $ whnf parsePitches (T.pack "c d e f d"),
+      bench "cqs' cqf,  gqs''" $ whnf parsePitches (T.pack "cqs' cqf,  gqs''")
     ]
 
 main :: IO ()
 main =
   defaultMain
-    [ benchmarkPitchToFloat,
-      benchmarkPcToRational,
+    [
+      {- benchmarkPitchToFloat,
+      benchmarkPcToRational, -}
       benchmarkParsePitches
     ]
