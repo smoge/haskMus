@@ -92,7 +92,6 @@ library
         DeriveFunctor
         DeriveGeneric
         DeriveLift
-        DeriveTraversable
         DisambiguateRecordFields
         DuplicateRecordFields
         ExistentialQuantification
@@ -147,7 +146,6 @@ executable haskMus-exe
         DeriveFunctor
         DeriveGeneric
         DeriveLift
-        DeriveTraversable
         DisambiguateRecordFields
         DuplicateRecordFields
         ExistentialQuantification
@@ -198,6 +196,7 @@ test-suite haskMus-test
         , test-framework-hunit
         , test-framework-quickcheck2
 
+
     default-language:   Haskell2010
     default-extensions:
         AllowAmbiguousTypes
@@ -207,7 +206,6 @@ test-suite haskMus-test
         DeriveFunctor
         DeriveGeneric
         DeriveLift
-        DeriveTraversable
         DisambiguateRecordFields
         DuplicateRecordFields
         ExistentialQuantification

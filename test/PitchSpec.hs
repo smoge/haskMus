@@ -7,6 +7,7 @@ import Data.Ratio
 import Pitch.Accidental
 import Pitch.Pitch
 import Test.Hspec
+import Pitch.Parser
 
 spec :: Spec
 spec = do
@@ -15,6 +16,10 @@ spec = do
       let c = PitchClass C Natural
       c ^. noteName `shouldBe` C
       c ^. accidental `shouldBe` Natural
+
+  describe "Pitch Parser" $ do
+    it "parses correctly" $ do
+      parsePitches "cqs' cqf,  gqs''" `shouldBe` Right [Pitch C QuarterSharp (Octave 5), Pitch C QuarterFlat (Octave 3), Pitch G QuarterSharp (Octave 6)]
 
 {-  it "can modify the accidental of a PitchClass" $ do
     let c = PitchClass C Natural
