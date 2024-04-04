@@ -18,7 +18,7 @@ build-type:    Simple
 -- extra-source-files:  readme.md
 --                      changelog.md
 
-tested-with:   GHC ==9.4.* || ==9.6.*
+tested-with:   GHC >=9.4 && <9.5 || >=9.6 && <9.7
 
 library
     hs-source-dirs:     src
@@ -34,6 +34,9 @@ library
         Rtm.Parser
         Rtm.QuasiQuoter
         Rtm.Shape
+        SimpleDSP.IIR
+        SimpleDSP.IO
+        SimpleDSP.Samples
         Text.XML.Writer
         Time.Dur
         Time.Duration
@@ -42,13 +45,9 @@ library
         ToXML
         Util.Fraction
         Util.MathDuration
-        SimpleDSP.IIR
-        SimpleDSP.IO
-        SimpleDSP.Samples
-
 
     build-depends:
-          base                               >=4.17 && <4.20
+        , base                >=4.17 && <4.20
         , bytestring
         , containers
         , data-default
@@ -67,16 +66,17 @@ library
         , pretty-simple
         , QuickCheck
         , random-shuffle
+        , safe
         , template-haskell
         , text
+        , these
+        , transformers
+        , typed-process
+        , vector
         , xml-conduit
         , xml-types
-        , typed-process
-        , transformers
-        , vector
-        , safe
-        , these
-         --, vector-space
+
+    --, vector-space
     --    , rando
     --    , random-fu
     --  , bimap >= 0.5.0 && < 0.6
@@ -85,6 +85,7 @@ library
     default-language:   Haskell2010
     default-extensions:
         AllowAmbiguousTypes
+        BlockArguments
         DataKinds
         DefaultSignatures
         DeriveDataTypeable
@@ -100,16 +101,22 @@ library
         GADTSyntax
         GADTs
         GeneralizedNewtypeDeriving
+        ImportQualifiedPost
         InstanceSigs
         LambdaCase
+        LambdaCase
         OverloadedLists
+        OverloadedRecordDot
         OverloadedStrings
+        OverloadedStrings
+        PartialTypeSignatures
         PolyKinds
         PostfixOperators
         QuasiQuotes
         RankNTypes
         ScopedTypeVariables
         StandaloneDeriving
+        StrictData
         TemplateHaskell
         TupleSections
         TypeApplications
@@ -117,13 +124,6 @@ library
         TypeOperators
         TypeSynonymInstances
         UnicodeSyntax
-        BlockArguments
-        ImportQualifiedPost
-        LambdaCase
-        PartialTypeSignatures
-        OverloadedStrings
-        OverloadedRecordDot
-        StrictData
 
     ghc-options:
         -Wall -Wcompat -Widentities -Wincomplete-record-updates
@@ -173,9 +173,9 @@ executable haskMus-exe
         UnicodeSyntax
 
     ghc-options:
-        -O2 -funbox-strict-fields -fforce-recomp
-        -Wall -Wcompat -Widentities -Wincomplete-record-updates
-        -Wincomplete-uni-patterns -Wmissing-export-lists -threaded -with-rtsopts=-N
+        -O2 -funbox-strict-fields -fforce-recomp -Wall -Wcompat
+        -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns
+        -Wmissing-export-lists -threaded -with-rtsopts=-N
         -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
 
 test-suite haskMus-test
@@ -241,15 +241,19 @@ source-repository head
     type:     git
     location: https://github.com/smoge/haskMus
 
-
 benchmark haskMus-benchmarks
-  type: exitcode-stdio-1.0
-  main-is: Main.hs
-  hs-source-dirs:
-      bench
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -rtsopts -threaded -with-rtsopts=-N
-  build-depends:
-      base
-    , haskMus
-    , criterion
-  default-language: Haskell2010
+    type:             exitcode-stdio-1.0
+    main-is:          Main.hs
+    hs-source-dirs:   bench
+    ghc-options:
+        -Wall -Wcompat -Widentities -Wincomplete-record-updates
+        -Wincomplete-uni-patterns -Wmissing-export-lists
+        -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+        -rtsopts -threaded -with-rtsopts=-N
+
+    build-depends:
+        , base
+        , criterion
+        , haskMus
+
+    default-language: Haskell2010
