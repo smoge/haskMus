@@ -4,6 +4,7 @@ import Language.Haskell.TH (Exp, Quote)
 import Language.Haskell.TH.Quote (QuasiQuoter (..))
 import Language.Haskell.TH.Syntax (dataToExpQ)
 import Pitch.Parser (parsePitches)
+import qualified Data.Text as T
 
 -- Define the parsePitches QuasiQuoter
 pitch :: QuasiQuoter
@@ -18,7 +19,7 @@ pitch =
 -- Convert a string to a [Pitch] Exp
 
 parsePitchesToExp :: (MonadFail m, Quote m) => String -> m Exp
-parsePitchesToExp s = case parsePitches s of
+parsePitchesToExp s = case parsePitches (T.pack s) of
     Left err -> fail $ "Parse error: " <> show err
     Right pitches -> dataToExpQ (const Nothing) pitches
 

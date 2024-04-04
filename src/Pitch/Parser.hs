@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveLift #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Pitch.Parser where
 
@@ -8,8 +9,10 @@ import Pitch.Accidental
 import Pitch.Pitch
 import Text.Parsec
 import qualified Text.Parsec as P
+import qualified Data.Text as T
 
-import Text.Parsec.String
+import Text.Parsec.Text
+import Text.Parsec.Error (ParseError)
 
 -- Consume spaces before and after the parser.
 {-# INLINE spaced #-}
@@ -57,7 +60,7 @@ pitchClassParser =
         ("b", B, Natural)
       ]
   where
-    parsePitchClass (str, pitch, accidental) = try (string str >> pure (PitchClass pitch accidental))
+    parsePitchClass (str, pitch, accidental) = try (string (T.unpack str) >> pure (PitchClass pitch accidental))
 
 
 octaveParser :: Parser Octave
@@ -68,8 +71,12 @@ octaveParser = do
   pure (Octave (octs + 4))
 
 
-parsePitches :: String -> Either ParseError [Pitch]
+{- parsePitches :: String -> Either ParseError [Pitch]
 parsePitches = parse pitchesParser ""
+ -}
+
+parsePitches :: T.Text -> Either ParseError [Pitch]
+parsePitches input = parse pitchesParser "" input
 
 {-# INLINE mkPitch'' #-}
 mkPitch'' :: PitchClass -> Octave -> Pitch

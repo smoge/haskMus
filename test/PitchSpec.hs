@@ -8,6 +8,7 @@ import Pitch.Accidental
 import Pitch.Pitch
 import Test.Hspec
 import Pitch.Parser
+import qualified Data.Text as T
 
 spec :: Spec
 spec = do
@@ -19,7 +20,7 @@ spec = do
 
   describe "Pitch Parser" $ do
     it "parses correctly" $ do
-      parsePitches "cqs' cqf,  gqs''" `shouldBe` Right [Pitch C QuarterSharp (Octave 5), Pitch C QuarterFlat (Octave 3), Pitch G QuarterSharp (Octave 6)]
+      parsePitches (T.pack "cqs' cqf,  gqs''") `shouldBe` Right [Pitch C QuarterSharp (Octave 5), Pitch C QuarterFlat (Octave 3), Pitch G QuarterSharp (Octave 6)]
 
 {-  it "can modify the accidental of a PitchClass" $ do
     let c = PitchClass C Natural
