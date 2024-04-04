@@ -6,16 +6,26 @@ module Pitch.Parser (
     parsePitches,
 ) where
 
--- import Control.Lens
--- import Language.Haskell.TH
--- import Language.Haskell.TH.Quote
--- import Language.Haskell.TH.Syntax
 import Pitch.Accidental (
     Accidental (Flat, Natural, QuarterFlat, QuarterSharp, Sharp),
  )
 import Pitch.Pitch
+    ( Octave(Octave),
+      Pitch,
+      PitchClass(PitchClass),
+      NoteName(B, C, D, E, F, G, A),
+      mkPitch' )
 import Text.Parsec
-import Text.Parsec.String
+    ( char,
+      spaces,
+      string,
+      sepEndBy,
+      (<|>),
+      many,
+      parse,
+      try,
+      ParseError )
+import Text.Parsec.String ( Parser )
 
 -- Consume spaces before and after the parser.
 spaced :: Parser a -> Parser a
@@ -58,55 +68,6 @@ pitchClassParser =
         <|> try (string "a" >> pure (PitchClass A Natural))
         <|> try (string "b" >> pure (PitchClass B Natural))
 
-{-
-
-import qualified Data.Map as Map
-
-pitchClassMap :: Map String PitchClass
-pitchClassMap = Map.fromList
-    [ ("cqs", PitchClass C QuarterSharp)
-    , ("cqf", PitchClass C QuarterFlat)
-    , ("dqf", PitchClass D QuarterFlat)
-    , ("dqs", PitchClass D QuarterSharp)
-    , ("eqf", PitchClass E QuarterFlat)
-    , ("eqs", PitchClass E QuarterSharp)
-    , ("fqs", PitchClass F QuarterSharp)
-    , ("fqf", PitchClass F QuarterFlat)
-    , ("gqf", PitchClass G QuarterFlat)
-    , ("gqs", PitchClass G QuarterSharp)
-    , ("aqf", PitchClass A QuarterFlat)
-    , ("aqs", PitchClass A QuarterSharp)
-    , ("bqf", PitchClass B QuarterFlat)
-    , ("bqs", PitchClass B QuarterSharp)
-    , ("cf", PitchClass C Flat)
-    , ("df", PitchClass D Flat)
-    , ("ef", PitchClass E Flat)
-    , ("gf", PitchClass G Flat)
-    , ("af", PitchClass A Flat)
-    , ("bf", PitchClass B Flat)
-    , ("cs", PitchClass C Sharp)
-    , ("ds", PitchClass D Sharp)
-    , ("es", PitchClass E Sharp)
-    , ("fs", PitchClass F Sharp)
-    , ("gs", PitchClass G Sharp)
-    , ("as", PitchClass A Sharp)
-    , ("bs", PitchClass B Sharp)
-    , ("c", PitchClass C Natural)
-    , ("d", PitchClass D Natural)
-    , ("e", PitchClass E Natural)
-    , ("f", PitchClass F Natural)
-    , ("g", PitchClass G Natural)
-    , ("a", PitchClass A Natural)
-    , ("b", PitchClass B Natural)
-    ]
-
-pitchClassParser :: Parser PitchClass
-pitchClassParser = choice
-    [ string key >> pure value
-    | (key, value) <- Map.toList pitchClassMap
-    ]
-
- -}
 octaveParser :: Parser Octave
 octaveParser = do
     upOctaves <- many (char '\'')
@@ -122,8 +83,6 @@ pitchParser = spaced $ do
     pc <- pitchClassParser
     mkPitch' pc <$> octaveParser
 
--- parsePitch :: String -> Either ParseError Pitch
--- parsePitch = parse pitchParser ""
 
 pitchesParser :: Parser [Pitch]
 pitchesParser = spaced $ sepEndBy pitchParser spaces
