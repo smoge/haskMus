@@ -18,101 +18,138 @@ spaced p = spaces *> p <* spaces
 
 pitchClassParser :: Parser PitchClass
 pitchClassParser =
-  try (string "cqs" >> pure (PitchClass C QuarterSharp))
-    <|> try (string "cqf" >> pure (PitchClass C QuarterFlat))
-    <|> try (string "dqf" >> pure (PitchClass D QuarterFlat))
-    <|> try (string "dqs" >> pure (PitchClass D QuarterSharp))
-    <|> try (string "eqf" >> pure (PitchClass E QuarterFlat))
-    <|> try (string "eqs" >> pure (PitchClass E QuarterSharp))
-    <|> try (string "fqs" >> pure (PitchClass F QuarterSharp))
-    <|> try (string "fqf" >> pure (PitchClass F QuarterFlat))
-    <|> try (string "gqf" >> pure (PitchClass G QuarterFlat))
-    <|> try (string "gqs" >> pure (PitchClass G QuarterSharp))
-    <|> try (string "aqf" >> pure (PitchClass A QuarterFlat))
-    <|> try (string "aqs" >> pure (PitchClass A QuarterSharp))
-    <|> try (string "bqf" >> pure (PitchClass B QuarterFlat))
-    <|> try (string "bqs" >> pure (PitchClass B QuarterSharp))
-    <|> try (string "cf" >> pure (PitchClass C Flat))
-    <|> try (string "df" >> pure (PitchClass D Flat))
-    <|> try (string "ef" >> pure (PitchClass E Flat))
-    <|> try (string "gf" >> pure (PitchClass G Flat))
-    <|> try (string "af" >> pure (PitchClass A Flat))
-    <|> try (string "bf" >> pure (PitchClass B Flat))
-    <|> try (string "cs" >> pure (PitchClass C Sharp))
-    <|> try (string "ds" >> pure (PitchClass D Sharp))
-    <|> try (string "es" >> pure (PitchClass E Sharp))
-    <|> try (string "fs" >> pure (PitchClass F Sharp))
-    <|> try (string "gs" >> pure (PitchClass G Sharp))
-    <|> try (string "as" >> pure (PitchClass A Sharp))
-    <|> try (string "bs" >> pure (PitchClass B Sharp))
-    <|> try (string "c" >> pure (PitchClass C Natural))
-    <|> try (string "d" >> pure (PitchClass D Natural))
-    <|> try (string "e" >> pure (PitchClass E Natural))
-    <|> try (string "f" >> pure (PitchClass F Natural))
-    <|> try (string "g" >> pure (PitchClass G Natural))
-    <|> try (string "a" >> pure (PitchClass A Natural))
-    <|> try (string "b" >> pure (PitchClass B Natural))
+  choice $
+    map
+      parsePitchClass
+      [ ("cqs", C, QuarterSharp),
+        ("cqf", C, QuarterFlat),
+        ("dqf", D, QuarterFlat),
+        ("dqs", D, QuarterSharp),
+        ("eqf", E, QuarterFlat),
+        ("eqs", E, QuarterSharp),
+        ("fqs", F, QuarterSharp),
+        ("fqf", F, QuarterFlat),
+        ("gqf", G, QuarterFlat),
+        ("gqs", G, QuarterSharp),
+        ("aqf", A, QuarterFlat),
+        ("aqs", A, QuarterSharp),
+        ("bqf", B, QuarterFlat),
+        ("bqs", B, QuarterSharp),
+        ("cf", C, Flat),
+        ("df", D, Flat),
+        ("ef", E, Flat),
+        ("gf", G, Flat),
+        ("af", A, Flat),
+        ("bf", B, Flat),
+        ("cs", C, Sharp),
+        ("ds", D, Sharp),
+        ("es", E, Sharp),
+        ("fs", F, Sharp),
+        ("gs", G, Sharp),
+        ("as", A, Sharp),
+        ("bs", B, Sharp),
+        ("c", C, Natural),
+        ("d", D, Natural),
+        ("e", E, Natural),
+        ("f", F, Natural),
+        ("g", G, Natural),
+        ("a", A, Natural),
+        ("b", B, Natural)
+      ]
+  where
+    parsePitchClass (str, pitch, accidental) = try (string str >> pure (PitchClass pitch accidental))
 
-pitchClassParser' :: Parser PitchClass
-pitchClassParser' =
-  P.choice
-    [ P.string "cqs" *> pure (PitchClass C QuarterSharp),
-      P.string "cqf" *> pure (PitchClass C QuarterFlat),
-      P.string "dqf" *> pure (PitchClass D QuarterFlat),
-      P.string "dqs" *> pure (PitchClass D QuarterSharp),
-      P.string "eqf" *> pure (PitchClass E QuarterFlat),
-      P.string "eqs" *> pure (PitchClass E QuarterSharp),
-      P.string "fqs" *> pure (PitchClass F QuarterSharp),
-      P.string "fqf" *> pure (PitchClass F QuarterFlat),
-      P.string "gqf" *> pure (PitchClass G QuarterFlat),
-      P.string "gqs" *> pure (PitchClass G QuarterSharp),
-      P.string "aqf" *> pure (PitchClass A QuarterFlat),
-      P.string "aqs" *> pure (PitchClass A QuarterSharp),
-      P.string "bqf" *> pure (PitchClass B QuarterFlat),
-      P.string "bqs" *> pure (PitchClass B QuarterSharp),
-      P.string "cf" *> pure (PitchClass C Flat),
-      P.string "df" *> pure (PitchClass D Flat),
-      P.string "ef" *> pure (PitchClass E Flat),
-      P.string "ff" *> pure (PitchClass F Flat),
-      P.string "gf" *> pure (PitchClass G Flat),
-      P.string "af" *> pure (PitchClass A Flat),
-      P.string "bf" *> pure (PitchClass B Flat),
-      P.string "cs" *> pure (PitchClass C Sharp),
-      P.string "ds" *> pure (PitchClass D Sharp),
-      P.string "es" *> pure (PitchClass E Sharp),
-      P.string "fs" *> pure (PitchClass F Sharp),
-      P.string "gs" *> pure (PitchClass G Sharp),
-      P.string "as" *> pure (PitchClass A Sharp),
-      P.string "bs" *> pure (PitchClass B Sharp),
-      P.string "c" *> pure (PitchClass C Natural),
-      P.string "d" *> pure (PitchClass D Natural),
-      P.string "e" *> pure (PitchClass E Natural),
-      P.string "f" *> pure (PitchClass F Natural),
-      P.string "g" *> pure (PitchClass G Natural),
-      P.string "a" *> pure (PitchClass A Natural),
-      P.string "b" *> pure (PitchClass B Natural)
-    ]
 
 octaveParser :: Parser Octave
 octaveParser = do
-  upOctaves <- many (char '\'')
-  downOctaves <- many (char ',')
-  let octs = length upOctaves - length downOctaves
+  upOctaves <- length <$> many (char '\'')
+  downOctaves <- length <$> many (char ',')
+  let octs = upOctaves - downOctaves
   pure (Octave (octs + 4))
 
--- | Parse a string into a list of pitches.
--- >>> parsePitches "cqs' cqf,  gqs''"
--- Right [C QuarterSharp Octave 5,C QuarterFlat Octave 3,G QuarterSharp Octave 6]
+
 parsePitches :: String -> Either ParseError [Pitch]
 parsePitches = parse pitchesParser ""
+
+{-# INLINE mkPitch'' #-}
+mkPitch'' :: PitchClass -> Octave -> Pitch
+mkPitch'' (PitchClass pitch accidental) o = Pitch {_noteName = pitch, _accidental = accidental, _octave = o}
+
 
 pitchParser :: Parser Pitch
 pitchParser = do
   pc <- pitchClassParser
-  mkPitch' pc <$> octaveParser
+  mkPitch'' pc <$> octaveParser
+
 
 pitchesParser :: Parser [Pitch]
-pitchesParser = spaced $ sepEndBy pitchParser spaces
+pitchesParser = sepEndBy pitchParser spaces
 
--- octaveParser :: Parser Octave
--- octaveParser = Octave . (+4) <$> (length <$> many (char '\'') <*> (negate . length <$> many (char ',')))
+
+
+{-
+User
+
+benchmarking parsePitches/c d e f d
+time                 17.69 μs   (17.17 μs .. 18.37 μs)
+                     0.992 R²   (0.985 R² .. 0.997 R²)
+mean                 17.92 μs   (17.58 μs .. 18.42 μs)
+std dev              1.373 μs   (1.090 μs .. 1.820 μs)
+variance introduced by outliers: 77% (severely inflated)
+
+benchmarking parsePitches/cqs' cqf,  gqs''
+time                 8.847 μs   (8.383 μs .. 9.340 μs)
+                     0.972 R²   (0.954 R² .. 0.984 R²)
+mean                 8.048 μs   (7.585 μs .. 8.471 μs)
+std dev              1.503 μs   (1.226 μs .. 1.958 μs)
+variance introduced by outliers: 96% (severely inflated)
+
+
+benchmarking parsePitches/c d e f d
+time                 23.47 μs   (22.57 μs .. 24.64 μs)
+                     0.992 R²   (0.987 R² .. 0.997 R²)
+mean                 23.24 μs   (22.73 μs .. 24.27 μs)
+std dev              2.484 μs   (1.675 μs .. 4.347 μs)
+variance introduced by outliers: 86% (severely inflated)
+
+benchmarking parsePitches/cqs' cqf,  gqs''
+time                 9.005 μs   (8.631 μs .. 9.265 μs)
+                     0.990 R²   (0.985 R² .. 0.994 R²)
+mean                 8.672 μs   (8.370 μs .. 8.931 μs)
+std dev              885.2 ns   (780.2 ns .. 1.013 μs)
+variance introduced by outliers: 87% (severely inflated)
+
+
+
+benchmarking parsePitches/c d e f d
+time                 21.76 μs   (20.22 μs .. 23.11 μs)
+                     0.980 R²   (0.970 R² .. 0.995 R²)
+mean                 21.11 μs   (20.54 μs .. 21.74 μs)
+std dev              2.076 μs   (1.657 μs .. 2.747 μs)
+variance introduced by outliers: 84% (severely inflated)
+
+benchmarking parsePitches/cqs' cqf,  gqs''
+time                 7.549 μs   (7.338 μs .. 7.786 μs)
+                     0.992 R²   (0.986 R² .. 0.996 R²)
+mean                 7.729 μs   (7.556 μs .. 7.924 μs)
+std dev              665.6 ns   (544.0 ns .. 834.3 ns)
+variance introduced by outliers: 83% (severely inflated)
+
+
+
+
+benchmarking parsePitches/c d e f d
+time                 20.25 μs   (19.80 μs .. 20.73 μs)
+                     0.994 R²   (0.990 R² .. 0.997 R²)
+mean                 20.73 μs   (20.04 μs .. 21.89 μs)
+std dev              2.855 μs   (1.501 μs .. 4.454 μs)
+variance introduced by outliers: 91% (severely inflated)
+
+benchmarking parsePitches/cqs' cqf,  gqs''
+time                 7.265 μs   (7.021 μs .. 7.520 μs)
+                     0.990 R²   (0.985 R² .. 0.995 R²)
+mean                 7.658 μs   (7.392 μs .. 7.930 μs)
+std dev              903.3 ns   (735.6 ns .. 1.260 μs)
+variance introduced by outliers: 90% (severely inflated)
+
+-}
