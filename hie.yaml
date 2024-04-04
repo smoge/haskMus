@@ -1,3 +1,6 @@
 cradle:
   stack:
-    component: "haskMus:lib"
+    component:
+      - "haskMus:lib"
+      - "haskMus:app"
+      - "haskMus:bench"

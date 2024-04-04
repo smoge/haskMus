@@ -3,21 +3,26 @@
 module Util.MathDuration where
 
 import Data.Bits ((.&.))
-import Data.List (find, sortOn, unfoldr)
+import Data.List (find, unfoldr, nub) -- sortOn
 import Data.Ratio
+{-
+orderByMusicalSimplicity :: [Rational] -> [Rational]
+orderByMusicalSimplicity = sortOn musicalOrderHelper
+-}
 
--- orderByMusicalSimplicity :: [Rational] -> [Rational]
--- orderByMusicalSimplicity = sortOn musicalOrderHelper
+{- kolmogorovComplexityRational :: Rational -> Int
+kolmogorovComplexityRational r = length (primeFactors (numerator r)) + length (primeFactors (denominator r))
+ -}
 
 musicalOrderHelper :: Rational -> (Int, Int, Int, Int, Int, Int)
 musicalOrderHelper r =
-    ( complexity
-    , denom
-    , numerLessThanDenom
-    , absDiff
-    , numer
-    , powerOfTwo
-    )
+  ( complexity,
+    denom,
+    numerLessThanDenom,
+    absDiff,
+    numer,
+    powerOfTwo
+  )
   where
     numer = negate $ fromIntegral (numerator r)
     denom = fromIntegral (denominator r)
@@ -26,8 +31,12 @@ musicalOrderHelper r =
     numerLessThanDenom = if absDiff < 0 then 1 else 0
     powerOfTwo = if isPowerOfTwo denom then 1 else 0
 
+countUniquePrimeFactors :: Integer -> Int
+countUniquePrimeFactors n = length $ nub $ primeFactors (toInteger n)
+
 kolmogorovComplexityRational :: Rational -> Int
-kolmogorovComplexityRational r = length (primeFactors (numerator r)) + length (primeFactors (denominator r))
+kolmogorovComplexityRational r = countUniquePrimeFactors (numerator r) + countUniquePrimeFactors (denominator r)
+
 
 isPowerOfTwo :: Int -> Bool
 isPowerOfTwo n = n > 0 && (n .&. (n - 1)) == 0
@@ -43,8 +52,8 @@ primeFactors num = unfoldr f (testFactors num, num)
   where
     f (_, 1) = Nothing
     f (ps, n) = case find (\p -> (n `rem` p) == 0) ps of
-        Nothing -> Just (n, ([], 1)) -- prime
-        Just fact -> Just (fact, (dropWhile (< fact) ps, n `div` fact))
+      Nothing -> Just (n, ([], 1)) -- prime
+      Just fact -> Just (fact, (dropWhile (< fact) ps, n `div` fact))
 
 primes :: [Integer]
 primes = 2 : 3 : filter (\n -> length (primeFactors n) == 1) [5, 7 ..]
