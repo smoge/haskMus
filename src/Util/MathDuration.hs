@@ -3,8 +3,9 @@
 module Util.MathDuration where
 
 import Data.Bits ((.&.))
-import Data.List (find, unfoldr, nub) -- sortOn
+import Data.List (find, nub, unfoldr) -- sortOn
 import Data.Ratio
+
 {-
 orderByMusicalSimplicity :: [Rational] -> [Rational]
 orderByMusicalSimplicity = sortOn musicalOrderHelper
@@ -32,11 +33,10 @@ musicalOrderHelper r =
     powerOfTwo = if isPowerOfTwo denom then 1 else 0
 
 countUniquePrimeFactors :: Integer -> Int
-countUniquePrimeFactors n = length $ nub $ primeFactors (toInteger n)
+countUniquePrimeFactors n = length $ nub $ primeFactors n
 
 kolmogorovComplexityRational :: Rational -> Int
 kolmogorovComplexityRational r = countUniquePrimeFactors (numerator r) + countUniquePrimeFactors (denominator r)
-
 
 isPowerOfTwo :: Int -> Bool
 isPowerOfTwo n = n > 0 && (n .&. (n - 1)) == 0
