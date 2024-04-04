@@ -8,7 +8,7 @@ build:
     stack build --fast --file-watch
 
 # Stack test file-watch
-test: 
+test:
     stack test --file-watch
 
 # Make GitHub CI from cabal file
@@ -20,13 +20,13 @@ build_w:
     stack build --fast --file-watch
 
 # Make cabal package version bounds
-cabal_bounds:
+bounds:
     cabal gen-bounds
 
 # Clean the project
 clean:
     stack clean --full
-    
+
 # Format Haskell project with fourmolu
 format:
     @echo "Formating the Haskell project (fourmolu)..."

@@ -1,4 +1,15 @@
-module Pitch.Hz where
+module Pitch.Hz
+(
+    -- * Types
+    Semitone (..),
+    Hz (..),
+    -- * Functions
+    semitoneToHz,
+    hzToSemitone,
+    hzToMidi,
+    roundHzToMidi
+)
+ where
 
 -- | The Pitch.Hz module provides types and functions to work with musical pitches in terms of semitones and Hertz.
 
