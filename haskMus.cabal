@@ -75,6 +75,7 @@ library
         , vector
         , xml-conduit
         , xml-types
+        , megaparsec
 
     --, vector-space
     --    , rando

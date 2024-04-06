@@ -8,21 +8,34 @@ module Pitch.Parser where
 import qualified Data.Text as T
 import Pitch.Accidental
 import Pitch.Pitch
-import Text.Parsec
-import Text.Parsec.Error (ParseError)
-import Text.Parsec.Text
+import Text.Megaparsec
+import Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer as L
+import Text.Megaparsec.Char.Lexer (lexeme)
+import Text.Megaparsec.Char (space1)
+
+import Data.Functor.Identity (Identity)
+import Data.Void (Void)
+import Control.Monad (void)
+
+
 
 -- Consume spaces before and after the parser.
 {-# INLINE spaced #-}
-spaced :: Parser a -> Parser a
-spaced p = spaces *> p <* spaces
+spaced :: Parsec Void T.Text a -> Parsec Void T.Text a
+spaced p = spaceConsumer *> p <* spaceConsumer
 
-pitchClassParser :: Parser PitchClass
+
+spaceConsumer = L.space space1 empty empty
+
+pitchClassParser :: Parsec Void T.Text PitchClass
 pitchClassParser =
-  choice $
-    map
-      parsePitchClass
-      [ ("cqs", C, QuarterSharp),
+  choice $ fmap parsePitchClass pitchTuples
+  where
+    parsePitchClass (str, pitch, accidental) = try (string str >> pure (PitchClass pitch accidental))
+
+pitchTuples :: [(T.Text, NoteName, Accidental)]
+pitchTuples =    [ ("cqs", C, QuarterSharp),
         ("cqf", C, QuarterFlat),
         ("dqf", D, QuarterFlat),
         ("dqs", D, QuarterSharp),
@@ -57,30 +70,118 @@ pitchClassParser =
         ("a", A, Natural),
         ("b", B, Natural)
       ]
-  where
-    parsePitchClass (str, pitch, accidental) = try (string' str >> pure (PitchClass pitch accidental))
 
-octaveParser :: Parser Octave
+octaveParser :: Parsec Void T.Text Octave
 octaveParser = do
   upOctaves <- length <$> many (char '\'')
   downOctaves <- length <$> many (char ',')
   let octs = upOctaves - downOctaves
   pure (Octave (octs + 4))
 
-parsePitches :: T.Text -> Either ParseError [Pitch]
-parsePitches input = parse pitchesParser "" input
+parsePitches :: T.Text -> Either (ParseErrorBundle T.Text Void) [Pitch]
+parsePitches input = runParser pitchesParser "" input
 
 {-# INLINE mkPitch'' #-}
 mkPitch'' :: PitchClass -> Octave -> Pitch
 mkPitch'' (PitchClass pitch accidental) o = Pitch {_noteName = pitch, _accidental = accidental, _octave = o}
 
-pitchParser :: Parser Pitch
+pitchParser :: ParsecT Void T.Text Identity Pitch
 pitchParser = do
   pc <- pitchClassParser
   mkPitch'' pc <$> octaveParser
 
-pitchesParser :: Parser [Pitch]
-pitchesParser = sepEndBy pitchParser spaces
+
+pitchesParser :: ParsecT Void T.Text Identity [Pitch]
+pitchesParser = sepEndBy pitchParser spaceConsumer
+
+
+
+
+
+
+-- {-# LANGUAGE DeriveLift #-}
+-- {-# LANGUAGE OverloadedStrings #-}
+-- {-# LANGUAGE StandaloneDeriving #-}
+-- {-# LANGUAGE TemplateHaskell #-}
+
+-- module Pitch.Parser where
+
+-- import qualified Data.Text as T
+-- import Pitch.Accidental
+-- import Pitch.Pitch
+-- import Text.Parsec
+-- import Text.Parsec.Error (ParseError)
+-- import Text.Parsec.Text
+
+-- -- Consume spaces before and after the parser.
+-- {-# INLINE spaced #-}
+-- spaced :: Parser a -> Parser a
+-- spaced p = spaces *> p <* spaces
+
+-- pitchClassParser :: Parser PitchClass
+-- pitchClassParser =
+--   choice $
+--     map
+--       parsePitchClass
+--       [ ("cqs", C, QuarterSharp),
+--         ("cqf", C, QuarterFlat),
+--         ("dqf", D, QuarterFlat),
+--         ("dqs", D, QuarterSharp),
+--         ("eqf", E, QuarterFlat),
+--         ("eqs", E, QuarterSharp),
+--         ("fqs", F, QuarterSharp),
+--         ("fqf", F, QuarterFlat),
+--         ("gqf", G, QuarterFlat),
+--         ("gqs", G, QuarterSharp),
+--         ("aqf", A, QuarterFlat),
+--         ("aqs", A, QuarterSharp),
+--         ("bqf", B, QuarterFlat),
+--         ("bqs", B, QuarterSharp),
+--         ("cf", C, Flat),
+--         ("df", D, Flat),
+--         ("ef", E, Flat),
+--         ("gf", G, Flat),
+--         ("af", A, Flat),
+--         ("bf", B, Flat),
+--         ("cs", C, Sharp),
+--         ("ds", D, Sharp),
+--         ("es", E, Sharp),
+--         ("fs", F, Sharp),
+--         ("gs", G, Sharp),
+--         ("as", A, Sharp),
+--         ("bs", B, Sharp),
+--         ("c", C, Natural),
+--         ("d", D, Natural),
+--         ("e", E, Natural),
+--         ("f", F, Natural),
+--         ("g", G, Natural),
+--         ("a", A, Natural),
+--         ("b", B, Natural)
+--       ]
+--   where
+--     parsePitchClass (str, pitch, accidental) = try (string' str >> pure (PitchClass pitch accidental))
+
+-- octaveParser :: Parser Octave
+-- octaveParser = do
+--   upOctaves <- length <$> many (char '\'')
+--   downOctaves <- length <$> many (char ',')
+--   let octs = upOctaves - downOctaves
+--   pure (Octave (octs + 4))
+
+-- parsePitches :: T.Text -> Either ParseError [Pitch]
+-- parsePitches input = parse pitchesParser "" input
+
+-- {-# INLINE mkPitch'' #-}
+-- mkPitch'' :: PitchClass -> Octave -> Pitch
+-- mkPitch'' (PitchClass pitch accidental) o = Pitch {_noteName = pitch, _accidental = accidental, _octave = o}
+
+-- pitchParser :: Parser Pitch
+-- pitchParser = do
+--   pc <- pitchClassParser
+--   mkPitch'' pc <$> octaveParser
+
+-- pitchesParser :: Parser [Pitch]
+-- pitchesParser = sepEndBy pitchParser spaces
 
 {-
 User
@@ -170,5 +271,24 @@ mean                 7.385 μs   (7.284 μs .. 7.503 μs)
 std dev              400.5 ns   (325.7 ns .. 507.4 ns)
 variance introduced by outliers: 65% (severely inflated)
 
+Megaparsec:
+
+Benchmark haskMus-benchmarks: RUNNING...
+benchmarking parsePitches/c d e f d
+time                 25.02 μs   (24.48 μs .. 25.67 μs)
+                     0.996 R²   (0.993 R² .. 0.998 R²)
+mean                 25.36 μs   (24.92 μs .. 25.90 μs)
+std dev              1.625 μs   (1.330 μs .. 2.008 μs)
+variance introduced by outliers: 69% (severely inflated)
+                     
+benchmarking parsePitches/cqs' cqf,  gqs''
+time                 6.773 μs   (6.263 μs .. 7.365 μs)
+                     0.973 R²   (0.954 R² .. 0.995 R²)
+mean                 6.346 μs   (6.203 μs .. 6.612 μs)
+std dev              671.7 ns   (459.4 ns .. 1.251 μs)
+variance introduced by outliers: 88% (severely inflated)
+                     
+Benchmark haskMus-benchmarks: FINISH
+Completed 2 action(s).
 
 -}
