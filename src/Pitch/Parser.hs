@@ -16,8 +16,7 @@ import Pitch.Accidental
 import Pitch.Pitch
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Text.Megaparsec.Char (space1, string)
-import Text.Megaparsec.Char.Lexer (lexeme)
+import Text.Megaparsec.Char (space1, string, char)
 import Text.Megaparsec.Char.Lexer qualified as L
 
 {-# INLINE spaced #-}
@@ -27,10 +26,10 @@ spaced p = spaceConsumer *> p <* spaceConsumer
 spaceConsumer = L.space space1 empty empty
 
 pitchClassParser :: Parsec Void T.Text PitchClass
-pitchClassParser =
-  choice $ fmap parsePitchClass pitchClasses
+pitchClassParser = choice . fmap (uncurry3 parsePitchClass) $ pitchClasses
   where
-    parsePitchClass (str, pitch, accidental) = try (string str >> pure (PitchClass pitch accidental))
+    uncurry3 f (a, b, c) = f a b c
+    parsePitchClass str n a = try $ string str >> pure (PitchClass n a)
 
 pitchClasses :: [(T.Text, NoteName, Accidental)]
 pitchClasses =
@@ -82,7 +81,7 @@ parsePitches = runParser pitchesParser ""
 
 {-# INLINE mkPitch'' #-}
 mkPitch'' :: PitchClass -> Octave -> Pitch
-mkPitch'' (PitchClass pitch accidental) o = Pitch {_noteName = pitch, _accidental = accidental, _octave = o}
+mkPitch'' pc@(PitchClass n a) = Pitch n a
 
 pitchParser :: ParsecT Void T.Text Identity Pitch
 pitchParser = do
