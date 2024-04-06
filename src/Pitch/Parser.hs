@@ -4,11 +4,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
-{-# HLINT ignore "Use fewer imports" #-}
-
 module Pitch.Parser where
 
-import Control.Monad (void)
 import Data.Functor.Identity (Identity)
 import Data.Text qualified as T
 import Data.Void (Void)
@@ -16,13 +13,13 @@ import Pitch.Accidental
 import Pitch.Pitch
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Text.Megaparsec.Char (space1, string, char)
 import Text.Megaparsec.Char.Lexer qualified as L
 
 {-# INLINE spaced #-}
 spaced :: Parsec Void T.Text a -> Parsec Void T.Text a
 spaced p = spaceConsumer *> p <* spaceConsumer
 
+spaceConsumer :: ParsecT Void T.Text Identity ()
 spaceConsumer = L.space space1 empty empty
 
 pitchClassParser :: Parsec Void T.Text PitchClass
