@@ -21,11 +21,13 @@ newtype Dots = Dots {unDot :: Integer}
 newtype Multiplier = Multiplier {unMultiplier :: Rational}
   deriving (Eq, Show, Ord, Data, Lift)
 
-data Duration = Duration
-  { _division :: Division,
-    _dots :: Dots,
-    _multiplier :: Rational
-  }
+data Duration where
+  Duration ::
+    { _division :: Division,
+      _dots :: Dots,
+      _multiplier :: Rational
+    } ->
+    Duration
   deriving (Eq, Show, Data, Lift)
 
 makeLenses ''Duration
@@ -116,18 +118,42 @@ dotsFromMultiplier r
         midMultiplier = cache !! fromIntegral mid
 
 -- | Get the number of dots corresponding to a given multiplier
+-- >>>  dotsFromMultiplier' (3 % 2)
+-- Dots {unDot = 1}
+-- >>>  dotsFromMultiplier' (7 % 4)
+-- Dots {unDot = 2}
+-- >>>  dotsFromMultiplier' (15 % 8)
+-- Dots {unDot = 3}
+-- >>>  dotsFromMultiplier' (31 % 16)
+-- Dots {unDot = 4}
+-- >>>  dotsFromMultiplier' (63 % 32)
+-- Dots {unDot = 5}
+-- >>>  dotsFromMultiplier' (127 % 64)
+-- Dots {unDot = 6}
+-- >>>  dotsFromMultiplier' (255 % 128)
+-- Dots {unDot = 7}
+-- >>>  dotsFromMultiplier' (511 % 256)
+-- Dots {unDot = 8}
+-- >>>  dotsFromMultiplier' (1023 % 512)
+-- Dots {unDot = 9}
 dotsFromMultiplier' :: Rational -> Dots
-dotsFromMultiplier' r = binarySearch 0 9
+dotsFromMultiplier' r = binarySearch 0 maxDots
   where
+    maxDots = 20 -- Define an appropriate upper limit based on requirements
+
     binarySearch :: Integer -> Integer -> Dots
     binarySearch low high
-      | low > high = error "Invalid multiplier or too many dots"
+      | low > high = error "Multiplier not found within range"
       | midMultiplier == r = Dots mid
       | midMultiplier < r = binarySearch (mid + 1) high
       | otherwise = binarySearch low (mid - 1)
       where
         mid = (low + high) `div` 2
         midMultiplier = dotMultiplier (Dots mid)
+
+{- dotMultiplier :: Dots -> Rational
+dotMultiplier (Dots d) = -- Implement the logic to calculate multiplier based on number of dots
+ -}
 
 -- | Check if two durations have the same multiplier
 isMEQ :: Duration -> Duration -> Bool
