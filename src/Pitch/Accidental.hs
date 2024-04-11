@@ -14,8 +14,8 @@ import           Data.Ratio
 import           Data.String
 import qualified Data.Text as T
 import           Language.Haskell.TH.Syntax (Lift, lift)
-import           Text.Parsec
-import           Text.Parsec.String (Parser)
+-- import           Text.Parsec
+-- import           Text.Parsec.String (Parser)
 
 data Accidental
     = DoubleFlat
@@ -30,19 +30,6 @@ data Accidental
     | Custom Rational
     deriving (Eq, Ord, Show, Data, Typeable)
 
-{-
-instance Lift Accidental where
-    lift DoubleFlat = [| DoubleFlat |]
-    lift ThreeQuartersFlat = [| ThreeQuartersFlat |]
-    lift Flat = [| Flat |]
-    lift QuarterFlat = [| QuarterFlat |]
-    lift Natural = [| Natural |]
-    lift QuarterSharp = [| QuarterSharp |]
-    lift Sharp = [| Sharp |]
-    lift ThreeQuartersSharp = [| ThreeQuartersSharp |]
-    lift DoubleSharp = [| DoubleSharp |]
-    lift (Custom r) = [| Custom r |]
- -}
 instance Lift Accidental where
     lift = \case
         DoubleFlat -> [|DoubleFlat|]
@@ -59,15 +46,17 @@ instance Lift Accidental where
 -- instance LifsemitonesToAccidental ((+ 1) $ accidentalToSemitones acc)
 
 {- |
- >>> map sharpesemitonesToAccidental ((+ ((-1) % 2)) $ accidentalToSemitones acc)
- >>> map sharpenS allAccidentals
- >>> map flattenQ allAccidentals
- >>> map flattesemitonesToAccidental ((+ (-1)) $ accidentalToSemitones acc)
+
+>>> map sharpesemitonesToAccidental ((+ ((-1) % 2)) $ accidentalToSemitones acc)
+>>> map sharpenS allAccidentals
+>>> map flattenQ allAccidentals
+>>> map flattesemitonesToAccidental ((+ (-1)) $ accidentalToSemitones acc)
  [ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp,Custom (5 % 2)]
  [Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp,Custom (5 % 2),Custom (3 % 1)]
  [Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp]l
  [Custom ((-3) % 1),Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp]
 -}
+
 sharpenQ :: Accidental -> Accidental
 sharpenQ acc = modifyAccidental acc (+ (1 / 2))
 

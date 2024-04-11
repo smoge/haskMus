@@ -13,29 +13,29 @@ import Util.MathDuration
 import Prelude hiding (toRational)
 
 newtype Division = Division {unDivision :: Integer}
-    deriving (Eq, Show, Ord, Data, Lift)
+  deriving (Eq, Show, Ord, Data, Lift)
 
 newtype Dots = Dots {unDot :: Integer}
-    deriving (Eq, Show, Enum, Ord, Data, Lift)
+  deriving (Eq, Show, Enum, Ord, Data, Lift)
 
 newtype Multiplier = Multiplier {unMultiplier :: Rational}
-    deriving (Eq, Show, Ord, Data, Lift)
+  deriving (Eq, Show, Ord, Data, Lift)
 
 data Duration = Duration
-    { _division :: Division
-    , _dots :: Dots
-    , _multiplier :: Rational
-    }
-    deriving (Eq, Show, Data, Lift)
+  { _division :: Division,
+    _dots :: Dots,
+    _multiplier :: Rational
+  }
+  deriving (Eq, Show, Data, Lift)
 
 makeLenses ''Duration
 
 -- | Convert a 'Duration' to Lilypond notation
 durationToLilypond :: Duration -> String
 durationToLilypond (Duration (Division 0) dts _) =
-    "\\breve" <> replicate (fromIntegral $ unDot dts) '.'
+  "\\breve" <> replicate (fromIntegral $ unDot dts) '.'
 durationToLilypond (Duration dv dts _) =
-    show (unDivision dv) <> replicate (fromIntegral $ unDot dts) '.'
+  show (unDivision dv) <> replicate (fromIntegral $ unDot dts) '.'
 
 -- | Calculate the multiplier for a given number of dots
 dotMultiplier :: Dots -> Rational
@@ -52,6 +52,7 @@ addDotsToDuration dur m = dur & dots .~ newDots
     newDots = Dots (unDot (dur ^. dots) + m)
 
 infixl 6 +.
+
 infixl 6 -.
 
 -- | Operator for adding dots to a 'Duration'
@@ -64,14 +65,14 @@ d -. i = addDotsToDuration d (negate i)
 
 -- | Custom 'Ord' instance for 'Duration'
 instance Ord Duration where
-    -- Compare two durations based on their 'Rational' representation
-    compare = comparing durationToRational
+  -- Compare two durations based on their 'Rational' representation
+  compare = comparing durationToRational
 
 -- | Convert a 'Duration' to a 'Rational'
 durationToRational :: Duration -> Rational
 durationToRational (Duration (Division divVal) dots_ m)
-    | divVal == 0 = 0 % 1
-    | otherwise = (1 % divVal) * dotMultiplier dots_ * m
+  | divVal == 0 = 0 % 1
+  | otherwise = (1 % divVal) * dotMultiplier dots_ * m
 
 -- | Convert a 'Division' to a 'Rational'
 divisionToRational :: Division -> Rational
@@ -80,36 +81,36 @@ divisionToRational (Division d) = 1 % d
 
 -- | Convert a value to a 'Rational'
 class ToRational a where
-    toRational :: a -> Rational
+  toRational :: a -> Rational
 
 instance ToRational Rational where
-    toRational = id
+  toRational = id
 
 instance ToRational Division where
-    toRational (Division 0) = 0 % 1
-    toRational (Division d) = 1 % d
+  toRational (Division 0) = 0 % 1
+  toRational (Division d) = 1 % d
 
 -- | Convert a 'Duration' to a 'Rational'
 durationToRat :: Duration -> Rational
 durationToRat (Duration (Division divVal) dots_ m)
-    | divVal == 0 = 0 % 1
-    | otherwise = (1 % divVal) * dotMultiplier dots_ * m
+  | divVal == 0 = 0 % 1
+  | otherwise = (1 % divVal) * dotMultiplier dots_ * m
 
 -- | Get the number of dots corresponding to a given multiplier
 dotsFromMultiplier :: Rational -> Maybe Dots
 dotsFromMultiplier r
-    | r < 0 = Nothing -- check for negative rationals
-    | otherwise = binarySearch 0 9
+  | r < 0 = Nothing -- check for negative rationals
+  | otherwise = binarySearch 0 9
   where
     -- Cache for dotMultiplier, converting each integer to Dots
     cache = fmap (dotMultiplier . Dots) [0 .. 9]
 
     binarySearch :: Integer -> Integer -> Maybe Dots
     binarySearch low high
-        | low > high = Nothing
-        | midMultiplier == r = Just $ Dots mid
-        | midMultiplier < r = binarySearch (mid + 1) high
-        | otherwise = binarySearch low (mid - 1)
+      | low > high = Nothing
+      | midMultiplier == r = Just $ Dots mid
+      | midMultiplier < r = binarySearch (mid + 1) high
+      | otherwise = binarySearch low (mid - 1)
       where
         mid = (low + high) `div` 2
         midMultiplier = cache !! fromIntegral mid
@@ -120,10 +121,10 @@ dotsFromMultiplier' r = binarySearch 0 9
   where
     binarySearch :: Integer -> Integer -> Dots
     binarySearch low high
-        | low > high = error "Invalid multiplier or too many dots"
-        | midMultiplier == r = Dots mid
-        | midMultiplier < r = binarySearch (mid + 1) high
-        | otherwise = binarySearch low (mid - 1)
+      | low > high = error "Invalid multiplier or too many dots"
+      | midMultiplier == r = Dots mid
+      | midMultiplier < r = binarySearch (mid + 1) high
+      | otherwise = binarySearch low (mid - 1)
       where
         mid = (low + high) `div` 2
         midMultiplier = dotMultiplier (Dots mid)

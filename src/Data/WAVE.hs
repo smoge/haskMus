@@ -1,5 +1,4 @@
--- Modified from:
--- Copyright (C) 2007 Bart Massey
+-- CHANGE THIS
 
 {- | This module implements reading and writing of the most
   common kinds of WAVE files.  WAVE files are Microsoft
