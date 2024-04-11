@@ -21,7 +21,6 @@ newtype Dots = Dots {unDot :: Integer}
 newtype Multiplier = Multiplier {unMultiplier :: Rational}
   deriving (Eq, Show, Ord, Data, Lift)
 
-
 data Duration = Duration
   { _division :: Division,
     _dots :: Dots,
@@ -119,7 +118,6 @@ dotsFromMultiplier r
 -- | Get the number of dots corresponding to a given multiplier
 -- >>>  dotsFromMultiplier' (3 % 2)
 -- Dots {unDot = 1}
-
 dotsFromMultiplier' :: Rational -> Dots
 dotsFromMultiplier' r = binarySearch 0 9
   where

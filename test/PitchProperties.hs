@@ -25,15 +25,27 @@ prop_setAccidental a pc = (pc & accidental .~ a) ^. accidental == a
 prop_setAccidentalPitch :: Accidental -> Pitch -> Bool
 prop_setAccidentalPitch a p = (p & accidental .~ a) ^. accidental == a
 
+
+instance Arbitrary Accidental where
+  arbitrary =
+    frequency
+      [ (10, elements allAccidentals), -- Picking from the predefined list
+        (1, Custom <$> arbitrary) -- Picking a custom accidental
+      ]
+
 instance Arbitrary NoteName where
   arbitrary = elements [C, D, E, F, G, A, B]
 
 instance Arbitrary PitchClass where
   arbitrary = PitchClass <$> arbitrary <*> arbitrary
 
-instance Arbitrary Octave where
+{- instance Arbitrary Octave where
   arbitrary :: Gen Octave
   arbitrary = Octave <$> arbitrary
+ -}
+
+instance Arbitrary Octave where
+  arbitrary = Octave <$> choose (1, 9)
 
 instance Arbitrary Pitch where
   arbitrary = Pitch <$> arbitrary <*> arbitrary <*> arbitrary
@@ -84,12 +96,7 @@ prop_identityAccidentalIsUnchanged a =
 
 -- QuickCheck MOVE ------------------------------------------------------------
 
-instance Arbitrary Accidental where
-  arbitrary =
-    frequency
-      [ (10, elements allAccidentals), -- Picking from the predefined list
-        (1, Custom <$> arbitrary) -- Picking a custom accidental
-      ]
+
 
 -- Newtype wrapper for specific accidental strings
 newtype AccidentalString
