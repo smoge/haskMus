@@ -1,2 +1,1 @@
-
-# HaskMus: A Haskell Algorithmic Composition Toolkit
+This software is unfinished. Keep your expectations low.
