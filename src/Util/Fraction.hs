@@ -1,9 +1,10 @@
-module Util.Fraction (
-    splitFraction,
+module Util.Fraction
+  ( splitFraction,
     unsplitFraction,
-) where
+  )
+where
 
---import Data.Ratio
+-- import Data.Ratio
 
 splitFraction :: Rational -> (Integer, Rational)
 splitFraction x = (wholePart, fractionalPart)

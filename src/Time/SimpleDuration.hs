@@ -12,15 +12,15 @@ import Data.Ratio ()
 import Language.Haskell.TH ()
 import Language.Haskell.TH.Quote ()
 import Language.Haskell.TH.Syntax (Lift)
-import Text.Parsec (
-    ParseError,
+import Text.Parsec
+  ( ParseError,
     char,
     digit,
     many,
     many1,
     parse,
     parserFail,
- )
+  )
 import Text.Parsec.String (Parser)
 import Util.MathDuration (isPowerOfTwo')
 
@@ -32,12 +32,12 @@ newtype Dots = Dots {unDots :: Integer} deriving (Eq, Show, Enum, Ord, Data, Lif
 
 -- | Represents a duration with division, dots, and multiplier.
 data SimpleDuration = SimpleDuration
-    { -- | The division value of the duration.
-      _division :: Division
-    , -- | The dots value of the duration.
-      _dots :: Dots
-    }
-    deriving (Eq, Show, Data, Lift)
+  { -- | The division value of the duration.
+    _division :: Division,
+    -- | The dots value of the duration.
+    _dots :: Dots
+  }
+  deriving (Eq, Show, Data, Lift)
 
 makeLenses ''SimpleDuration
 
@@ -46,15 +46,15 @@ makeLenses ''SimpleDuration
 
 mkDivision :: Integer -> Maybe Division
 mkDivision x
-    | x > 0 && isPowerOfTwo' x = Just (Division x)
-    | otherwise = Nothing
+  | x > 0 && isPowerOfTwo' x = Just (Division x)
+  | otherwise = Nothing
 
 mkDots :: Integer -> Maybe Dots
 mkDots x = if x >= 0 then Just (Dots x) else Nothing
 
 mkSimpleDuration :: Integer -> Integer -> Maybe SimpleDuration
 mkSimpleDuration divValue dotsValue =
-    SimpleDuration <$> mkDivision divValue <*> mkDots dotsValue
+  SimpleDuration <$> mkDivision divValue <*> mkDots dotsValue
 
 {- mkSimpleDuration :: Integer -> Integer -> Maybe SimpleDuration
 mkSimpleDuration divValue dotsValue = do
@@ -71,11 +71,11 @@ dotsParser = fromIntegral . length <$> many (char '.')
 
 lilyPondDurationParser :: Parser SimpleDuration
 lilyPondDurationParser = do
-    divValue <- divisionParser
-    dotsValue <- dotsParser
-    case mkSimpleDuration divValue dotsValue of
-        Just duration -> pure duration
-        Nothing -> parserFail "Invalid duration format"
+  divValue <- divisionParser
+  dotsValue <- dotsParser
+  case mkSimpleDuration divValue dotsValue of
+    Just duration -> pure duration
+    Nothing -> parserFail "Invalid duration format"
 
 parseLilyPondDuration :: String -> Either ParseError SimpleDuration
 parseLilyPondDuration = parse lilyPondDurationParser ""

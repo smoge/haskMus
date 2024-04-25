@@ -27,10 +27,10 @@ bounds:
 clean:
     stack clean --full
 
-# Format Haskell project with fourmolu
+# Format Haskell project
 format:
-    @echo "Formating the Haskell project (fourmolu)..."
-    find ./src -name '*.hs' | xargs fourmolu -i
+    @echo "Formating the Haskell project (ormolu)..."
+    find ./src -name '*.hs' | xargs ormolu -i
 
 # docs
 # stack haddock --haddock-arguments --theme="./my.css"

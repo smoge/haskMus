@@ -5,14 +5,11 @@
 --
 --  See: http://shepazu.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html
 --   Or: https://www.w3.org/TR/audio-eq-cookbook/
-
 module SimpleDSP.IIR
-  ( 
-    filterSamples,
+  ( filterSamples,
     IIRParams,
     initialIIRState,
     IIRState,
-
     lowPassFilter,
     highPassFilter,
     bandPassFilter,
@@ -55,7 +52,6 @@ calcW0 freq = 2 * pi * freq / 44100
 {-# INLINE calcAQ #-}
 calcAQ :: Float -> Float -> Float
 calcAQ w0 q = sin w0 / (2 * q)
-
 
 lowPassFilter :: Float -> Float -> IIRParams
 lowPassFilter freq q =
@@ -165,7 +161,6 @@ highShelfFilter freq q =
     w0 = calcW0 freq
     α = calcAQ w0 q
     cosWO = cos w0
-
 
 data IIRState = IIRState
   { x0 :: {-# UNPACK #-} Float,

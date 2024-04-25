@@ -1,15 +1,15 @@
 module Pitch.Hz
-(
-    -- * Types
+  ( -- * Types
     Semitone (..),
     Hz (..),
+
     -- * Functions
     semitoneToHz,
     hzToSemitone,
     hzToMidi,
-    roundHzToMidi
-)
- where
+    roundHzToMidi,
+  )
+where
 
 -- | The Pitch.Hz module provides types and functions to work with musical pitches in terms of semitones and Hertz.
 
@@ -19,10 +19,10 @@ newtype Semitone = Semitone {unSemitone :: Double} deriving (Eq, Num, Ord)
 newtype Hz = Hz {unHz :: Double} deriving (Eq, Num, Ord)
 
 instance Show Semitone where
-    show (Semitone n) = show n <> " Semitone(s)"
+  show (Semitone n) = show n <> " Semitone(s)"
 
 instance Show Hz where
-    show (Hz hz) = show hz <> " Hz"
+  show (Hz hz) = show hz <> " Hz"
 
 -- Standard pitch (A4) definition in Hertz.
 pitchStandard :: Hz

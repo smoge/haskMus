@@ -1,8 +1,9 @@
-resolver: lts-22.15
-#resolver: nightly-2024-04-10
+resolver: lts-22.18
 
 packages:
   - .
+
+notify-if-nix-on-path: false
 
 # ghc-options:
 #  "$locals": -prof -fprof-auto
@@ -13,4 +14,3 @@ packages:
 #ghc-options:
 # "$everything": -O2
 
-notify-if-nix-on-path: false

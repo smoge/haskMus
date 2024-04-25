@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
-module Rtm.Common (
-    RtmLabel (..),
+module Rtm.Common
+  ( RtmLabel (..),
     Rtm,
     showRtm,
     scalar,
@@ -21,7 +21,8 @@ module Rtm.Common (
     extractIntsFromLabels,
     reconstructLabelsFromInts,
     setRtmLabelInt,
-) where
+  )
+where
 
 import Data.Data
 import Data.Maybe (mapMaybe)
@@ -39,11 +40,11 @@ isValidRtm $ rtm' [s 1, g 3, 2 |: [s 1, g 1, s 1], s 1]
 ------------------------------------------------------------------------------------------------}
 
 data RtmLabel
-    = RtmScalar !Int
-    | RtmGap !Int
-    | RtmVector !Int
-    | RtmCons
-    deriving (Eq, Show, Data)
+  = RtmScalar !Int
+  | RtmGap !Int
+  | RtmVector !Int
+  | RtmCons
+  deriving (Eq, Show, Data)
 
 type Rtm = Tree RtmLabel
 
@@ -114,17 +115,16 @@ rtmDepth :: Rtm -> Int
 rtmDepth (Node _ []) = 1
 rtmDepth (Node _ subs) = 1 + maximum (fmap rtmDepth subs)
 
-{- | Given an Rtm, collapses all gaps in the tree by summing consecutive gaps
- and returning a new Rtm with the gaps collapsed.
--}
+-- | Given an Rtm, collapses all gaps in the tree by summing consecutive gaps
+-- and returning a new Rtm with the gaps collapsed.
 collapseRtmGaps :: Rtm -> Rtm
 collapseRtmGaps (Node z children) = Node z (processChildren children)
   where
     processChildren [] = []
     processChildren (Node (RtmGap y) [] : xs) =
-        let (rests, remainder) = span isRest xs
-            total_ = y + sum (fmap getRestValue rests)
-         in Node (RtmGap total_) [] : processChildren remainder
+      let (rests, remainder) = span isRest xs
+          total_ = y + sum (fmap getRestValue rests)
+       in Node (RtmGap total_) [] : processChildren remainder
     processChildren (x : xs) = collapseRtmGaps x : processChildren xs
 
     isRest (Node (RtmGap _) []) = True
@@ -145,10 +145,9 @@ countRtmScalars :: Rtm -> Int
 countRtmScalars (Node (RtmScalar _) children) = 1 + sum (fmap countRtmScalars children)
 countRtmScalars (Node _ children) = sum (fmap countRtmScalars children)
 
-{- | Given a list of RtmLabels, returns a list of Ints extracted from the labels
-   that carry an Int. RtmScalar, RtmGap and RtmVector carry an Int, while
-   RtmCons and any other label do not.
--}
+-- | Given a list of RtmLabels, returns a list of Ints extracted from the labels
+--   that carry an Int. RtmScalar, RtmGap and RtmVector carry an Int, while
+--   RtmCons and any other label do not.
 extractIntsFromLabels :: [RtmLabel] -> [Int]
 extractIntsFromLabels = mapMaybe extractInt
   where

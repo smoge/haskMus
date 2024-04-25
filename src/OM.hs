@@ -8,7 +8,7 @@ import NeatInterpolation (trimming)
 
 header :: Text
 header =
-    [trimming|
+  [trimming|
 ;fileheader
 ; (7.0 :inst 0 0 0 \"doc\" 183)
 ;endfileheader
@@ -18,7 +18,7 @@ header =
 
 poly :: Text -> Text
 poly a =
-    [trimming|
+  [trimming|
 (setf *instance-to-load*
 (omng-make-new-instance
 (make-instance 'poly
@@ -34,7 +34,7 @@ poly a =
 
 f :: Text -> Text -> Text
 f a b =
-    [trimming|
+  [trimming|
     function(){
       function(){
         $a
