@@ -4,8 +4,8 @@ module Rtm.Parser
   )
 where
 
-import           Rtm.Common (Rtm, gap, printRtm, rtm', scalar, vector)
-import           Text.Parsec
+import Rtm.Common (Rtm, gap, printRtm, rtm', scalar, vector)
+import Text.Parsec
   ( ParseError,
     char,
     digit,
@@ -20,7 +20,7 @@ import           Text.Parsec
     try,
     (<|>),
   )
-import           Text.Parsec.String (Parser)
+import Text.Parsec.String (Parser)
 
 -- Consume spaces before and after the parser.
 spaced :: Parser a -> Parser a
