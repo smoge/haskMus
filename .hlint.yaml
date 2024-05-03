@@ -11,7 +11,7 @@
   - default: true
 
 
-# - ignore: { name: Avoid lambda }
+- ignore: { name: Avoid lambda }
 # - ignore: { name: Redundant lambda }
 # - ignore: { name: Redundant bracket }
 - ignore: { name: Unused LANGUAGE pragma }

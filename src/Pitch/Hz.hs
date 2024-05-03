@@ -6,8 +6,7 @@ module Pitch.Hz
     -- * Functions
     semitoneToHz,
     hzToSemitone,
-    hzToMidi,
-    roundHzToMidi,
+    hzToMidi
   )
 where
 
@@ -56,8 +55,12 @@ semitoneToMidi :: Semitone -> Double
 semitoneToMidi = hzToMidi . semitoneToHz . unSemitone
 
 -- Function to round a `Double` to a specified number of decimal places.
+-- roundTo :: Int -> Double -> Double
+-- roundTo n f = fromInteger (round $ f * (10 ^ n)) / (10.0 ^^ n)
+
 roundTo :: Int -> Double -> Double
-roundTo n f = fromInteger (round $ f * (10 ^ n)) / (10.0 ^^ n)
+roundTo n f = fromInteger (round $ f * (10 ^ n)) / (10 ** fromIntegral n)
+
 
 -- Example usage with rounding: Convert Hz to MIDI and round to 2 decimal places.
 -- >>> roundHzToMidi middleCinHz
