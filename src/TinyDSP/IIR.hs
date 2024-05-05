@@ -1,3 +1,4 @@
+{-# LANGUAGE NamedFieldPuns #-}
 -- | This module implements tiny IIR filters.
 --
 --  See: http://shepazu.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html
@@ -114,14 +115,14 @@ highPassFilter freq q =
 -- | BPF (constant skirt gain, peak gain = Q)
 bandPassSkirtFilter :: Float -> Float -> IIRParams
 bandPassSkirtFilter freq q =
-    IIRParams
-        { b0
-        , b1 = 0
-        , b2 = (-1) * b0
-        , a0 = 1 + α
-        , a1 = (-2) * cos w0
-        , a2 = 1 - α
-        }
+  IIRParams
+    { b0,
+      b1 = 0,
+      b2 = (-1) * b0,
+      a0 = 1 + α,
+      a1 = (-2) * cos w0,
+      a2 = 1 - α
+    }
   where
     b0 = sin w0 / 2
     w0 = calcW0 freq

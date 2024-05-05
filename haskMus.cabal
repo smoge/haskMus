@@ -34,9 +34,9 @@ library
         Rtm.Parser
         Rtm.QuasiQuoter
         Rtm.Shape
-        SimpleDSP.IIR
-        SimpleDSP.IO
-        SimpleDSP.Samples
+        TinyDSP.IIR
+        TinyDSP.IO
+        TinyDSP.Samples
         Text.XML.Writer
         Time.Dur
         Time.Duration
@@ -235,7 +235,7 @@ test-suite haskMus-test
         -Wall -Wcompat -Widentities -Wincomplete-record-updates
         -Wincomplete-uni-patterns -Wmissing-export-lists
         -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
-        
+
 
 --  -ddump-to-file
 -- -dsuppress-coercions

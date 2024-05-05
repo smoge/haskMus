@@ -1,4 +1,4 @@
-module SimpleDSP.Samples where
+module TinyDSP.Samples where
 
 import Data.Vector.Storable (Vector, length)
 
