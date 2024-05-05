@@ -3,6 +3,9 @@
 --  See: http://shepazu.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html
 --   Or: https://www.w3.org/TR/audio-eq-cookbook/
 
+
+-- TODO use CFloat before implementing more modules
+
 module TinyDSP.IIR (
     -- * Usage
     filterSamples,
