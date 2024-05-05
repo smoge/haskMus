@@ -1,4 +1,4 @@
-resolver: lts-22.19
+resolver: lts-22.20
 
 packages:
   - .
@@ -7,6 +7,9 @@ notify-if-nix-on-path: false
 
 # ghc-options:
 #  "$locals": -prof -fprof-auto
+
+# ghc-options:
+#   "$locals":  -ddump-to-file  -ddump-ds
 
 #extra-deps:
 # - haskell-dap-0.0.16.0@sha256:5ee4fba7ce1b8220f486a5251a941e6cd739ab2330e8f25efc5af553a4e1c61d,944

@@ -235,6 +235,15 @@ test-suite haskMus-test
         -Wall -Wcompat -Widentities -Wincomplete-record-updates
         -Wincomplete-uni-patterns -Wmissing-export-lists
         -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+        
+
+--  -ddump-to-file
+-- -dsuppress-coercions
+-- -dsupress-module-prefixes
+-- -ddump-ds
+-- -ddump-spec
+-- -ddump-simpl
+-- -dverbose-core2core
 
 source-repository head
     type:     git
