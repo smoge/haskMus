@@ -1,0 +1,1896 @@
+
+==================== Desugar (after optimization) ====================
+2024-05-03 12:26:27.547626325 UTC
+
+Result size of Desugar (after optimization)
+  = {terms: 1,276, types: 757, coercions: 65, joins: 0/34}
+
+-- RHS size: {terms: 94, types: 70, coercions: 0, joins: 0/0}
+$cshowsPrec_a1kFG :: Int -> IIRParams -> ShowS
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=NEVER}]
+$cshowsPrec_a1kFG
+  = \ (a_a1kpS :: Int) (ds_d1kLg :: IIRParams) ->
+      case ds_d1kLg of
+      { IIRParams bx_d1kMR bx_d1kMS bx_d1kMT bx_d1kMU bx_d1kMV
+                  bx_d1kMW ->
+      showParen
+        (>=
+           @Int
+           ghc-prim:GHC.Classes.$fOrdInt
+           a_a1kpS
+           (ghc-prim:GHC.Types.I# 11#))
+        (. @String
+           @String
+           @String
+           (showString (ghc-prim:GHC.CString.unpackCString# "IIRParams {"#))
+           (. @String
+              @String
+              @String
+              (showString (ghc-prim:GHC.CString.unpackCString# "b0 = "#))
+              (. @String
+                 @String
+                 @String
+                 (showsPrec
+                    @Float
+                    GHC.Float.$fShowFloat
+                    (ghc-prim:GHC.Types.I# 0#)
+                    (ghc-prim:GHC.Types.F# bx_d1kMR))
+                 (. @String
+                    @String
+                    @String
+                    GHC.Show.showCommaSpace
+                    (. @String
+                       @String
+                       @String
+                       (showString (ghc-prim:GHC.CString.unpackCString# "b1 = "#))
+                       (. @String
+                          @String
+                          @String
+                          (showsPrec
+                             @Float
+                             GHC.Float.$fShowFloat
+                             (ghc-prim:GHC.Types.I# 0#)
+                             (ghc-prim:GHC.Types.F# bx_d1kMS))
+                          (. @String
+                             @String
+                             @String
+                             GHC.Show.showCommaSpace
+                             (. @String
+                                @String
+                                @String
+                                (showString (ghc-prim:GHC.CString.unpackCString# "b2 = "#))
+                                (. @String
+                                   @String
+                                   @String
+                                   (showsPrec
+                                      @Float
+                                      GHC.Float.$fShowFloat
+                                      (ghc-prim:GHC.Types.I# 0#)
+                                      (ghc-prim:GHC.Types.F# bx_d1kMT))
+                                   (. @String
+                                      @String
+                                      @String
+                                      GHC.Show.showCommaSpace
+                                      (. @String
+                                         @String
+                                         @String
+                                         (showString (ghc-prim:GHC.CString.unpackCString# "a0 = "#))
+                                         (. @String
+                                            @String
+                                            @String
+                                            (showsPrec
+                                               @Float
+                                               GHC.Float.$fShowFloat
+                                               (ghc-prim:GHC.Types.I# 0#)
+                                               (ghc-prim:GHC.Types.F# bx_d1kMU))
+                                            (. @String
+                                               @String
+                                               @String
+                                               GHC.Show.showCommaSpace
+                                               (. @String
+                                                  @String
+                                                  @String
+                                                  (showString
+                                                     (ghc-prim:GHC.CString.unpackCString# "a1 = "#))
+                                                  (. @String
+                                                     @String
+                                                     @String
+                                                     (showsPrec
+                                                        @Float
+                                                        GHC.Float.$fShowFloat
+                                                        (ghc-prim:GHC.Types.I# 0#)
+                                                        (ghc-prim:GHC.Types.F# bx_d1kMV))
+                                                     (. @String
+                                                        @String
+                                                        @String
+                                                        GHC.Show.showCommaSpace
+                                                        (. @String
+                                                           @String
+                                                           @String
+                                                           (showString
+                                                              (ghc-prim:GHC.CString.unpackCString#
+                                                                 "a2 = "#))
+                                                           (. @String
+                                                              @String
+                                                              @String
+                                                              (showsPrec
+                                                                 @Float
+                                                                 GHC.Float.$fShowFloat
+                                                                 (ghc-prim:GHC.Types.I# 0#)
+                                                                 (ghc-prim:GHC.Types.F# bx_d1kMW))
+                                                              (showString
+                                                                 (ghc-prim:GHC.CString.unpackCString#
+                                                                    "}"#))))))))))))))))))))
+      }
+
+Rec {
+-- RHS size: {terms: 4, types: 1, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$fShowIIRParams [InlPrag=CONLIKE] :: Show IIRParams
+[LclIdX[DFunId],
+ Unf=DFun: \ ->
+       GHC.Show.C:Show TYPE: IIRParams
+                       $cshowsPrec_a1kFG
+                       $cshow_a1kGS
+                       $cshowList_a1kGZ]
+SimpleDSP.IIR.$fShowIIRParams
+  = GHC.Show.C:Show
+      @IIRParams $cshowsPrec_a1kFG $cshow_a1kGS $cshowList_a1kGZ
+
+-- RHS size: {terms: 9, types: 5, coercions: 0, joins: 0/0}
+$cshowList_a1kGZ [Occ=LoopBreaker] :: [IIRParams] -> ShowS
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [0 0] 80 0}]
+$cshowList_a1kGZ
+  = \ (ls_a9Yh :: [IIRParams]) (s_a9Yi :: String) ->
+      GHC.Show.showList__
+        @IIRParams
+        (showsPrec
+           @IIRParams
+           SimpleDSP.IIR.$fShowIIRParams
+           (ghc-prim:GHC.Types.I# 0#))
+        ls_a9Yh
+        s_a9Yi
+
+-- RHS size: {terms: 7, types: 3, coercions: 0, joins: 0/0}
+$cshow_a1kGS [Occ=LoopBreaker] :: IIRParams -> String
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [0] 60 0}]
+$cshow_a1kGS
+  = \ (x_a9Ym :: IIRParams) ->
+      showsPrec
+        @IIRParams
+        SimpleDSP.IIR.$fShowIIRParams
+        (ghc-prim:GHC.Types.I# 0#)
+        x_a9Ym
+        (ghc-prim:GHC.Types.[] @Char)
+end Rec }
+
+-- RHS size: {terms: 94, types: 70, coercions: 0, joins: 0/0}
+$cshowsPrec_a1kEd :: Int -> IIRState -> ShowS
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=NEVER}]
+$cshowsPrec_a1kEd
+  = \ (a_a1kpL :: Int) (ds_d1kLf :: IIRState) ->
+      case ds_d1kLf of
+      { IIRState bx_d1kML bx_d1kMM bx_d1kMN bx_d1kMO bx_d1kMP bx_d1kMQ ->
+      showParen
+        (>=
+           @Int
+           ghc-prim:GHC.Classes.$fOrdInt
+           a_a1kpL
+           (ghc-prim:GHC.Types.I# 11#))
+        (. @String
+           @String
+           @String
+           (showString (ghc-prim:GHC.CString.unpackCString# "IIRState {"#))
+           (. @String
+              @String
+              @String
+              (showString (ghc-prim:GHC.CString.unpackCString# "x0 = "#))
+              (. @String
+                 @String
+                 @String
+                 (showsPrec
+                    @Float
+                    GHC.Float.$fShowFloat
+                    (ghc-prim:GHC.Types.I# 0#)
+                    (ghc-prim:GHC.Types.F# bx_d1kML))
+                 (. @String
+                    @String
+                    @String
+                    GHC.Show.showCommaSpace
+                    (. @String
+                       @String
+                       @String
+                       (showString (ghc-prim:GHC.CString.unpackCString# "x1 = "#))
+                       (. @String
+                          @String
+                          @String
+                          (showsPrec
+                             @Float
+                             GHC.Float.$fShowFloat
+                             (ghc-prim:GHC.Types.I# 0#)
+                             (ghc-prim:GHC.Types.F# bx_d1kMM))
+                          (. @String
+                             @String
+                             @String
+                             GHC.Show.showCommaSpace
+                             (. @String
+                                @String
+                                @String
+                                (showString (ghc-prim:GHC.CString.unpackCString# "x2 = "#))
+                                (. @String
+                                   @String
+                                   @String
+                                   (showsPrec
+                                      @Float
+                                      GHC.Float.$fShowFloat
+                                      (ghc-prim:GHC.Types.I# 0#)
+                                      (ghc-prim:GHC.Types.F# bx_d1kMN))
+                                   (. @String
+                                      @String
+                                      @String
+                                      GHC.Show.showCommaSpace
+                                      (. @String
+                                         @String
+                                         @String
+                                         (showString (ghc-prim:GHC.CString.unpackCString# "y0 = "#))
+                                         (. @String
+                                            @String
+                                            @String
+                                            (showsPrec
+                                               @Float
+                                               GHC.Float.$fShowFloat
+                                               (ghc-prim:GHC.Types.I# 0#)
+                                               (ghc-prim:GHC.Types.F# bx_d1kMO))
+                                            (. @String
+                                               @String
+                                               @String
+                                               GHC.Show.showCommaSpace
+                                               (. @String
+                                                  @String
+                                                  @String
+                                                  (showString
+                                                     (ghc-prim:GHC.CString.unpackCString# "y1 = "#))
+                                                  (. @String
+                                                     @String
+                                                     @String
+                                                     (showsPrec
+                                                        @Float
+                                                        GHC.Float.$fShowFloat
+                                                        (ghc-prim:GHC.Types.I# 0#)
+                                                        (ghc-prim:GHC.Types.F# bx_d1kMP))
+                                                     (. @String
+                                                        @String
+                                                        @String
+                                                        GHC.Show.showCommaSpace
+                                                        (. @String
+                                                           @String
+                                                           @String
+                                                           (showString
+                                                              (ghc-prim:GHC.CString.unpackCString#
+                                                                 "y2 = "#))
+                                                           (. @String
+                                                              @String
+                                                              @String
+                                                              (showsPrec
+                                                                 @Float
+                                                                 GHC.Float.$fShowFloat
+                                                                 (ghc-prim:GHC.Types.I# 0#)
+                                                                 (ghc-prim:GHC.Types.F# bx_d1kMQ))
+                                                              (showString
+                                                                 (ghc-prim:GHC.CString.unpackCString#
+                                                                    "}"#))))))))))))))))))))
+      }
+
+Rec {
+-- RHS size: {terms: 4, types: 1, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$fShowIIRState [InlPrag=CONLIKE] :: Show IIRState
+[LclIdX[DFunId],
+ Unf=DFun: \ ->
+       GHC.Show.C:Show TYPE: IIRState
+                       $cshowsPrec_a1kEd
+                       $cshow_a1kFp
+                       $cshowList_a1kFw]
+SimpleDSP.IIR.$fShowIIRState
+  = GHC.Show.C:Show
+      @IIRState $cshowsPrec_a1kEd $cshow_a1kFp $cshowList_a1kFw
+
+-- RHS size: {terms: 9, types: 5, coercions: 0, joins: 0/0}
+$cshowList_a1kFw [Occ=LoopBreaker] :: [IIRState] -> ShowS
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [0 0] 80 0}]
+$cshowList_a1kFw
+  = \ (ls_a9Yh :: [IIRState]) (s_a9Yi :: String) ->
+      GHC.Show.showList__
+        @IIRState
+        (showsPrec
+           @IIRState SimpleDSP.IIR.$fShowIIRState (ghc-prim:GHC.Types.I# 0#))
+        ls_a9Yh
+        s_a9Yi
+
+-- RHS size: {terms: 7, types: 3, coercions: 0, joins: 0/0}
+$cshow_a1kFp [Occ=LoopBreaker] :: IIRState -> String
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [0] 60 0}]
+$cshow_a1kFp
+  = \ (x_a9Ym :: IIRState) ->
+      showsPrec
+        @IIRState
+        SimpleDSP.IIR.$fShowIIRState
+        (ghc-prim:GHC.Types.I# 0#)
+        x_a9Ym
+        (ghc-prim:GHC.Types.[] @Char)
+end Rec }
+
+-- RHS size: {terms: 6, types: 8, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:a2:IIRParams :: IIRParams -> Float
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:a2:IIRParams
+  = \ (ds_d1kL8 :: IIRParams) ->
+      case ds_d1kL8 of
+      { IIRParams _ [Occ=Dead] _ [Occ=Dead] _ [Occ=Dead] _ [Occ=Dead]
+                  _ [Occ=Dead] bx_d1kMK ->
+      ghc-prim:GHC.Types.F# bx_d1kMK
+      }
+
+-- RHS size: {terms: 6, types: 8, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:a1:IIRParams :: IIRParams -> Float
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:a1:IIRParams
+  = \ (ds_d1kL1 :: IIRParams) ->
+      case ds_d1kL1 of
+      { IIRParams _ [Occ=Dead] _ [Occ=Dead] _ [Occ=Dead] _ [Occ=Dead]
+                  bx_d1kMD _ [Occ=Dead] ->
+      ghc-prim:GHC.Types.F# bx_d1kMD
+      }
+
+-- RHS size: {terms: 6, types: 8, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:a0:IIRParams :: IIRParams -> Float
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:a0:IIRParams
+  = \ (ds_d1kKU :: IIRParams) ->
+      case ds_d1kKU of
+      { IIRParams _ [Occ=Dead] _ [Occ=Dead] _ [Occ=Dead] bx_d1kMw
+                  _ [Occ=Dead] _ [Occ=Dead] ->
+      ghc-prim:GHC.Types.F# bx_d1kMw
+      }
+
+-- RHS size: {terms: 6, types: 8, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:b2:IIRParams :: IIRParams -> Float
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:b2:IIRParams
+  = \ (ds_d1kKN :: IIRParams) ->
+      case ds_d1kKN of
+      { IIRParams _ [Occ=Dead] _ [Occ=Dead] bx_d1kMp _ [Occ=Dead]
+                  _ [Occ=Dead] _ [Occ=Dead] ->
+      ghc-prim:GHC.Types.F# bx_d1kMp
+      }
+
+-- RHS size: {terms: 6, types: 8, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:b1:IIRParams :: IIRParams -> Float
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:b1:IIRParams
+  = \ (ds_d1kKG :: IIRParams) ->
+      case ds_d1kKG of
+      { IIRParams _ [Occ=Dead] bx_d1kMi _ [Occ=Dead] _ [Occ=Dead]
+                  _ [Occ=Dead] _ [Occ=Dead] ->
+      ghc-prim:GHC.Types.F# bx_d1kMi
+      }
+
+-- RHS size: {terms: 6, types: 8, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:b0:IIRParams :: IIRParams -> Float
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:b0:IIRParams
+  = \ (ds_d1kKz :: IIRParams) ->
+      case ds_d1kKz of
+      { IIRParams bx_d1kMb _ [Occ=Dead] _ [Occ=Dead] _ [Occ=Dead]
+                  _ [Occ=Dead] _ [Occ=Dead] ->
+      ghc-prim:GHC.Types.F# bx_d1kMb
+      }
+
+-- RHS size: {terms: 6, types: 8, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:y2:IIRState :: IIRState -> Float
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:y2:IIRState
+  = \ (ds_d1kKs :: IIRState) ->
+      case ds_d1kKs of
+      { IIRState _ [Occ=Dead] _ [Occ=Dead] _ [Occ=Dead] _ [Occ=Dead]
+                 _ [Occ=Dead] bx_d1kMa ->
+      ghc-prim:GHC.Types.F# bx_d1kMa
+      }
+
+-- RHS size: {terms: 6, types: 8, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:y1:IIRState :: IIRState -> Float
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:y1:IIRState
+  = \ (ds_d1kKl :: IIRState) ->
+      case ds_d1kKl of
+      { IIRState _ [Occ=Dead] _ [Occ=Dead] _ [Occ=Dead] _ [Occ=Dead]
+                 bx_d1kM3 _ [Occ=Dead] ->
+      ghc-prim:GHC.Types.F# bx_d1kM3
+      }
+
+-- RHS size: {terms: 6, types: 8, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:y0:IIRState :: IIRState -> Float
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:y0:IIRState
+  = \ (ds_d1kKe :: IIRState) ->
+      case ds_d1kKe of
+      { IIRState _ [Occ=Dead] _ [Occ=Dead] _ [Occ=Dead] bx_d1kLW
+                 _ [Occ=Dead] _ [Occ=Dead] ->
+      ghc-prim:GHC.Types.F# bx_d1kLW
+      }
+
+-- RHS size: {terms: 6, types: 8, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:x2:IIRState :: IIRState -> Float
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:x2:IIRState
+  = \ (ds_d1kK7 :: IIRState) ->
+      case ds_d1kK7 of
+      { IIRState _ [Occ=Dead] _ [Occ=Dead] bx_d1kLP _ [Occ=Dead]
+                 _ [Occ=Dead] _ [Occ=Dead] ->
+      ghc-prim:GHC.Types.F# bx_d1kLP
+      }
+
+-- RHS size: {terms: 6, types: 8, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:x1:IIRState :: IIRState -> Float
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:x1:IIRState
+  = \ (ds_d1kK0 :: IIRState) ->
+      case ds_d1kK0 of
+      { IIRState _ [Occ=Dead] bx_d1kLI _ [Occ=Dead] _ [Occ=Dead]
+                 _ [Occ=Dead] _ [Occ=Dead] ->
+      ghc-prim:GHC.Types.F# bx_d1kLI
+      }
+
+-- RHS size: {terms: 6, types: 8, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:x0:IIRState :: IIRState -> Float
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:x0:IIRState
+  = \ (ds_d1kJT :: IIRState) ->
+      case ds_d1kJT of
+      { IIRState bx_d1kLB _ [Occ=Dead] _ [Occ=Dead] _ [Occ=Dead]
+                 _ [Occ=Dead] _ [Occ=Dead] ->
+      ghc-prim:GHC.Types.F# bx_d1kLB
+      }
+
+-- RHS size: {terms: 6, types: 6, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:rmsDecay:RMSInfo :: RMSInfo -> Float
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:rmsDecay:RMSInfo
+  = \ (ds_d1kJO :: RMSInfo) ->
+      case ds_d1kJO of
+      { RMSInfo _ [Occ=Dead] _ [Occ=Dead] _ [Occ=Dead] bx_d1kLA ->
+      ghc-prim:GHC.Types.F# bx_d1kLA
+      }
+
+-- RHS size: {terms: 6, types: 6, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:rmsVolume:RMSInfo :: RMSInfo -> Float
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:rmsVolume:RMSInfo
+  = \ (ds_d1kJJ :: RMSInfo) ->
+      case ds_d1kJJ of
+      { RMSInfo _ [Occ=Dead] _ [Occ=Dead] bx_d1kLx _ [Occ=Dead] ->
+      ghc-prim:GHC.Types.F# bx_d1kLx
+      }
+
+-- RHS size: {terms: 5, types: 6, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:params:RMSInfo :: RMSInfo -> IIRParams
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:params:RMSInfo
+  = \ (ds_d1kJE :: RMSInfo) ->
+      case ds_d1kJE of
+      { RMSInfo _ [Occ=Dead] ds_d1kJG _ [Occ=Dead] _ [Occ=Dead] ->
+      ds_d1kJG
+      }
+
+-- RHS size: {terms: 5, types: 6, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$sel:state:RMSInfo :: RMSInfo -> IIRState
+[LclIdX[[RecSel]],
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+SimpleDSP.IIR.$sel:state:RMSInfo
+  = \ (ds_d1kJz :: RMSInfo) ->
+      case ds_d1kJz of
+      { RMSInfo ds_d1kJA _ [Occ=Dead] _ [Occ=Dead] _ [Occ=Dead] ->
+      ds_d1kJA
+      }
+
+-- RHS size: {terms: 13, types: 0, coercions: 0, joins: 0/0}
+initialIIRState :: IIRState
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=False, ConLike=True, WorkFree=False, Expandable=True,
+         Guidance=IF_ARGS [] 130 0}]
+initialIIRState
+  = SimpleDSP.IIR.$WIIRState
+      (ghc-prim:GHC.Types.F# 0.0#)
+      (ghc-prim:GHC.Types.F# 0.0#)
+      (ghc-prim:GHC.Types.F# 0.0#)
+      (ghc-prim:GHC.Types.F# 0.0#)
+      (ghc-prim:GHC.Types.F# 0.0#)
+      (ghc-prim:GHC.Types.F# 0.0#)
+
+-- RHS size: {terms: 8, types: 1, coercions: 0, joins: 0/0}
+mkRMSInfo :: IIRParams -> RMSInfo
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [0] 70 0}]
+mkRMSInfo
+  = \ (params_a1kn3 :: IIRParams) ->
+      SimpleDSP.IIR.$WRMSInfo
+        initialIIRState
+        params_a1kn3
+        (ghc-prim:GHC.Types.F# 0.0#)
+        (ghc-prim:GHC.Types.F# 0.0#)
+
+-- RHS size: {terms: 5, types: 0, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$trModule :: ghc-prim:GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 190 10}]
+SimpleDSP.IIR.$trModule
+  = ghc-prim:GHC.Types.Module
+      (ghc-prim:GHC.Types.TrNameS
+         "haskMus-0.1.0.0-D7UtYhLQ5TeFhGotB8XMDM"#)
+      (ghc-prim:GHC.Types.TrNameS "SimpleDSP.IIR"#)
+
+-- RHS size: {terms: 3, types: 1, coercions: 0, joins: 0/0}
+$krep_a1kHr [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHr
+  = ghc-prim:GHC.Types.KindRepTyConApp
+      ghc-prim:GHC.Types.$tcFloat
+      (ghc-prim:GHC.Types.[] @ghc-prim:GHC.Types.KindRep)
+
+-- RHS size: {terms: 8, types: 0, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$tcIIRParams :: ghc-prim:GHC.Types.TyCon
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 60 10}]
+SimpleDSP.IIR.$tcIIRParams
+  = ghc-prim:GHC.Types.TyCon
+      1610279279998451237#Word64
+      15025021061137279124#Word64
+      SimpleDSP.IIR.$trModule
+      (ghc-prim:GHC.Types.TrNameS "IIRParams"#)
+      0#
+      ghc-prim:GHC.Types.krep$*
+
+-- RHS size: {terms: 3, types: 1, coercions: 0, joins: 0/0}
+$krep_a1kHp [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHp
+  = ghc-prim:GHC.Types.KindRepTyConApp
+      SimpleDSP.IIR.$tcIIRParams
+      (ghc-prim:GHC.Types.[] @ghc-prim:GHC.Types.KindRep)
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHF [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHF = ghc-prim:GHC.Types.KindRepFun $krep_a1kHr $krep_a1kHp
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHE [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHE = ghc-prim:GHC.Types.KindRepFun $krep_a1kHr $krep_a1kHF
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHD [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHD = ghc-prim:GHC.Types.KindRepFun $krep_a1kHr $krep_a1kHE
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHC [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHC = ghc-prim:GHC.Types.KindRepFun $krep_a1kHr $krep_a1kHD
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHB [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHB = ghc-prim:GHC.Types.KindRepFun $krep_a1kHr $krep_a1kHC
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHA [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHA = ghc-prim:GHC.Types.KindRepFun $krep_a1kHr $krep_a1kHB
+
+-- RHS size: {terms: 8, types: 0, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$tc'IIRParams :: ghc-prim:GHC.Types.TyCon
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 60 10}]
+SimpleDSP.IIR.$tc'IIRParams
+  = ghc-prim:GHC.Types.TyCon
+      8621875782527656213#Word64
+      2621416913776951902#Word64
+      SimpleDSP.IIR.$trModule
+      (ghc-prim:GHC.Types.TrNameS "'IIRParams"#)
+      0#
+      $krep_a1kHA
+
+-- RHS size: {terms: 8, types: 0, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$tcIIRState :: ghc-prim:GHC.Types.TyCon
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 50 10}]
+SimpleDSP.IIR.$tcIIRState
+  = ghc-prim:GHC.Types.TyCon
+      18326771505065085762#Word64
+      3997210692903307393#Word64
+      SimpleDSP.IIR.$trModule
+      (ghc-prim:GHC.Types.TrNameS "IIRState"#)
+      0#
+      ghc-prim:GHC.Types.krep$*
+
+-- RHS size: {terms: 3, types: 1, coercions: 0, joins: 0/0}
+$krep_a1kHn [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHn
+  = ghc-prim:GHC.Types.KindRepTyConApp
+      SimpleDSP.IIR.$tcIIRState
+      (ghc-prim:GHC.Types.[] @ghc-prim:GHC.Types.KindRep)
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHz [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHz = ghc-prim:GHC.Types.KindRepFun $krep_a1kHr $krep_a1kHn
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHy [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHy = ghc-prim:GHC.Types.KindRepFun $krep_a1kHr $krep_a1kHz
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHx [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHx = ghc-prim:GHC.Types.KindRepFun $krep_a1kHr $krep_a1kHy
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHw [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHw = ghc-prim:GHC.Types.KindRepFun $krep_a1kHr $krep_a1kHx
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHv [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHv = ghc-prim:GHC.Types.KindRepFun $krep_a1kHr $krep_a1kHw
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHu [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHu = ghc-prim:GHC.Types.KindRepFun $krep_a1kHr $krep_a1kHv
+
+-- RHS size: {terms: 8, types: 0, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$tc'IIRState :: ghc-prim:GHC.Types.TyCon
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 60 10}]
+SimpleDSP.IIR.$tc'IIRState
+  = ghc-prim:GHC.Types.TyCon
+      11697651090644273209#Word64
+      12827721824238063643#Word64
+      SimpleDSP.IIR.$trModule
+      (ghc-prim:GHC.Types.TrNameS "'IIRState"#)
+      0#
+      $krep_a1kHu
+
+-- RHS size: {terms: 8, types: 0, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$tcRMSInfo :: ghc-prim:GHC.Types.TyCon
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 50 10}]
+SimpleDSP.IIR.$tcRMSInfo
+  = ghc-prim:GHC.Types.TyCon
+      17285913514729564065#Word64
+      17251089147650332694#Word64
+      SimpleDSP.IIR.$trModule
+      (ghc-prim:GHC.Types.TrNameS "RMSInfo"#)
+      0#
+      ghc-prim:GHC.Types.krep$*
+
+-- RHS size: {terms: 3, types: 1, coercions: 0, joins: 0/0}
+$krep_a1kHt [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHt
+  = ghc-prim:GHC.Types.KindRepTyConApp
+      SimpleDSP.IIR.$tcRMSInfo
+      (ghc-prim:GHC.Types.[] @ghc-prim:GHC.Types.KindRep)
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHs [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHs = ghc-prim:GHC.Types.KindRepFun $krep_a1kHr $krep_a1kHt
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHq [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHq = ghc-prim:GHC.Types.KindRepFun $krep_a1kHr $krep_a1kHs
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHo [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHo = ghc-prim:GHC.Types.KindRepFun $krep_a1kHp $krep_a1kHq
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+$krep_a1kHm [InlPrag=[~]] :: ghc-prim:GHC.Types.KindRep
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 10 10}]
+$krep_a1kHm = ghc-prim:GHC.Types.KindRepFun $krep_a1kHn $krep_a1kHo
+
+-- RHS size: {terms: 8, types: 0, coercions: 0, joins: 0/0}
+SimpleDSP.IIR.$tc'RMSInfo :: ghc-prim:GHC.Types.TyCon
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [] 50 10}]
+SimpleDSP.IIR.$tc'RMSInfo
+  = ghc-prim:GHC.Types.TyCon
+      11259878263561117165#Word64
+      10661241932531375536#Word64
+      SimpleDSP.IIR.$trModule
+      (ghc-prim:GHC.Types.TrNameS "'RMSInfo"#)
+      0#
+      $krep_a1kHm
+
+-- RHS size: {terms: 78, types: 36, coercions: 0, joins: 0/5}
+applyIIR [InlPrag=INLINE (sat-args=3)]
+  :: IIRParams -> Float -> IIRState -> IIRState
+[LclId,
+ Unf=Unf{Src=StableUser, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=False,boring_ok=False)
+         Tmpl= \ (ds_d1kHJ [Occ=Once1!] :: IIRParams)
+                 (x0_a1kmP :: Float)
+                 (ds_d1kHK [Occ=Once1!] :: IIRState) ->
+                 case ds_d1kHJ of
+                 { IIRParams bx_d1kLh [Occ=Once1] bx_d1kLi [Occ=Once1]
+                             bx_d1kLj [Occ=Once1] bx_d1kLk [Occ=OnceL1] bx_d1kLl [Occ=Once1]
+                             bx_d1kLm [Occ=Once1] ->
+                 let {
+                   a0_a1kmM :: Float
+                   [LclId]
+                   a0_a1kmM = ghc-prim:GHC.Types.F# bx_d1kLk } in
+                 case ds_d1kHK of
+                 { IIRState bx_d1kLn [Occ=OnceL1] bx_d1kLo [Occ=OnceL1] _ [Occ=Dead]
+                            bx_d1kLq [Occ=OnceL1] bx_d1kLr [Occ=OnceL1] _ [Occ=Dead] ->
+                 let {
+                   x1_a1kmQ :: Float
+                   [LclId]
+                   x1_a1kmQ = ghc-prim:GHC.Types.F# bx_d1kLn } in
+                 let {
+                   x2_a1kmR :: Float
+                   [LclId]
+                   x2_a1kmR = ghc-prim:GHC.Types.F# bx_d1kLo } in
+                 let {
+                   y1_a1kmS :: Float
+                   [LclId]
+                   y1_a1kmS = ghc-prim:GHC.Types.F# bx_d1kLq } in
+                 let {
+                   y2_a1kmT :: Float
+                   [LclId]
+                   y2_a1kmT = ghc-prim:GHC.Types.F# bx_d1kLr } in
+                 SimpleDSP.IIR.$WIIRState
+                   x0_a1kmP
+                   x1_a1kmQ
+                   x2_a1kmR
+                   (- @Float
+                      GHC.Float.$fNumFloat
+                      (- @Float
+                         GHC.Float.$fNumFloat
+                         (+ @Float
+                            GHC.Float.$fNumFloat
+                            (+ @Float
+                               GHC.Float.$fNumFloat
+                               (* @Float
+                                  GHC.Float.$fNumFloat
+                                  (/ @Float
+                                     GHC.Float.$fFractionalFloat
+                                     (ghc-prim:GHC.Types.F# bx_d1kLh)
+                                     a0_a1kmM)
+                                  x0_a1kmP)
+                               (* @Float
+                                  GHC.Float.$fNumFloat
+                                  (/ @Float
+                                     GHC.Float.$fFractionalFloat
+                                     (ghc-prim:GHC.Types.F# bx_d1kLi)
+                                     a0_a1kmM)
+                                  x1_a1kmQ))
+                            (* @Float
+                               GHC.Float.$fNumFloat
+                               (/ @Float
+                                  GHC.Float.$fFractionalFloat
+                                  (ghc-prim:GHC.Types.F# bx_d1kLj)
+                                  a0_a1kmM)
+                               x2_a1kmR))
+                         (* @Float
+                            GHC.Float.$fNumFloat
+                            (/ @Float
+                               GHC.Float.$fFractionalFloat
+                               (ghc-prim:GHC.Types.F# bx_d1kLl)
+                               a0_a1kmM)
+                            y1_a1kmS))
+                      (* @Float
+                         GHC.Float.$fNumFloat
+                         (/ @Float
+                            GHC.Float.$fFractionalFloat
+                            (ghc-prim:GHC.Types.F# bx_d1kLm)
+                            a0_a1kmM)
+                         y2_a1kmT))
+                   y1_a1kmS
+                   y2_a1kmT
+                 }
+                 }}]
+applyIIR
+  = \ (ds_d1kHJ :: IIRParams)
+      (x0_a1kmP :: Float)
+      (ds_d1kHK :: IIRState) ->
+      case ds_d1kHJ of
+      { IIRParams bx_d1kLh bx_d1kLi bx_d1kLj bx_d1kLk bx_d1kLl
+                  bx_d1kLm ->
+      let {
+        a0_a1kmM :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=True, ConLike=True, WorkFree=True, Expandable=True,
+                 Guidance=IF_ARGS [] 10 10}]
+        a0_a1kmM = ghc-prim:GHC.Types.F# bx_d1kLk } in
+      case ds_d1kHK of
+      { IIRState bx_d1kLn bx_d1kLo _ [Occ=Dead] bx_d1kLq bx_d1kLr
+                 _ [Occ=Dead] ->
+      let {
+        x1_a1kmQ :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=True, ConLike=True, WorkFree=True, Expandable=True,
+                 Guidance=IF_ARGS [] 10 10}]
+        x1_a1kmQ = ghc-prim:GHC.Types.F# bx_d1kLn } in
+      let {
+        x2_a1kmR :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=True, ConLike=True, WorkFree=True, Expandable=True,
+                 Guidance=IF_ARGS [] 10 10}]
+        x2_a1kmR = ghc-prim:GHC.Types.F# bx_d1kLo } in
+      let {
+        y1_a1kmS :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=True, ConLike=True, WorkFree=True, Expandable=True,
+                 Guidance=IF_ARGS [] 10 10}]
+        y1_a1kmS = ghc-prim:GHC.Types.F# bx_d1kLq } in
+      let {
+        y2_a1kmT :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=True, ConLike=True, WorkFree=True, Expandable=True,
+                 Guidance=IF_ARGS [] 10 10}]
+        y2_a1kmT = ghc-prim:GHC.Types.F# bx_d1kLr } in
+      SimpleDSP.IIR.$WIIRState
+        x0_a1kmP
+        x1_a1kmQ
+        x2_a1kmR
+        (- @Float
+           GHC.Float.$fNumFloat
+           (- @Float
+              GHC.Float.$fNumFloat
+              (+ @Float
+                 GHC.Float.$fNumFloat
+                 (+ @Float
+                    GHC.Float.$fNumFloat
+                    (* @Float
+                       GHC.Float.$fNumFloat
+                       (/ @Float
+                          GHC.Float.$fFractionalFloat
+                          (ghc-prim:GHC.Types.F# bx_d1kLh)
+                          a0_a1kmM)
+                       x0_a1kmP)
+                    (* @Float
+                       GHC.Float.$fNumFloat
+                       (/ @Float
+                          GHC.Float.$fFractionalFloat
+                          (ghc-prim:GHC.Types.F# bx_d1kLi)
+                          a0_a1kmM)
+                       x1_a1kmQ))
+                 (* @Float
+                    GHC.Float.$fNumFloat
+                    (/ @Float
+                       GHC.Float.$fFractionalFloat
+                       (ghc-prim:GHC.Types.F# bx_d1kLj)
+                       a0_a1kmM)
+                    x2_a1kmR))
+              (* @Float
+                 GHC.Float.$fNumFloat
+                 (/ @Float
+                    GHC.Float.$fFractionalFloat
+                    (ghc-prim:GHC.Types.F# bx_d1kLl)
+                    a0_a1kmM)
+                 y1_a1kmS))
+           (* @Float
+              GHC.Float.$fNumFloat
+              (/ @Float
+                 GHC.Float.$fFractionalFloat
+                 (ghc-prim:GHC.Types.F# bx_d1kLm)
+                 a0_a1kmM)
+              y2_a1kmT))
+        y1_a1kmS
+        y2_a1kmT
+      }
+      }
+
+-- RHS size: {terms: 27, types: 32, coercions: 11, joins: 0/3}
+filterSamplesState
+  :: forall (m :: * -> *).
+     Monad m =>
+     IIRParams -> Samples -> StateT IIRState m Samples
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [30] 260 60}]
+filterSamplesState
+  = \ (@(m_a1kts :: * -> *)) ($dMonad_a1ktt :: Monad m_a1kts) ->
+      let {
+        $dMonad_a1kuk :: Monad (StateT IIRState m_a1kts)
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=True, WorkFree=False, Expandable=True,
+                 Guidance=IF_ARGS [] 20 0}]
+        $dMonad_a1kuk
+          = Control.Monad.Trans.State.Strict.$fMonadStateT
+              @m_a1kts @IIRState $dMonad_a1ktt } in
+      let {
+        $dApplicative_a1ktM :: Applicative m_a1kts
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=True,
+                 Guidance=IF_ARGS [] 20 0}]
+        $dApplicative_a1ktM = GHC.Base.$p1Monad @m_a1kts $dMonad_a1ktt } in
+      \ (params_a1kmW :: IIRParams) ->
+        SV.mapM
+          @(StateT IIRState m_a1kts)
+          @Float
+          @Float
+          $dMonad_a1kuk
+          Foreign.Storable.$fStorableFloat
+          Foreign.Storable.$fStorableFloat
+          (\ (curSample_a1kmY :: Float) ->
+             (\ (curState_a1kmZ :: IIRState) ->
+                let {
+                  newState_a1kn0 :: IIRState
+                  [LclId,
+                   Unf=Unf{Src=<vanilla>, TopLvl=False,
+                           Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                           Guidance=IF_ARGS [] 40 0}]
+                  newState_a1kn0
+                    = applyIIR params_a1kmW curSample_a1kmY curState_a1kmZ } in
+                pure
+                  @m_a1kts
+                  $dApplicative_a1ktM
+                  @(Float, IIRState)
+                  (GHC.Records.getField
+                     @ghc-prim:GHC.Types.Symbol
+                     @"y0"
+                     @IIRState
+                     @Float
+                     (SimpleDSP.IIR.$sel:y0:IIRState
+                      `cast` (Sym (GHC.Records.N:HasField[0]
+                                       <ghc-prim:GHC.Types.Symbol>_N
+                                       <"y0">_N
+                                       <IIRState>_N
+                                       <Float>_N)
+                              :: (IIRState -> Float)
+                                 ~R# GHC.Records.HasField "y0" IIRState Float))
+                     newState_a1kn0,
+                   newState_a1kn0))
+             `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
+                              <IIRState>_N <m_a1kts>_R <Float>_N)
+                     :: (IIRState -> m_a1kts (Float, IIRState))
+                        ~R# StateT IIRState m_a1kts Float))
+
+-- RHS size: {terms: 9, types: 17, coercions: 0, joins: 0/0}
+filterSamples
+  :: IIRParams -> Samples -> IIRState -> (Samples, IIRState)
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [0 0] 90 60}]
+filterSamples
+  = \ (params_a1kn1 :: IIRParams) (samples_a1kn2 :: Samples) ->
+      . @(Identity (Samples, IIRState))
+        @(Samples, IIRState)
+        @IIRState
+        (runIdentity @(Samples, IIRState))
+        (runStateT
+           @IIRState
+           @Identity
+           @Samples
+           (filterSamplesState
+              @Identity
+              Data.Functor.Identity.$fMonadIdentity
+              params_a1kn1
+              samples_a1kn2))
+
+-- RHS size: {terms: 86, types: 93, coercions: 54, joins: 0/4}
+updateInfo :: RMSInfo -> Samples -> RMSInfo
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=NEVER}]
+updateInfo
+  = \ (info_a1kn4 :: RMSInfo) (samples_a1kn5 :: Samples) ->
+      let {
+        ds_d1kIj :: (IIRState, Float)
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 380 0}]
+        ds_d1kIj
+          = SV.foldl'
+              @Float
+              @(IIRState, Float)
+              Foreign.Storable.$fStorableFloat
+              (\ (ds_d1kIk :: (IIRState, Float)) (sample_a1kn9 :: Float) ->
+                 case ds_d1kIk of { (prevState_a1kn7, prevVolume_a1kn8) ->
+                 let {
+                   newState_a1kna :: IIRState
+                   [LclId,
+                    Unf=Unf{Src=<vanilla>, TopLvl=False,
+                            Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                            Guidance=IF_ARGS [] 70 0}]
+                   newState_a1kna
+                     = applyIIR
+                         (GHC.Records.getField
+                            @ghc-prim:GHC.Types.Symbol
+                            @"params"
+                            @RMSInfo
+                            @IIRParams
+                            (SimpleDSP.IIR.$sel:params:RMSInfo
+                             `cast` (Sym (GHC.Records.N:HasField[0]
+                                              <ghc-prim:GHC.Types.Symbol>_N
+                                              <"params">_N
+                                              <RMSInfo>_N
+                                              <IIRParams>_N)
+                                     :: (RMSInfo -> IIRParams)
+                                        ~R# GHC.Records.HasField "params" RMSInfo IIRParams))
+                            info_a1kn4)
+                         sample_a1kn9
+                         prevState_a1kn7 } in
+                 (newState_a1kna,
+                  max
+                    @Float
+                    ghc-prim:GHC.Classes.$fOrdFloat
+                    prevVolume_a1kn8
+                    (* @Float
+                       GHC.Float.$fNumFloat
+                       (GHC.Records.getField
+                          @ghc-prim:GHC.Types.Symbol
+                          @"y0"
+                          @IIRState
+                          @Float
+                          (SimpleDSP.IIR.$sel:y0:IIRState
+                           `cast` (Sym (GHC.Records.N:HasField[0]
+                                            <ghc-prim:GHC.Types.Symbol>_N
+                                            <"y0">_N
+                                            <IIRState>_N
+                                            <Float>_N)
+                                   :: (IIRState -> Float)
+                                      ~R# GHC.Records.HasField "y0" IIRState Float))
+                          newState_a1kna)
+                       (GHC.Records.getField
+                          @ghc-prim:GHC.Types.Symbol
+                          @"y0"
+                          @IIRState
+                          @Float
+                          (SimpleDSP.IIR.$sel:y0:IIRState
+                           `cast` (Sym (GHC.Records.N:HasField[0]
+                                            <ghc-prim:GHC.Types.Symbol>_N
+                                            <"y0">_N
+                                            <IIRState>_N
+                                            <Float>_N)
+                                   :: (IIRState -> Float)
+                                      ~R# GHC.Records.HasField "y0" IIRState Float))
+                          newState_a1kna)))
+                 })
+              (GHC.Records.getField
+                 @ghc-prim:GHC.Types.Symbol
+                 @"state"
+                 @RMSInfo
+                 @IIRState
+                 (SimpleDSP.IIR.$sel:state:RMSInfo
+                  `cast` (Sym (GHC.Records.N:HasField[0]
+                                   <ghc-prim:GHC.Types.Symbol>_N
+                                   <"state">_N
+                                   <RMSInfo>_N
+                                   <IIRState>_N)
+                          :: (RMSInfo -> IIRState)
+                             ~R# GHC.Records.HasField "state" RMSInfo IIRState))
+                 info_a1kn4,
+               GHC.Records.getField
+                 @ghc-prim:GHC.Types.Symbol
+                 @"rmsVolume"
+                 @RMSInfo
+                 @Float
+                 (SimpleDSP.IIR.$sel:rmsVolume:RMSInfo
+                  `cast` (Sym (GHC.Records.N:HasField[0]
+                                   <ghc-prim:GHC.Types.Symbol>_N
+                                   <"rmsVolume">_N
+                                   <RMSInfo>_N
+                                   <Float>_N)
+                          :: (RMSInfo -> Float)
+                             ~R# GHC.Records.HasField "rmsVolume" RMSInfo Float))
+                 info_a1kn4)
+              samples_a1kn5 } in
+      let {
+        newVolume_a1knd :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=True, Expandable=False,
+                 Guidance=IF_ARGS [] 10 0}]
+        newVolume_a1knd
+          = case ds_d1kIj of { (_ [Occ=Dead], newVolume_a1knd) ->
+            newVolume_a1knd
+            } } in
+      let {
+        ds_d1kIi :: (Float, Float)
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 260 20}]
+        ds_d1kIi
+          = case > @Float
+                   ghc-prim:GHC.Classes.$fOrdFloat
+                   newVolume_a1knd
+                   (GHC.Records.getField
+                      @ghc-prim:GHC.Types.Symbol
+                      @"rmsVolume"
+                      @RMSInfo
+                      @Float
+                      (SimpleDSP.IIR.$sel:rmsVolume:RMSInfo
+                       `cast` (Sym (GHC.Records.N:HasField[0]
+                                        <ghc-prim:GHC.Types.Symbol>_N
+                                        <"rmsVolume">_N
+                                        <RMSInfo>_N
+                                        <Float>_N)
+                               :: (RMSInfo -> Float)
+                                  ~R# GHC.Records.HasField "rmsVolume" RMSInfo Float))
+                      info_a1kn4)
+            of {
+              False ->
+                (- @Float
+                   GHC.Float.$fNumFloat
+                   newVolume_a1knd
+                   (GHC.Records.getField
+                      @ghc-prim:GHC.Types.Symbol
+                      @"rmsDecay"
+                      @RMSInfo
+                      @Float
+                      (SimpleDSP.IIR.$sel:rmsDecay:RMSInfo
+                       `cast` (Sym (GHC.Records.N:HasField[0]
+                                        <ghc-prim:GHC.Types.Symbol>_N
+                                        <"rmsDecay">_N
+                                        <RMSInfo>_N
+                                        <Float>_N)
+                               :: (RMSInfo -> Float)
+                                  ~R# GHC.Records.HasField "rmsDecay" RMSInfo Float))
+                      info_a1kn4),
+                 GHC.Records.getField
+                   @ghc-prim:GHC.Types.Symbol
+                   @"rmsDecay"
+                   @RMSInfo
+                   @Float
+                   (SimpleDSP.IIR.$sel:rmsDecay:RMSInfo
+                    `cast` (Sym (GHC.Records.N:HasField[0]
+                                     <ghc-prim:GHC.Types.Symbol>_N
+                                     <"rmsDecay">_N
+                                     <RMSInfo>_N
+                                     <Float>_N)
+                            :: (RMSInfo -> Float)
+                               ~R# GHC.Records.HasField "rmsDecay" RMSInfo Float))
+                   info_a1kn4);
+              True ->
+                (newVolume_a1knd,
+                 / @Float
+                   GHC.Float.$fFractionalFloat
+                   newVolume_a1knd
+                   (ghc-prim:GHC.Types.F# 4.0#))
+            } } in
+      SimpleDSP.IIR.$WRMSInfo
+        (case ds_d1kIj of { (state_a1knc, _ [Occ=Dead]) -> state_a1knc })
+        (GHC.Records.getField
+           @ghc-prim:GHC.Types.Symbol
+           @"params"
+           @RMSInfo
+           @IIRParams
+           (SimpleDSP.IIR.$sel:params:RMSInfo
+            `cast` (Sym (GHC.Records.N:HasField[0]
+                             <ghc-prim:GHC.Types.Symbol>_N
+                             <"params">_N
+                             <RMSInfo>_N
+                             <IIRParams>_N)
+                    :: (RMSInfo -> IIRParams)
+                       ~R# GHC.Records.HasField "params" RMSInfo IIRParams))
+           info_a1kn4)
+        (case ds_d1kIi of { (rmsVolume_a1kne, _ [Occ=Dead]) ->
+         rmsVolume_a1kne
+         })
+        (case ds_d1kIi of { (_ [Occ=Dead], rmsDecay_a1knf) ->
+         rmsDecay_a1knf
+         })
+
+-- RHS size: {terms: 12, types: 5, coercions: 0, joins: 0/0}
+calcAQ [InlPrag=INLINE (sat-args=2)] :: Float -> Float -> Float
+[LclId,
+ Unf=Unf{Src=StableUser, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=2,unsat_ok=False,boring_ok=False)
+         Tmpl= \ (w0_a1km5 [Occ=Once1] :: Float)
+                 (q_a1km6 [Occ=Once1] :: Float) ->
+                 / @Float
+                   GHC.Float.$fFractionalFloat
+                   (sin @Float GHC.Float.$fFloatingFloat w0_a1km5)
+                   (* @Float
+                      GHC.Float.$fNumFloat
+                      (ghc-prim:GHC.Types.F# 2.0#)
+                      q_a1km6)}]
+calcAQ
+  = \ (w0_a1km5 :: Float) (q_a1km6 :: Float) ->
+      / @Float
+        GHC.Float.$fFractionalFloat
+        (sin @Float GHC.Float.$fFloatingFloat w0_a1km5)
+        (* @Float
+           GHC.Float.$fNumFloat
+           (ghc-prim:GHC.Types.F# 2.0#)
+           q_a1km6)
+
+-- RHS size: {terms: 14, types: 5, coercions: 0, joins: 0/0}
+calcW0 [InlPrag=INLINE (sat-args=1)] :: Float -> Float
+[LclId,
+ Unf=Unf{Src=StableUser, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=False,boring_ok=False)
+         Tmpl= \ (freq_a1km4 [Occ=Once1] :: Float) ->
+                 / @Float
+                   GHC.Float.$fFractionalFloat
+                   (* @Float
+                      GHC.Float.$fNumFloat
+                      (* @Float
+                         GHC.Float.$fNumFloat
+                         (ghc-prim:GHC.Types.F# 2.0#)
+                         (pi @Float GHC.Float.$fFloatingFloat))
+                      freq_a1km4)
+                   (ghc-prim:GHC.Types.F# 44100.0#)}]
+calcW0
+  = \ (freq_a1km4 :: Float) ->
+      / @Float
+        GHC.Float.$fFractionalFloat
+        (* @Float
+           GHC.Float.$fNumFloat
+           (* @Float
+              GHC.Float.$fNumFloat
+              (ghc-prim:GHC.Types.F# 2.0#)
+              (pi @Float GHC.Float.$fFloatingFloat))
+           freq_a1km4)
+        (ghc-prim:GHC.Types.F# 44100.0#)
+
+-- RHS size: {terms: 48, types: 14, coercions: 0, joins: 0/4}
+lowPassFilter :: Float -> Float -> IIRParams
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [0 0] 520 0}]
+lowPassFilter
+  = \ (freq_a1km7 :: Float) (q_a1km8 :: Float) ->
+      let {
+        w0_a1km9 :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 20 0}]
+        w0_a1km9 = calcW0 freq_a1km7 } in
+      let {
+        cosW0_a1kma :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 30 0}]
+        cosW0_a1kma = cos @Float GHC.Float.$fFloatingFloat w0_a1km9 } in
+      let {
+        b0_calc_a1kmc :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 100 0}]
+        b0_calc_a1kmc
+          = / @Float
+              GHC.Float.$fFractionalFloat
+              (- @Float
+                 GHC.Float.$fNumFloat
+                 (ghc-prim:GHC.Types.F# 1.0#)
+                 cosW0_a1kma)
+              (ghc-prim:GHC.Types.F# 2.0#) } in
+      let {
+        alpha_a1kmb :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 30 0}]
+        alpha_a1kmb = calcAQ w0_a1km9 q_a1km8 } in
+      SimpleDSP.IIR.$WIIRParams
+        b0_calc_a1kmc
+        (- @Float
+           GHC.Float.$fNumFloat
+           (ghc-prim:GHC.Types.F# 1.0#)
+           cosW0_a1kma)
+        b0_calc_a1kmc
+        (+ @Float
+           GHC.Float.$fNumFloat
+           (ghc-prim:GHC.Types.F# 1.0#)
+           alpha_a1kmb)
+        (* @Float
+           GHC.Float.$fNumFloat
+           (negate @Float GHC.Float.$fNumFloat (ghc-prim:GHC.Types.F# 2.0#))
+           cosW0_a1kma)
+        (- @Float
+           GHC.Float.$fNumFloat
+           (ghc-prim:GHC.Types.F# 1.0#)
+           alpha_a1kmb)
+
+-- RHS size: {terms: 54, types: 16, coercions: 0, joins: 0/4}
+highPassFilter :: Float -> Float -> IIRParams
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [0 0] 600 0}]
+highPassFilter
+  = \ (freq_a1kmd :: Float) (q_a1kme :: Float) ->
+      let {
+        w0_a1kmg :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 20 0}]
+        w0_a1kmg = calcW0 freq_a1kmd } in
+      let {
+        α_a1kmh :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 30 0}]
+        α_a1kmh = calcAQ w0_a1kmg q_a1kme } in
+      let {
+        cosWO_a1kmi :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 30 0}]
+        cosWO_a1kmi = cos @Float GHC.Float.$fFloatingFloat w0_a1kmg } in
+      let {
+        b0_a1kmf :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 100 0}]
+        b0_a1kmf
+          = / @Float
+              GHC.Float.$fFractionalFloat
+              (+ @Float
+                 GHC.Float.$fNumFloat
+                 (ghc-prim:GHC.Types.F# 1.0#)
+                 cosWO_a1kmi)
+              (ghc-prim:GHC.Types.F# 2.0#) } in
+      SimpleDSP.IIR.$WIIRParams
+        b0_a1kmf
+        (* @Float
+           GHC.Float.$fNumFloat
+           (negate @Float GHC.Float.$fNumFloat (ghc-prim:GHC.Types.F# 1.0#))
+           (+ @Float
+              GHC.Float.$fNumFloat
+              (ghc-prim:GHC.Types.F# 1.0#)
+              cosWO_a1kmi))
+        b0_a1kmf
+        (+ @Float
+           GHC.Float.$fNumFloat
+           (ghc-prim:GHC.Types.F# 1.0#)
+           α_a1kmh)
+        (* @Float
+           GHC.Float.$fNumFloat
+           (negate @Float GHC.Float.$fNumFloat (ghc-prim:GHC.Types.F# 2.0#))
+           cosWO_a1kmi)
+        (- @Float
+           GHC.Float.$fNumFloat
+           (ghc-prim:GHC.Types.F# 1.0#)
+           α_a1kmh)
+
+-- RHS size: {terms: 47, types: 14, coercions: 0, joins: 0/3}
+bandPassSkirtFilter :: Float -> Float -> IIRParams
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [0 0] 530 0}]
+bandPassSkirtFilter
+  = \ (freq_a1kmj :: Float) (q_a1kmk :: Float) ->
+      let {
+        w0_a1kmm :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 20 0}]
+        w0_a1kmm = calcW0 freq_a1kmj } in
+      let {
+        α_a1kmn :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 30 0}]
+        α_a1kmn = calcAQ w0_a1kmm q_a1kmk } in
+      let {
+        b0_a1kml :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 80 0}]
+        b0_a1kml
+          = / @Float
+              GHC.Float.$fFractionalFloat
+              (sin @Float GHC.Float.$fFloatingFloat w0_a1kmm)
+              (ghc-prim:GHC.Types.F# 2.0#) } in
+      SimpleDSP.IIR.$WIIRParams
+        b0_a1kml
+        (ghc-prim:GHC.Types.F# 0.0#)
+        (* @Float
+           GHC.Float.$fNumFloat
+           (negate @Float GHC.Float.$fNumFloat (ghc-prim:GHC.Types.F# 1.0#))
+           b0_a1kml)
+        (+ @Float
+           GHC.Float.$fNumFloat
+           (ghc-prim:GHC.Types.F# 1.0#)
+           α_a1kmn)
+        (* @Float
+           GHC.Float.$fNumFloat
+           (negate @Float GHC.Float.$fNumFloat (ghc-prim:GHC.Types.F# 2.0#))
+           (cos @Float GHC.Float.$fFloatingFloat w0_a1kmm))
+        (- @Float
+           GHC.Float.$fNumFloat
+           (ghc-prim:GHC.Types.F# 1.0#)
+           α_a1kmn)
+
+-- RHS size: {terms: 39, types: 11, coercions: 0, joins: 0/2}
+bandPassFilter :: Float -> Float -> IIRParams
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [0 0] 440 0}]
+bandPassFilter
+  = \ (freq_a1kmo :: Float) (q_a1kmp :: Float) ->
+      let {
+        w0_a1kmq :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 20 0}]
+        w0_a1kmq = calcW0 freq_a1kmo } in
+      let {
+        α_a1kmr :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 30 0}]
+        α_a1kmr = calcAQ w0_a1kmq q_a1kmp } in
+      SimpleDSP.IIR.$WIIRParams
+        α_a1kmr
+        (ghc-prim:GHC.Types.F# 0.0#)
+        (* @Float
+           GHC.Float.$fNumFloat
+           (negate @Float GHC.Float.$fNumFloat (ghc-prim:GHC.Types.F# 1.0#))
+           α_a1kmr)
+        (+ @Float
+           GHC.Float.$fNumFloat
+           (ghc-prim:GHC.Types.F# 1.0#)
+           α_a1kmr)
+        (* @Float
+           GHC.Float.$fNumFloat
+           (negate @Float GHC.Float.$fNumFloat (ghc-prim:GHC.Types.F# 2.0#))
+           (cos @Float GHC.Float.$fFloatingFloat w0_a1kmq))
+        (- @Float
+           GHC.Float.$fNumFloat
+           (ghc-prim:GHC.Types.F# 1.0#)
+           α_a1kmr)
+
+-- RHS size: {terms: 42, types: 12, coercions: 0, joins: 0/3}
+notchFilter :: Float -> Float -> IIRParams
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=IF_ARGS [0 0] 460 0}]
+notchFilter
+  = \ (freq_a1kms :: Float) (q_a1kmt :: Float) ->
+      let {
+        w0_a1kmu :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 20 0}]
+        w0_a1kmu = calcW0 freq_a1kms } in
+      let {
+        α_a1kmv :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 30 0}]
+        α_a1kmv = calcAQ w0_a1kmu q_a1kmt } in
+      let {
+        cosWO_a1kmw :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 30 0}]
+        cosWO_a1kmw = cos @Float GHC.Float.$fFloatingFloat w0_a1kmu } in
+      SimpleDSP.IIR.$WIIRParams
+        (ghc-prim:GHC.Types.F# 1.0#)
+        (* @Float
+           GHC.Float.$fNumFloat
+           (negate @Float GHC.Float.$fNumFloat (ghc-prim:GHC.Types.F# 2.0#))
+           cosWO_a1kmw)
+        (ghc-prim:GHC.Types.F# 1.0#)
+        (+ @Float
+           GHC.Float.$fNumFloat
+           (ghc-prim:GHC.Types.F# 1.0#)
+           α_a1kmv)
+        (* @Float
+           GHC.Float.$fNumFloat
+           (negate @Float GHC.Float.$fNumFloat (ghc-prim:GHC.Types.F# 2.0#))
+           cosWO_a1kmw)
+        (- @Float
+           GHC.Float.$fNumFloat
+           (ghc-prim:GHC.Types.F# 1.0#)
+           α_a1kmv)
+
+-- RHS size: {terms: 11, types: 2, coercions: 0, joins: 0/0}
+bigA :: Float
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=False, ConLike=False, WorkFree=False, Expandable=False,
+         Guidance=IF_ARGS [] 130 0}]
+bigA
+  = powerFloat
+      (ghc-prim:GHC.Types.F# 10.0#)
+      (/ @Float
+         GHC.Float.$fFractionalFloat
+         (negate @Float GHC.Float.$fNumFloat (ghc-prim:GHC.Types.F# 24.0#))
+         (ghc-prim:GHC.Types.F# 40.0#))
+
+-- RHS size: {terms: 144, types: 43, coercions: 0, joins: 0/3}
+lowShelfFilter :: Float -> Float -> IIRParams
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=NEVER}]
+lowShelfFilter
+  = \ (freq_a1kmx :: Float) (q_a1kmy :: Float) ->
+      let {
+        w0_a1kmA :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 20 0}]
+        w0_a1kmA = calcW0 freq_a1kmx } in
+      let {
+        cosWO_a1kmC :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 30 0}]
+        cosWO_a1kmC = cos @Float GHC.Float.$fFloatingFloat w0_a1kmA } in
+      let {
+        bigAsq_a1kmz :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 150 0}]
+        bigAsq_a1kmz
+          = * @Float
+              GHC.Float.$fNumFloat
+              (* @Float
+                 GHC.Float.$fNumFloat
+                 (ghc-prim:GHC.Types.F# 2.0#)
+                 (sqrt @Float GHC.Float.$fFloatingFloat bigA))
+              (calcAQ w0_a1kmA q_a1kmy) } in
+      SimpleDSP.IIR.$WIIRParams
+        (* @Float
+           GHC.Float.$fNumFloat
+           bigA
+           (+ @Float
+              GHC.Float.$fNumFloat
+              (- @Float
+                 GHC.Float.$fNumFloat
+                 (+ @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                 (* @Float
+                    GHC.Float.$fNumFloat
+                    (- @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                    cosWO_a1kmC))
+              bigAsq_a1kmz))
+        (* @Float
+           GHC.Float.$fNumFloat
+           (* @Float GHC.Float.$fNumFloat (ghc-prim:GHC.Types.F# 2.0#) bigA)
+           (- @Float
+              GHC.Float.$fNumFloat
+              (- @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+              (* @Float
+                 GHC.Float.$fNumFloat
+                 (+ @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                 cosWO_a1kmC)))
+        (* @Float
+           GHC.Float.$fNumFloat
+           bigA
+           (- @Float
+              GHC.Float.$fNumFloat
+              (- @Float
+                 GHC.Float.$fNumFloat
+                 (+ @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                 (* @Float
+                    GHC.Float.$fNumFloat
+                    (- @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                    cosWO_a1kmC))
+              bigAsq_a1kmz))
+        (+ @Float
+           GHC.Float.$fNumFloat
+           (+ @Float
+              GHC.Float.$fNumFloat
+              (+ @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+              (* @Float
+                 GHC.Float.$fNumFloat
+                 (- @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                 cosWO_a1kmC))
+           bigAsq_a1kmz)
+        (* @Float
+           GHC.Float.$fNumFloat
+           (negate @Float GHC.Float.$fNumFloat (ghc-prim:GHC.Types.F# 2.0#))
+           (+ @Float
+              GHC.Float.$fNumFloat
+              (- @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+              (* @Float
+                 GHC.Float.$fNumFloat
+                 (+ @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                 cosWO_a1kmC)))
+        (- @Float
+           GHC.Float.$fNumFloat
+           (+ @Float
+              GHC.Float.$fNumFloat
+              (+ @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+              (* @Float
+                 GHC.Float.$fNumFloat
+                 (- @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                 cosWO_a1kmC))
+           bigAsq_a1kmz)
+
+-- RHS size: {terms: 142, types: 42, coercions: 0, joins: 0/3}
+highShelfFilter :: Float -> Float -> IIRParams
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True,
+         Value=True, ConLike=True, WorkFree=True, Expandable=True,
+         Guidance=NEVER}]
+highShelfFilter
+  = \ (freq_a1kmD :: Float) (q_a1kmE :: Float) ->
+      let {
+        w0_a1kmG :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 20 0}]
+        w0_a1kmG = calcW0 freq_a1kmD } in
+      let {
+        cosWO_a1kmI :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 30 0}]
+        cosWO_a1kmI = cos @Float GHC.Float.$fFloatingFloat w0_a1kmG } in
+      let {
+        bigAsq_a1kmF :: Float
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False,
+                 Value=False, ConLike=False, WorkFree=False, Expandable=False,
+                 Guidance=IF_ARGS [] 150 0}]
+        bigAsq_a1kmF
+          = * @Float
+              GHC.Float.$fNumFloat
+              (* @Float
+                 GHC.Float.$fNumFloat
+                 (ghc-prim:GHC.Types.F# 2.0#)
+                 (sqrt @Float GHC.Float.$fFloatingFloat bigA))
+              (calcAQ w0_a1kmG q_a1kmE) } in
+      SimpleDSP.IIR.$WIIRParams
+        (* @Float
+           GHC.Float.$fNumFloat
+           bigA
+           (+ @Float
+              GHC.Float.$fNumFloat
+              (+ @Float
+                 GHC.Float.$fNumFloat
+                 (+ @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                 (* @Float
+                    GHC.Float.$fNumFloat
+                    (- @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                    cosWO_a1kmI))
+              bigAsq_a1kmF))
+        (* @Float
+           GHC.Float.$fNumFloat
+           (* @Float GHC.Float.$fNumFloat (ghc-prim:GHC.Types.F# 2.0#) bigA)
+           (+ @Float
+              GHC.Float.$fNumFloat
+              (- @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+              (* @Float
+                 GHC.Float.$fNumFloat
+                 (+ @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                 cosWO_a1kmI)))
+        (* @Float
+           GHC.Float.$fNumFloat
+           bigA
+           (- @Float
+              GHC.Float.$fNumFloat
+              (+ @Float
+                 GHC.Float.$fNumFloat
+                 (+ @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                 (* @Float
+                    GHC.Float.$fNumFloat
+                    (- @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                    cosWO_a1kmI))
+              bigAsq_a1kmF))
+        (+ @Float
+           GHC.Float.$fNumFloat
+           (- @Float
+              GHC.Float.$fNumFloat
+              (+ @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+              (* @Float
+                 GHC.Float.$fNumFloat
+                 (- @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                 cosWO_a1kmI))
+           bigAsq_a1kmF)
+        (* @Float
+           GHC.Float.$fNumFloat
+           (ghc-prim:GHC.Types.F# 2.0#)
+           (- @Float
+              GHC.Float.$fNumFloat
+              (- @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+              (* @Float
+                 GHC.Float.$fNumFloat
+                 (+ @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                 cosWO_a1kmI)))
+        (- @Float
+           GHC.Float.$fNumFloat
+           (- @Float
+              GHC.Float.$fNumFloat
+              (+ @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+              (* @Float
+                 GHC.Float.$fNumFloat
+                 (- @Float GHC.Float.$fNumFloat bigA (ghc-prim:GHC.Types.F# 1.0#))
+                 cosWO_a1kmI))
+           bigAsq_a1kmF)
+
+
