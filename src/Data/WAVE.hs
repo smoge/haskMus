@@ -127,7 +127,7 @@ sampleToDouble v =
       minb = toInteger (minBound :: WAVESample)
    in if v >= 0
         then fromInteger (toInteger v) / fromInteger maxb
-        else -fromInteger (toInteger v) / fromInteger minb
+        else - (fromInteger (toInteger v) / fromInteger minb)
 
 -- | Utility routine for working with audio data in floating
 --  point format.
