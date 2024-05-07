@@ -6,7 +6,7 @@ module Pitch.Hz
     -- * Functions
     semitoneToHz,
     hzToSemitone,
-    hzToMidi
+    hzToMidi,
   )
 where
 
@@ -60,7 +60,6 @@ semitoneToMidi = hzToMidi . semitoneToHz . unSemitone
 
 roundTo :: Int -> Double -> Double
 roundTo n f = fromInteger (round $ f * (10 ^ n)) / (10 ** fromIntegral n)
-
 
 -- Example usage with rounding: Convert Hz to MIDI and round to 2 decimal places.
 -- >>> roundHzToMidi middleCinHz

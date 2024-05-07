@@ -7,9 +7,9 @@ import Data.ByteString.Internal (toForeignPtr0)
 import Data.Vector.Storable (unsafeFromForeignPtr0)
 import Foreign (Storable (sizeOf))
 import Foreign.ForeignPtr (ForeignPtr, castForeignPtr)
-import TinyDSP.Samples
 import System.Exit (ExitCode (ExitSuccess))
 import System.Process.Typed (proc, readProcessStdout)
+import TinyDSP.Samples
 
 decodeFile :: FilePath -> IO Samples
 decodeFile fname = do
