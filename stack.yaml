@@ -1,10 +1,9 @@
-resolver: lts-22.20
+resolver: lts-22.22
 
 packages:
   - .
 
 notify-if-nix-on-path: false
-
 # ghc-options:
 #  "$locals": -prof -fprof-auto
 
@@ -16,4 +15,3 @@ notify-if-nix-on-path: false
 
 #ghc-options:
 # "$everything": -O2
-
