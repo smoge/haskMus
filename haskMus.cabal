@@ -45,6 +45,7 @@ library
         ToXML
         Util.Fraction
         Util.MathDuration
+        Util.Rand
 
     build-depends:
         , base                >=4.17 && <4.20
@@ -76,6 +77,8 @@ library
         , xml-conduit
         , xml-types
         , megaparsec
+        , random
+        , random-fu
 
     --, vector-space
     --    , rando
