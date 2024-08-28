@@ -2,8 +2,20 @@
 module Util.Rand where
 
 import qualified Data.Vector as V
-import System.Random (RandomGen, randomR, Random)
+import System.Random (RandomGen, randomR, Random, mkStdGen)
 import Data.List (foldl')
+
+
+-- | Fisher-Yates shuffle algorithm for randomly permuting a list.
+--
+-- This algorithm generates a random permutation of a finite sequence in O(n) time.
+--
+-- Example:
+--
+-- >>> let g = mkStdGen 42
+-- >>> let originalList = [1..10]
+-- >>> let (shuffledList, newGen) = shuffle originalList g
+-- >>> shuffledList
 
 shuffle :: forall g a. RandomGen g => [a] -> g -> ([a], g)
 shuffle xs g =
@@ -68,3 +80,38 @@ normalRandom mean_ stdDev_ g =
         (u2, g2) = randomR (0, 1) g1
         z0 = sqrt (- (2 * log u1)) * cos (2 * pi * u2)
     in (mean_ + stdDev_ * z0, g2)
+
+
+
+-- Basic random number generation functions
+
+-- | Generates a random number between 0 and n.
+rand :: (RandomGen g, Random n, Num n) => n -> g -> (n, g)
+rand n = randomR (0, n)
+
+-- | Generates a list of k random numbers between 0 and n.
+nrand :: (RandomGen g, Random n, Num n) => Int -> n -> g -> ([n], g)
+nrand k = kvariant k . rand
+
+-- | Generates a random number between -n and n.
+rand2 :: (RandomGen g, Random n, Num n) => n -> g -> (n, g)
+rand2 n = randomR (-n, n)
+
+-- | Generates a list of k random numbers between -n and n.
+nrand2 :: (RandomGen g, Random a, Num a) => Int -> a -> g -> ([a], g)
+nrand2 k = kvariant k . rand2
+
+-- | Generates a random number in the range [l, r].
+rrand :: (Random n, RandomGen g) => n -> n -> g -> (n, g)
+rrand = curry randomR
+
+mk_kvariant :: r -> (t -> r -> r) -> (r -> s) -> Int -> (g -> (t, g)) -> g -> (s, g)
+mk_kvariant k_nil k_join un_k k f = go k_nil k
+  where
+    go x i g
+      | i == 0 = (un_k x, g)
+      | otherwise = let (y, g') = f g in go (k_join y x) (i - 1) g'
+
+-- | Generates a list of random values.
+kvariant :: Int -> (g -> (a, g)) -> g -> ([a], g)
+kvariant = mk_kvariant [] (:) id
