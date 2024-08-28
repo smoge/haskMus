@@ -46,6 +46,7 @@ library
         Util.Fraction
         Util.MathDuration
         Util.Rand
+        Time.Pattern
 
     build-depends:
         , base                >=4.17 && <4.20
@@ -79,6 +80,7 @@ library
         , megaparsec
         , random
         , random-fu
+        , time
 
     --, vector-space
     --    , rando
