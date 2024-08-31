@@ -82,6 +82,7 @@ library
         , random-fu
         , time
         , deepseq
+        , clock
 
     --, vector-space
     --    , rando
