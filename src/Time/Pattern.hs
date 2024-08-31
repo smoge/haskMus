@@ -6,7 +6,7 @@
 module Time.Pattern where
 
 import Control.Concurrent (threadDelay)
-import Control.Monad (replicateM )
+import Control.Monad (replicateM)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Time.Clock.POSIX (getPOSIXTime)
@@ -14,7 +14,8 @@ import System.Random (StdGen, random, randomRIO, mkStdGen, randomR)
 import Data.List (scanl')
 import Data.Maybe (fromMaybe)
 
-
+import Debug.Trace (trace)
+import Control.DeepSeq (deepseq)
 
 type Time = Double
 type Duration = Double
@@ -24,7 +25,6 @@ data Event = Event
   , eDuration :: !Duration
   , eParameters :: !(Map String Double)
   } deriving (Show)
-
 
 newtype Pattern a = Pattern { runPattern :: Time -> StdGen -> (a, StdGen) }
 
@@ -41,12 +41,7 @@ getRandom f = Pattern $ \_ gen -> f gen
 pwhite :: Double -> Double -> Pattern Double
 pwhite min_ max_ = getRandom (randomR (min_, max_))
 
---pbrown :: Double -> Double -> Double -> Pattern Double
---pbrown lo hi step = Pattern $ \t gen ->
---  let (r, gen') = randomR (-step, step) gen
---      next = max lo (min hi (t + r))
---  in (next, gen')
-
+-- Brownian motion pattern.
 pbrown :: Double -> Double -> Double -> Pattern Double
 pbrown lo hi step = Pattern $ \_ gen ->
   let (r, gen') = randomR (-step, step) gen
@@ -54,11 +49,13 @@ pbrown lo hi step = Pattern $ \_ gen ->
       next = max lo (min hi (current + r))
   in (next, gen')
 
+-- Scale patterns.
 pscale :: [Double] -> Pattern Double
 pscale scale = Pattern $ \t _ ->
   let i = floor t `mod` length scale
   in (scale !! i, mkStdGen (floor t))  -- Use time as seed for reproducibility
 
+-- Bind multiple patterns into an event.
 pbind :: Map String (Pattern Double) -> Pattern Event
 pbind paramPatterns = Pattern $ \t gen ->
   let (paramValues, gen') = foldr
@@ -75,28 +72,33 @@ pbind paramPatterns = Pattern $ \t gen ->
 midiToFreq :: Double -> Double
 midiToFreq n = 440 * (2 ** ((n - 69) / 12))
 
+copyList :: [(a, b)] -> [(a, b)]
+copyList = fmap (\(x, y) -> (x, y))
 
 pchoose :: [(Double, Double)] -> Pattern Double
-pchoose weightedItems = Pattern $ \_ gen ->
-    let totalWeight = sum $ fmap snd weightedItems
-        cumWeights = scanl' (+) 0 $ fmap snd weightedItems
-        (r, gen') = randomR (0, totalWeight) gen
-        chosen = selectItem r weightedItems cumWeights
-    in (chosen, gen')
+pchoose weightedItemsOrig
+    | null weightedItemsOrig = error "pchoose: empty list of items"
+    | otherwise =
+        let weightedItems = copyList weightedItemsOrig
+        in weightedItems `deepseq` Pattern $ \_ gen ->
+            let totalWeight = sum $ fmap snd weightedItems
+                cumWeights = case scanl' (+) 0 $ fmap snd weightedItems of
+                  _ : xs -> xs
+                  [] -> error "pchoose: empty list of items"
+                (r, gen') = randomR (0, totalWeight) gen
+            in trace ("selected item with r: " <> show r) (selectItem r weightedItems cumWeights, gen')
   where
-    selectItem :: Double -> [(Double, Double)] -> [Double] -> Double
     selectItem _ [] _ = error "pchoose: empty list of items"
     selectItem r ((x, _):xs) (w:ws)
         | r <= w    = x
-        | otherwise = selectItem (r - w) xs ws
+        | otherwise = selectItem r xs ws
     selectItem _ _ _ = error "pchoose: mismatched weights"
 
--- Helper function to ensure non-zero weights
 ensureNonZeroWeights :: [(a, Double)] -> [(a, Double)]
+ensureNonZeroWeights [] = error "ensureNonZeroWeights: empty list of items"
 ensureNonZeroWeights items =
     let minWeight = 1e-6  -- A small, non-zero value
     in fmap (\(x, w) -> (x, max w minWeight)) items
-
 
 scheduleEvents :: [Event] -> IO ()
 scheduleEvents events = do
@@ -110,7 +112,6 @@ scheduleEvents events = do
       threadDelay $ floor $ delay * 1000000
       print event
 
-
 runPatternIO :: Int -> Pattern Event -> IO [Event]
 runPatternIO n p = do
   let initialGen = mkStdGen 42
@@ -120,38 +121,23 @@ runPatternIO n p = do
             nextT = t + eDuration event
         go nextT (i - 1) gen' (event : acc)
   go 0 n initialGen []
---
-
---main :: IO ()
---main = do
---    let durPattern = pwhite 0.11 1.3
---        freqPattern = fmap midiToFreq (pbrown 60 72 1)
---        ampPattern = pwhite 0.1 0.8
---        -- New weighted choice pattern for scale degrees
---        scalePattern = pchoose [(60, 0.4), (62, 0.2), (64, 0.2), (65, 0.1), (67, 0.1)]
---        myPattern = pbind $ Map.fromList
---            [ ("dur", durPattern)
---            , ("freq", fmap midiToFreq scalePattern)  -- Use weighted choice for frequency
---            , ("amp", ampPattern)
---            , ("pan", pwhite (-1) 1)
---            ]
---    events <- runPatternIO 50 myPattern
---    scheduleEvents events
-
 
 main :: IO ()
 main = do
-    let durPattern = pwhite 0.11 1.3
+    let durPattern = pwhite 0.011 0.3
         freqPattern = fmap midiToFreq (pbrown 60 72 1)
         ampPattern = pwhite 0.1 0.8
-        -- Ensure non-zero weights
-        scalePattern = pchoose $ ensureNonZeroWeights
-            [(60, 0.2), (62, 0.2), (64, 0.2), (65, 0.2), (67, 0.2)]
-        myPattern = pbind $ Map.fromList
+        rawScalePattern = [(60, 0.2), (62, 0.2), (64, 0.2), (65, 0.2), (67, 0.2)]
+        scalePattern = pchoose $ ensureNonZeroWeights rawScalePattern
+
+    trace ("rawScalePattern: " <> show rawScalePattern) $ pure ()
+
+    let myPattern = pbind $ Map.fromList
             [ ("dur", durPattern)
             , ("freq", fmap midiToFreq scalePattern)
             , ("amp", ampPattern)
             , ("pan", pwhite (-1) 1)
             ]
+
     events <- runPatternIO 50 myPattern
     scheduleEvents events
