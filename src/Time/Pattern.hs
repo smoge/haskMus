@@ -30,6 +30,11 @@ data Pattern a where
   PGeom :: Double -> Double -> Int -> Int -> Pattern Double
   PMap :: (a -> b) -> Pattern a -> Pattern b
   PBind :: Map String (Stream Double) -> Pattern Event
+  PCycle :: [Pattern a] -> Pattern a
+  PXRand :: [Stream a] -> Pattern a
+  PBrown :: Double -> Double -> Double -> Pattern Double
+  PScale :: [Double] -> Pattern Double
+  PDegrade :: Double -> Pattern a -> Pattern a
 
 class IsPattern p where
   asStream :: p a -> Stream a
@@ -76,6 +81,35 @@ instance IsPattern Pattern where
         event = Event { eTime = t, eDuration = dur, eParameters = params }
     pure (event, asStream (PBind paramStreams'))
 
+  asStream (PCycle patterns) = Stream $ \t ->
+    let loop [] = loop patterns
+        loop (p:ps) = do
+          (x, s) <- runStream (asStream p) t
+          pure (x, Stream $ \t' -> if t' == t then runStream s t' else loop ps)
+     in loop patterns
+
+  asStream (PXRand streams) = Stream $ \t -> do
+    i <- randomRIO (0, length streams - 1)
+    (x, s') <- runStream (streams !! i) t
+    let newStreams = take i streams ++ drop (i + 1) streams ++ [s']
+    pure (x, asStream (PXRand newStreams))
+
+  asStream (PBrown min_ max_ step) = Stream $ \_ -> do
+    x <- randomRIO (min_, max_)
+    let nextMin = max min_ (x - step)
+        nextMax = min max_ (x + step)
+    pure (x, asStream (PBrown nextMin nextMax step))
+
+  asStream (PScale scale) = Stream $ \t ->
+    let index = floor t `mod` length scale
+     in pure (scale !! index, asStream (PScale (drop (index + 1) scale ++ take (index + 1) scale)))
+
+  asStream (PDegrade prob p) = Stream $ \t -> do
+    r <- randomRIO (0, 1)
+    if r < prob
+      then runStream (asStream p) t
+      else pure (error "Degraded", asStream (PDegrade prob p))
+
 runParamStreams :: Map String (Stream Double) -> Time -> IO (Map String Double, Map String (Stream Double))
 runParamStreams streams t = do
   results <- mapM (\(k, s) -> do (v, s') <- runStream s t; pure ((k, v), (k, s'))) (Map.toList streams)
@@ -99,6 +133,21 @@ pmap = PMap
 
 pbind :: Map String (Pattern Double) -> Pattern Event
 pbind = PBind . Map.map asStream
+
+pcycle :: [Pattern a] -> Pattern a
+pcycle = PCycle
+
+pxrand :: [Pattern a] -> Pattern a
+pxrand patterns = PXRand (map asStream patterns)
+
+pbrown :: Double -> Double -> Double -> Pattern Double
+pbrown = PBrown
+
+pscale :: [Double] -> Pattern Double
+pscale = PScale
+
+pdegrade :: Double -> Pattern a -> Pattern a
+pdegrade = PDegrade
 
 constant :: a -> Pattern a
 constant x = pseq [PMap (const x) (PWhite 0 1)] True
@@ -136,16 +185,23 @@ scheduleEvents events = do
       threadDelay $ floor $ delay * 1000000
       print event
 
+midiToFreq :: Double -> Double
+midiToFreq n = 440 * (2 ** ((n - 69) / 12))
+
 main :: IO ()
 main = do
-  let durPattern = pwhite 0.0000001 1.5
+  let durPattern = pwhite 0.1 1.0
       freqPattern = prand [pgeom 100 1.1 15, pgeom 1000 1.1 15, pgeom 5000 1.1 15]
       ampPattern = pwhite 0.1 0.8
+      scalePattern = pscale [60, 62, 64, 65, 67, 69, 71, 72]  -- C major scale
+      degradedFreqPattern = pdegrade 0.2 freqPattern  -- 20% chance of skipping a frequency
+      brownianPattern = pbrown 60 72 1  -- Brownian motion between MIDI notes 60 and 72
 
       myPattern = pbind $ fromList
         [ ("dur", durPattern)
-        , ("freq", freqPattern)
+        , ("freq", pmap midiToFreq brownianPattern)  -- Convert MIDI notes to Hz
         , ("amp", ampPattern)
+        , ("pan", pwhite (-1) 1)  -- Add panning
         ]
 
   events <- runPattern 50 myPattern
