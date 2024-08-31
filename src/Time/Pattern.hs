@@ -6,172 +6,97 @@
 module Time.Pattern where
 
 import Control.Concurrent (threadDelay)
-import Data.Map (Map, fromList)
+import Control.Monad (replicateM )
+import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Time.Clock.POSIX (getPOSIXTime)
-import System.Random (randomRIO)
+import System.Random (StdGen, random, randomRIO, mkStdGen, randomR)
+import Data.List (scanl')
+import Data.Maybe (fromMaybe)
+
+
 
 type Time = Double
 type Duration = Double
 
 data Event = Event
-  { eTime :: Time,
-    eDuration :: Duration,
-    eParameters :: Map String Double
-  }
-  deriving (Show)
+  { eTime :: !Time
+  , eDuration :: !Duration
+  , eParameters :: !(Map String Double)
+  } deriving (Show)
 
-newtype Stream a = Stream {runStream :: Time -> IO (a, Stream a)}
 
-data Pattern a where
-  PSeq :: [Pattern a] -> Bool -> Pattern a
-  PRand :: [Stream a] -> Pattern a
-  PWhite :: Double -> Double -> Pattern Double
-  PGeom :: Double -> Double -> Int -> Int -> Pattern Double
-  PMap :: (a -> b) -> Pattern a -> Pattern b
-  PBind :: Map String (Stream Double) -> Pattern Event
-  PCycle :: [Pattern a] -> Pattern a
-  PXRand :: [Stream a] -> Pattern a
-  PBrown :: Double -> Double -> Double -> Pattern Double
-  PScale :: [Double] -> Pattern Double
-  PDegrade :: Double -> Pattern a -> Pattern a
+newtype Pattern a = Pattern { runPattern :: Time -> StdGen -> (a, StdGen) }
 
-class IsPattern p where
-  asStream :: p a -> Stream a
+instance Functor Pattern where
+  fmap f (Pattern p) = Pattern $ \t gen ->
+    let (x, gen') = p t gen
+    in (f x, gen')
 
-instance Functor Stream where
-  fmap f (Stream s) = Stream $ \t -> do
-    (x, s') <- s t
-    pure (f x, fmap f s')
+-- Helper function to get a random value
+getRandom :: (StdGen -> (a, StdGen)) -> Pattern a
+getRandom f = Pattern $ \_ gen -> f gen
 
-instance Applicative Stream where
-  pure x = Stream $ \_ -> pure (x, pure x)
-  (Stream sf) <*> (Stream sx) = Stream $ \t -> do
-    (f, sf') <- sf t
-    (x, sx') <- sx t
-    pure (f x, sf' <*> sx')
-
-instance IsPattern Pattern where
-  asStream (PSeq patterns repeat_) = Stream $ \t ->
-    let loop [] = if repeat_ then loop patterns else error "PSeq exhausted"
-        loop (p : ps) = do
-          (x, s) <- runStream (asStream p) t
-          pure (x, Stream $ \t' -> if t' == t then runStream s t' else loop ps)
-     in loop patterns
-
-  asStream (PRand streams) = Stream $ \t -> do
-    i <- randomRIO (0, length streams - 1)
-    (x, s') <- runStream (streams !! i) t
-    let newStreams = take i streams ++ [s'] ++ drop (i + 1) streams
-    pure (x, asStream (PRand newStreams))
-
-  asStream (PWhite min_ max_) = Stream $ \_ -> do
-    x <- randomRIO (min_, max_)
-    pure (x, asStream (PWhite min_ max_))
-
-  asStream (PGeom start grow len counter) = Stream $ \_ ->
-    let x = start * (grow ^ (counter `mod` len))
-     in pure (x, asStream (PGeom start grow len (counter + 1)))
-
-  asStream (PMap f p) = fmap f (asStream p)
-
-  asStream (PBind paramStreams) = Stream $ \t -> do
-    (params, paramStreams') <- runParamStreams paramStreams t
-    let dur = Map.findWithDefault 0 "dur" params
-        event = Event { eTime = t, eDuration = dur, eParameters = params }
-    pure (event, asStream (PBind paramStreams'))
-
-  asStream (PCycle patterns) = Stream $ \t ->
-    let loop [] = loop patterns
-        loop (p:ps) = do
-          (x, s) <- runStream (asStream p) t
-          pure (x, Stream $ \t' -> if t' == t then runStream s t' else loop ps)
-     in loop patterns
-
-  asStream (PXRand streams) = Stream $ \t -> do
-    i <- randomRIO (0, length streams - 1)
-    (x, s') <- runStream (streams !! i) t
-    let newStreams = take i streams ++ drop (i + 1) streams ++ [s']
-    pure (x, asStream (PXRand newStreams))
-
-  asStream (PBrown min_ max_ step) = Stream $ \_ -> do
-    x <- randomRIO (min_, max_)
-    let nextMin = max min_ (x - step)
-        nextMax = min max_ (x + step)
-    pure (x, asStream (PBrown nextMin nextMax step))
-
-  asStream (PScale scale) = Stream $ \t ->
-    let index = floor t `mod` length scale
-     in pure (scale !! index, asStream (PScale (drop (index + 1) scale ++ take (index + 1) scale)))
-
-  asStream (PDegrade prob p) = Stream $ \t -> do
-    r <- randomRIO (0, 1)
-    if r < prob
-      then runStream (asStream p) t
-      else pure (error "Degraded", asStream (PDegrade prob p))
-
-runParamStreams :: Map String (Stream Double) -> Time -> IO (Map String Double, Map String (Stream Double))
-runParamStreams streams t = do
-  results <- mapM (\(k, s) -> do (v, s') <- runStream s t; pure ((k, v), (k, s'))) (Map.toList streams)
-  let (params, streams') = unzip results
-  pure (Map.fromList params, Map.fromList streams')
-
-pseq :: [Pattern a] -> Bool -> Pattern a
-pseq = PSeq
-
-prand :: [Pattern a] -> Pattern a
-prand patterns = PRand (map asStream patterns)
-
+-- Pattern combinators
 pwhite :: Double -> Double -> Pattern Double
-pwhite = PWhite
+pwhite min_ max_ = getRandom (randomR (min_, max_))
 
-pgeom :: Double -> Double -> Int -> Pattern Double
-pgeom start grow len = PGeom start grow len 0
-
-pmap :: (a -> b) -> Pattern a -> Pattern b
-pmap = PMap
-
-pbind :: Map String (Pattern Double) -> Pattern Event
-pbind = PBind . Map.map asStream
-
-pcycle :: [Pattern a] -> Pattern a
-pcycle = PCycle
-
-pxrand :: [Pattern a] -> Pattern a
-pxrand patterns = PXRand (map asStream patterns)
+--pbrown :: Double -> Double -> Double -> Pattern Double
+--pbrown lo hi step = Pattern $ \t gen ->
+--  let (r, gen') = randomR (-step, step) gen
+--      next = max lo (min hi (t + r))
+--  in (next, gen')
 
 pbrown :: Double -> Double -> Double -> Pattern Double
-pbrown = PBrown
+pbrown lo hi step = Pattern $ \_ gen ->
+  let (r, gen') = randomR (-step, step) gen
+      current = (lo + hi) / 2  -- Start in the middle of the range
+      next = max lo (min hi (current + r))
+  in (next, gen')
 
 pscale :: [Double] -> Pattern Double
-pscale = PScale
+pscale scale = Pattern $ \t _ ->
+  let i = floor t `mod` length scale
+  in (scale !! i, mkStdGen (floor t))  -- Use time as seed for reproducibility
 
-pdegrade :: Double -> Pattern a -> Pattern a
-pdegrade = PDegrade
+pbind :: Map String (Pattern Double) -> Pattern Event
+pbind paramPatterns = Pattern $ \t gen ->
+  let (paramValues, gen') = foldr
+        (\(k, v) (acc, g) ->
+          let (val, g') = runPattern v t g
+          in ((k, val):acc, g'))
+        ([], gen)
+        (Map.toList paramPatterns)
+      params = Map.fromList paramValues
+      dur = Map.findWithDefault 0 "dur" params
+      event = Event t dur params
+  in (event, gen')
 
-constant :: a -> Pattern a
-constant x = pseq [PMap (const x) (PWhite 0 1)] True
+midiToFreq :: Double -> Double
+midiToFreq n = 440 * (2 ** ((n - 69) / 12))
 
-class RunPattern p where
-  runPattern :: Int -> p -> IO [Event]
 
-instance RunPattern (Pattern Event) where
-  runPattern steps p = go steps (asStream p) 0
-    where
-      go 0 _ _ = pure []
-      go n s t = do
-        (event@Event {eDuration = dur}, s') <- runStream s t
-        events <- go (n - 1) s' (t + dur)
-        pure (event : events)
+pchoose :: [(Double, Double)] -> Pattern Double
+pchoose weightedItems = Pattern $ \_ gen ->
+    let totalWeight = sum $ fmap snd weightedItems
+        cumWeights = scanl' (+) 0 $ fmap snd weightedItems
+        (r, gen') = randomR (0, totalWeight) gen
+        chosen = selectItem r weightedItems cumWeights
+    in (chosen, gen')
+  where
+    selectItem :: Double -> [(Double, Double)] -> [Double] -> Double
+    selectItem _ [] _ = error "pchoose: empty list of items"
+    selectItem r ((x, _):xs) (w:ws)
+        | r <= w    = x
+        | otherwise = selectItem (r - w) xs ws
+    selectItem _ _ _ = error "pchoose: mismatched weights"
 
-instance RunPattern (Pattern Double) where
-  runPattern steps p = go steps (asStream p) 0
-    where
-      go 0 _ _ = pure []
-      go n s t = do
-        (x, s') <- runStream s t
-        events <- go (n - 1) s' t
-        pure (Event t 0 (Map.singleton "value" x) : events)
+-- Helper function to ensure non-zero weights
+ensureNonZeroWeights :: [(a, Double)] -> [(a, Double)]
+ensureNonZeroWeights items =
+    let minWeight = 1e-6  -- A small, non-zero value
+    in fmap (\(x, w) -> (x, max w minWeight)) items
+
 
 scheduleEvents :: [Event] -> IO ()
 scheduleEvents events = do
@@ -185,24 +110,48 @@ scheduleEvents events = do
       threadDelay $ floor $ delay * 1000000
       print event
 
-midiToFreq :: Double -> Double
-midiToFreq n = 440 * (2 ** ((n - 69) / 12))
+
+runPatternIO :: Int -> Pattern Event -> IO [Event]
+runPatternIO n p = do
+  let initialGen = mkStdGen 42
+      go _ 0 _ acc = pure (reverse acc)
+      go t i gen acc = do
+        let (event, gen') = runPattern p t gen
+            nextT = t + eDuration event
+        go nextT (i - 1) gen' (event : acc)
+  go 0 n initialGen []
+--
+
+--main :: IO ()
+--main = do
+--    let durPattern = pwhite 0.11 1.3
+--        freqPattern = fmap midiToFreq (pbrown 60 72 1)
+--        ampPattern = pwhite 0.1 0.8
+--        -- New weighted choice pattern for scale degrees
+--        scalePattern = pchoose [(60, 0.4), (62, 0.2), (64, 0.2), (65, 0.1), (67, 0.1)]
+--        myPattern = pbind $ Map.fromList
+--            [ ("dur", durPattern)
+--            , ("freq", fmap midiToFreq scalePattern)  -- Use weighted choice for frequency
+--            , ("amp", ampPattern)
+--            , ("pan", pwhite (-1) 1)
+--            ]
+--    events <- runPatternIO 50 myPattern
+--    scheduleEvents events
+
 
 main :: IO ()
 main = do
-  let durPattern = pwhite 0.1 1.0
-      freqPattern = prand [pgeom 100 1.1 15, pgeom 1000 1.1 15, pgeom 5000 1.1 15]
-      ampPattern = pwhite 0.1 0.8
-      scalePattern = pscale [60, 62, 64, 65, 67, 69, 71, 72]  -- C major scale
-      degradedFreqPattern = pdegrade 0.2 freqPattern  -- 20% chance of skipping a frequency
-      brownianPattern = pbrown 60 72 1  -- Brownian motion between MIDI notes 60 and 72
-
-      myPattern = pbind $ fromList
-        [ ("dur", durPattern)
-        , ("freq", pmap midiToFreq brownianPattern)  -- Convert MIDI notes to Hz
-        , ("amp", ampPattern)
-        , ("pan", pwhite (-1) 1)  -- Add panning
-        ]
-
-  events <- runPattern 50 myPattern
-  scheduleEvents events
+    let durPattern = pwhite 0.11 1.3
+        freqPattern = fmap midiToFreq (pbrown 60 72 1)
+        ampPattern = pwhite 0.1 0.8
+        -- Ensure non-zero weights
+        scalePattern = pchoose $ ensureNonZeroWeights
+            [(60, 0.2), (62, 0.2), (64, 0.2), (65, 0.2), (67, 0.2)]
+        myPattern = pbind $ Map.fromList
+            [ ("dur", durPattern)
+            , ("freq", fmap midiToFreq scalePattern)
+            , ("amp", ampPattern)
+            , ("pan", pwhite (-1) 1)
+            ]
+    events <- runPatternIO 50 myPattern
+    scheduleEvents events
