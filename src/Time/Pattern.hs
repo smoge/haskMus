@@ -6,16 +6,17 @@
 module Time.Pattern where
 
 import Control.Concurrent (threadDelay)
-import Control.Monad (replicateM)
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Time.Clock.POSIX (getPOSIXTime)
-import System.Random (StdGen, random, randomRIO, mkStdGen, randomR)
-import Data.List (scanl')
-import Data.Maybe (fromMaybe)
+--import System.Random (StdGen, mkStdGen, randomR)
+--import Data.List (scanl')
+--import Data.Maybe (fromMaybe)
 import Debug.Trace (trace)
 import Control.DeepSeq (deepseq)
 import System.Clock (Clock(Monotonic), getTime, toNanoSecs)
+import Control.Monad.State
+import System.Random
+
 
 type Time = Double
 type Duration = Double
@@ -29,28 +30,77 @@ data Event = Event
 newtype Pattern a = Pattern { runPattern :: Time -> StdGen -> (a, StdGen) }
 
 instance Functor Pattern where
+  fmap :: (a -> b) -> Pattern a -> Pattern b
   fmap f (Pattern p) = Pattern $ \t gen ->
     let (x, gen') = p t gen
     in (f x, gen')
 
--- Helper functions
+instance Applicative Pattern where
+  pure x = Pattern $ \_ gen -> (x, gen)
+  Pattern pf <*> Pattern px = Pattern $ \t gen ->
+    let (f, gen')  = pf t gen
+        (x, gen'') = px t gen'
+    in (f x, gen'')
+
+-- Using Applicative 
+sumPattern :: Pattern Double -> Pattern Double -> Pattern Double
+sumPattern = liftA2 (+)
+
+productPattern :: Pattern Double -> Pattern Double -> Pattern Double
+productPattern = liftA2 (*)
+
+instance Monad Pattern where
+  return = pure
+  Pattern px >>= f = Pattern $ \t gen ->
+    let (x, gen') = px t gen
+        Pattern py = f x
+    in py t gen'
+
+-- Using Monad 
+dependentPattern :: Pattern Double -> Pattern Double
+dependentPattern p = do
+  x <- p
+  if x > 0.5
+    then pure (x * 2)
+    else pure (x / 2)
+
+
 getRandom :: (StdGen -> (a, StdGen)) -> Pattern a
 getRandom f = Pattern $ \_ gen -> f gen
 
 pwhite :: Double -> Double -> Pattern Double
 pwhite min_ max_ = getRandom (randomR (min_, max_))
 
+
+
+type BrownianState = (Double, StdGen)
+
+
+brownianStep :: Double -> Double -> Double -> State BrownianState Double
+brownianStep lo hi sqrtDeltaT = do
+  (pos, g) <- get
+  let (r, g') = randomR (-1.0, 1.0) g
+      dW = r * sqrtDeltaT
+      newPos = max lo (min hi (pos + dW))
+  put (newPos, g')
+  pure newPos
+
+
+
 pbrown :: Double -> Double -> Double -> Pattern Double
-pbrown lo hi step = Pattern $ \_ gen ->
-  let (r, gen') = randomR (-step, step) gen
-      current = (lo + hi) / 2
-      next = max lo (min hi (current + r))
-  in (next, gen')
+pbrown lo hi volatility = Pattern $ \_ gen ->
+  let initialPos = (lo + hi) / 2
+      initialState = (initialPos, gen)
+      (result, (_, newGen)) = runState (brownianStep lo hi volatility) initialState
+  in (result, newGen)
 
 pscale :: [Double] -> Pattern Double
 pscale scale = Pattern $ \t _ ->
   let i = floor t `mod` length scale
-  in (scale !! i, mkStdGen (floor t))
+      scale' = (case drop i scale of
+         x : _ -> x
+         [] -> error "pscale: empty scale")
+  in (scale', mkStdGen (floor t))
 
 pbind :: Map String (Pattern Double) -> Pattern Event
 pbind paramPatterns = Pattern $ \t gen ->
@@ -114,9 +164,10 @@ scheduleEvents events = do
       threadDelay $ floor (delay * 1000000)
       print event
 
-runPatternIO :: Int -> Pattern Event -> IO [Event]
-runPatternIO n p = do
-  let initialGen = mkStdGen 42
+
+runPatternIO :: Int -> Int -> Pattern Event -> IO [Event]
+runPatternIO seed n p = do
+  let initialGen = mkStdGen seed
       go _ 0 _ acc = pure (reverse acc)
       go t i gen acc = do
         let (event, gen') = runPattern p t gen
@@ -137,18 +188,19 @@ pexponential lambda = getRandom $ \gen ->
 main :: IO ()
 main = do
     let durPattern = fmap (* 0.5) (pexponential 9)
-        freqPattern = fmap midiToFreq (pbrown 60 72 1)
+        freqPattern = fmap (* 100) (pbrown 0 1.0 0.2)  -- fmap midiToFreq (pbrown 60 72 1)
         ampPattern = pwhite 0.1 0.8
-        rawScalePattern = normalizeSum [(60, 0.2), (62, -0.2), (64, 0.5), (65, 0.2), (67, 0.2)]
+        rawScalePattern = normalizeSum [(60, 0.2), (62, 0.2), (64, 0.5), (65, 0.2), (67, 0.2)]
         scalePattern = pchoose  rawScalePattern
 
     let myPattern = pbind $ Map.fromList
             [ ("dur", durPattern)
             , ("freq", fmap midiToFreq scalePattern)
+            , ("BROWN", freqPattern)
             , ("amp", ampPattern)
             , ("pan", pwhite (-1) 1)
             ]
 
-    events <- runPatternIO 50 myPattern
+    events <- runPatternIO 42 150 myPattern
     scheduleEvents events
-    trace ("rawScalePattern: " <> show rawScalePattern) $ pure ()
+    --trace ("rawScalePattern: " <> show rawScalePattern) $ pure ()
