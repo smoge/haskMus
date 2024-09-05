@@ -83,6 +83,11 @@ library
         , time
         , deepseq
         , clock
+        , stm 
+        --, csound-expression
+        , hosc
+        , hsc3
+        --, vivid
 
     --, vector-space
     --    , rando
@@ -179,7 +184,7 @@ executable haskMus-exe
         UnicodeSyntax
 
     ghc-options:
-        -O2 -funbox-strict-fields -fforce-recomp -Wall -Wcompat
+        -funbox-strict-fields -fforce-recomp -Wall -Wcompat
         -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns
         -Wmissing-export-lists -threaded -with-rtsopts=-N
         -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
