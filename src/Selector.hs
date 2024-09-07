@@ -114,8 +114,8 @@ wchoose (x:xs) = Just $ Weighted (x :| xs)
 wchooseWithDefault :: a -> [(Double, a)] -> IO a
 wchooseWithDefault defaultValue weights =
   case wchoose weights of
-    Just selector -> runSelector selector  
-    Nothing -> pure defaultValue        
+    Just selector -> runSelector selector
+    Nothing -> pure defaultValue
 
 ap :: Selector (a -> b) -> Selector a -> Selector b
 ap sf sx = do
@@ -126,7 +126,7 @@ markov :: String -> Selector String
 markov "A" = weighted (fromList [(0.5, "A"), (0.3, "B"), (0.2, "C")])
 markov "B" = weighted (fromList [(0.4, "A"), (0.4, "B"), (0.2, "C")])
 markov "C" = weighted (fromList [(0.1, "A"), (0.4, "B"), (0.5, "C")])
-markov _   = pure "A"  -- Default to "A" if we encounter an invalid state (for safety)
+markov _   = pure "A"  
 
 runMarkovChain :: String -> Int -> Selector [String]
 runMarkovChain start steps = replicateM steps (markov start >>= markov)
@@ -136,12 +136,12 @@ runMarkovChain' start steps transitions = replicateM steps (markov_ start >>= ma
   where
     markov_ state = case wchoose (transitions state) of
       Just selector -> selector
-      Nothing -> pure state 
+      Nothing -> pure state
 
 normalizeWeights :: [(Double, a)] -> [(Double, a)]
 normalizeWeights weights =
-  let total = sum (map fst weights)
-  in map (\(w, x) -> (w / total, x)) weights
+  let total = sum (fmap fst weights)
+  in fmap (\(w, x) -> (w / total, x)) weights
 
 
 main :: IO ()
@@ -163,3 +163,4 @@ main = do
 
   result4 <- runSelector $ runMarkovChain' 1 1000 transitions
   putStrLn $ "Markov chain result: " <> show result4
+
