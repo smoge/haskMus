@@ -47,6 +47,7 @@ library
         Util.MathDuration
         Util.Rand
         Time.Pattern
+        Selector
 
     build-depends:
         , base                >=4.17 && <4.20
@@ -88,7 +89,9 @@ library
         , hosc
         , hsc3
         --, vivid
-
+        , tf-random
+        , non-empty
+        , MonadRandom
     --, vector-space
     --    , rando
     --    , random-fu
