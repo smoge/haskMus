@@ -18,6 +18,8 @@ module Selector
   , wchooseWithDefault
   , markov
   , runMarkovChain
+  , runMarkovChain'
+  , normalizeWeights
   ) where
 
 import Data.Kind (Type)
@@ -136,6 +138,11 @@ runMarkovChain' start steps transitions = replicateM steps (markov_ start >>= ma
       Just selector -> selector
       Nothing -> pure state 
 
+normalizeWeights :: [(Double, a)] -> [(Double, a)]
+normalizeWeights weights =
+  let total = sum (map fst weights)
+  in map (\(w, x) -> (w / total, x)) weights
+
 
 main :: IO ()
 main = do
@@ -146,7 +153,7 @@ main = do
   result2 <- runSelector $ weighted (fromList [(0.3, "Red"), (0.5, "Blue"), (0.2, "Green")])
   putStrLn $ "Selected weighted item: " <> result2
 
-  result3 <- runSelector $ runMarkovChain "A" 50
+  result3 <- runSelector $ runMarkovChain "A" 100
   putStrLn $ "Markov chain result: " <> show result3
 
   let transitions :: Int -> [(Double, Int)]
@@ -154,5 +161,5 @@ main = do
       transitions 2 = [(0.4, 1), (0.4, 2), (0.2, 3)]
       transitions 3 = [(0.1, 1), (0.4, 2), (0.5, 3)]
 
-  result4 <- runSelector $ runMarkovChain' 1 10 transitions
+  result4 <- runSelector $ runMarkovChain' 1 1000 transitions
   putStrLn $ "Markov chain result: " <> show result4
