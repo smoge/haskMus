@@ -5,7 +5,7 @@
 
 module Time.Pattern where
 
-import Control.Concurrent (threadDelay)
+
 import Data.Map (Map)
 import qualified Data.Map as Map
 --import System.Random (StdGen, mkStdGen, randomR)
@@ -16,18 +16,25 @@ import Control.DeepSeq (deepseq)
 import System.Clock (Clock(Monotonic), getTime, toNanoSecs)
 import Control.Monad.State
 import System.Random
+import Sound.Sc3
+import Sound.Sc3.Server.Command
+import Sound.Osc.Fd
+--import qualified Sound.Sc3 as Sc3
+--import Sound.Sc3.Server.Command
+--import qualified Sound.Osc.Fd as Osc
+import Control.Concurrent (threadDelay, forkIO)
+import Control.Monad 
 
-
-type Time = Double
+type TimeP = Double
 type Duration = Double
 
 data Event = Event
-  { eTime :: !Time
+  { eTime :: !TimeP
   , eDuration :: !Duration
   , eParameters :: !(Map String Double)
   } deriving (Show)
 
-newtype Pattern a = Pattern { runPattern :: Time -> StdGen -> (a, StdGen) }
+newtype Pattern a = Pattern { runPattern :: TimeP -> StdGen -> (a, StdGen) }
 
 instance Functor Pattern where
   fmap :: (a -> b) -> Pattern a -> Pattern b
@@ -123,9 +130,9 @@ normalize xs = fmap (/ totalSum) xs
   where
     totalSum = sum xs
 
-normalizeSum :: [(a, Double)] -> [(a, Double)]
-normalizeSum [] = error "normalizeSum: empty list of items"
-normalizeSum xs = fmap (\(x, w) -> (x, abs w / totalSum)) xs
+normalizeSum' :: [(a, Double)] -> [(a, Double)]
+normalizeSum' [] = error "normalizeSum: empty list of items"
+normalizeSum' xs = fmap (\(x, w) -> (x, abs w / totalSum)) xs
   where
     totalSum = sum $ fmap (abs . snd) xs
 
@@ -190,7 +197,7 @@ main = do
     let durPattern = fmap (* 0.5) (pexponential 9)
         freqPattern = fmap (* 100) (pbrown 0 1.0 0.2)  -- fmap midiToFreq (pbrown 60 72 1)
         ampPattern = pwhite 0.1 0.8
-        rawScalePattern = normalizeSum [(60, 0.2), (62, 0.2), (64, 0.5), (65, 0.2), (67, 0.2)]
+        rawScalePattern = normalizeSum' [(60, 0.2), (62, 0.2), (64, 0.5), (65, 0.2), (67, 0.2)]
         scalePattern = pchoose  rawScalePattern
 
     let myPattern = pbind $ Map.fromList
@@ -204,3 +211,50 @@ main = do
     events <- runPatternIO 42 150 myPattern
     scheduleEvents events
     --trace ("rawScalePattern: " <> show rawScalePattern) $ pure ()
+
+
+simpleSynth :: Ugen
+simpleSynth = out 0 $ pan2 (sinOsc ar freq 0 * amp) pan 1
+  where
+    freq = control kr "freq" 440
+    amp = control kr "amp" 0.5
+    pan = control kr "pan" 0
+--
+--createSynthForEvent :: Event -> IO ()
+--createSynthForEvent event = withSc3 $ do
+--    let freq = Map.findWithDefault 440 "freq" (eParameters event)
+--        amp = Map.findWithDefault 0.5 "amp" (eParameters event)
+--        pan = Map.findWithDefault 0 "pan" (eParameters event)
+--        dur = eDuration event
+--
+--    -- Send synth definition to the server (if not already sent)
+--    async $ d_recv (synthdef "simple" simpleSynth)
+--
+--    -- Start the synth
+--    nodeId <- async $ s_new "simple" (-1) AddToTail 1
+--                        [("freq", freq), ("amp", amp), ("pan", pan)]
+--
+--    -- Schedule the synth to stop after its duration
+--    liftIO $ forkIO $ do
+--        threadDelay (floor (dur * 1000000))  -- Convert to microseconds
+--        withSc3 $ n_free [nodeId]
+
+-- New GrainEvent type for granular synthesis
+data GrainEvent = GrainEvent
+  { geTime :: !TimeP
+  , geDuration :: !Duration
+  , geFreq :: !Double
+  , geAmp :: !Double
+  , gePan :: !Double
+  } deriving (Show)
+
+-- Generate a cloud of grain events
+generateGrainCloud :: Int -> TimeP -> Duration -> IO [GrainEvent]
+generateGrainCloud grainCount startTime totalDuration = replicateM grainCount $ do
+  time <- randomRIO (startTime, startTime + totalDuration)
+  duration <- randomRIO (0.01, 0.1)  -- Typical grain durations
+  freq <- randomRIO (200, 2000)  -- Frequency range
+  amp <- randomRIO (0.01, 0.1)  -- Amplitude range
+  pan <- randomRIO (-1, 1)  -- Panning
+  pure $ GrainEvent time duration freq amp pan
+
