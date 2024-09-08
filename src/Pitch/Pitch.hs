@@ -7,6 +7,8 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Eta reduce" #-}
 
 module Pitch.Pitch where
 
@@ -26,6 +28,7 @@ import Pitch.Accidental
 import Data.Ratio
 import Data.List (find)
 import Data.List.Extra (enumerate)
+
 
 data NoteName = C | D | E | F | G | A | B
   deriving (Eq, Ord, Show, Enum, Bounded, Lift, Data)
@@ -48,6 +51,7 @@ data Pitch = Pitch
 
 newtype Octave = Octave {unOctave :: Int}
   deriving (Eq, Ord, Lift, Data, Enum)
+
 
 -- deriving instance Data Pitch
 
@@ -236,7 +240,11 @@ enharmonicPCEquivs' :: PitchClass -> [(Rational, PitchClass)]
 enharmonicPCEquivs' pc =
   [(v, pc') | pc' <- allPitchClasses, let v = pcToRational pc', v `mod'` 12 == pcToRational pc `mod'` 12]
 
+
+
 type EnharmonicMapping = [(Rational, [PitchClass])]
+
+-- type EnharmonicMapping = Map.Map Rational [PitchClass]
 
 enharmonicMapping :: [Rational] -> EnharmonicMapping
 enharmonicMapping = fmap (\r -> (r, fmap snd (enharmonicPCEquivs r)))
@@ -308,7 +316,7 @@ normalizeEnharmonicPitch pitch = case pitch of
   Pitch A Sharp oct -> Pitch B Flat oct
   Pitch B Sharp oct -> Pitch C Natural (octaveUp oct)
   Pitch B ThreeQuartersSharp oct -> Pitch C QuarterSharp (octaveUp oct)
-  _ -> pitch 
+  _ -> pitch
   where
     octaveDown (Octave o) = Octave (o - 1)
     octaveUp (Octave o) = Octave (o + 1)
@@ -320,10 +328,11 @@ normalizeEnharmonicPitches :: [Pitch] -> [Pitch]
 normalizeEnharmonicPitches = fmap normalizeEnharmonicPitch
 
 data Rule = Rule
-  { fromPitch :: PitchClass
-  , toPitch :: PitchClass
-  , octaveChange :: OctaveChange
+  { fromPitch :: !PitchClass
+  , toPitch :: !PitchClass
+  , octaveChange :: !OctaveChange
   } deriving (Show, Eq)
+
 
 
 data OctaveChange = NoChange | OctaveUp | OctaveDown
@@ -351,28 +360,28 @@ enharmonicRules :: [Rule]
 enharmonicRules =
   [ Rule (PitchClass C Flat)           (PitchClass B Natural)        OctaveDown
   , Rule (PitchClass C DoubleFlat)     (PitchClass B Flat)           OctaveDown
-  , Rule (PitchClass C Sharp)          (PitchClass C Sharp)          NoChange  
+  , Rule (PitchClass C Sharp)          (PitchClass C Sharp)          NoChange
   , Rule (PitchClass C DoubleSharp)    (PitchClass D Natural)        NoChange
   , Rule (PitchClass D Flat)           (PitchClass C Sharp)          NoChange
   , Rule (PitchClass D Sharp)          (PitchClass E Flat)           NoChange
   , Rule (PitchClass E Sharp)          (PitchClass F Natural)        NoChange
   , Rule (PitchClass E DoubleSharp)    (PitchClass F Sharp)          NoChange
   , Rule (PitchClass F Flat)           (PitchClass E Natural)        NoChange
-  , Rule (PitchClass F Sharp)          (PitchClass F Sharp)          NoChange  
+  , Rule (PitchClass F Sharp)          (PitchClass F Sharp)          NoChange
   , Rule (PitchClass G Flat)           (PitchClass F Sharp)          NoChange
-  , Rule (PitchClass G Sharp)          (PitchClass G Sharp)          NoChange  
+  , Rule (PitchClass G Sharp)          (PitchClass G Sharp)          NoChange
   , Rule (PitchClass A Flat)           (PitchClass G Sharp)          NoChange
   , Rule (PitchClass A Sharp)          (PitchClass B Flat)           NoChange
   , Rule (PitchClass B Sharp)          (PitchClass C Natural)        OctaveUp
   , Rule (PitchClass B DoubleSharp)    (PitchClass C Sharp)          OctaveUp
 
-  , Rule (PitchClass C QuarterSharp)   (PitchClass C QuarterSharp)   NoChange  
+  , Rule (PitchClass C QuarterSharp)   (PitchClass C QuarterSharp)   NoChange
   , Rule (PitchClass C ThreeQuartersSharp) (PitchClass D QuarterFlat) NoChange
-  , Rule (PitchClass D QuarterFlat)    (PitchClass D QuarterFlat)    NoChange  
+  , Rule (PitchClass D QuarterFlat)    (PitchClass D QuarterFlat)    NoChange
   , Rule (PitchClass D ThreeQuartersFlat)  (PitchClass C QuarterSharp) NoChange
   , Rule (PitchClass E QuarterSharp)   (PitchClass F QuarterFlat)    NoChange
-  , Rule (PitchClass F QuarterSharp)   (PitchClass F QuarterSharp)   NoChange  
-  , Rule (PitchClass G QuarterSharp)   (PitchClass G QuarterSharp)   NoChange  
+  , Rule (PitchClass F QuarterSharp)   (PitchClass F QuarterSharp)   NoChange
+  , Rule (PitchClass G QuarterSharp)   (PitchClass G QuarterSharp)   NoChange
   , Rule (PitchClass A QuarterSharp)   (PitchClass B ThreeQuartersFlat) NoChange
   , Rule (PitchClass B QuarterSharp)   (PitchClass C QuarterFlat)    OctaveUp
   ]
@@ -444,8 +453,19 @@ prettyPrintRules = mapM_ (\(Rule from_ to_ oct) ->
 
 -- >>> prettyPrintRules enharmonicRules
 
-applyRulesToPitches :: [Rule] -> [Pitch] -> [Pitch]
-applyRulesToPitches rules = fmap (applyRulesToPitch rules)
+
+
+applyRuleMap :: Functor f => RuleMap -> f Pitch -> f Pitch
+applyRuleMap ruleMap = fmap (applyRulesWithMap ruleMap)
+
+{-# INLINE applyRuleMapToPitches #-}
+applyRuleMapToPitch :: RuleMap -> Pitch -> Pitch
+applyRuleMapToPitch   = applyRulesWithMap
+
+-- Apply rules to a list of Pitches
+applyRuleMapToPitches :: RuleMap -> [Pitch] -> [Pitch]
+applyRuleMapToPitches   = applyRuleMap
+
 
 applyRulesToPitch :: [Rule] -> Pitch -> Pitch
 applyRulesToPitch rules pitch@(Pitch name acc oct) =
@@ -493,20 +513,17 @@ type RuleMap = Map.Map PitchClass Rule
 applyRulesWithMap :: RuleMap -> Pitch -> Pitch
 applyRulesWithMap ruleMap (Pitch nn acc oct) =
     case Map.lookup (PitchClass nn acc) ruleMap of
-        Just (Rule _ toPC octChange) -> 
+        Just (Rule _ toPC octChange) ->
             Pitch (toPC ^. noteName) (toPC ^. accidental) (applyOctaveChange octChange oct)
         Nothing -> Pitch nn acc oct
 
-{-# INLINE applyRuleMapToPitches #-}
-applyRuleMapToPitches :: RuleMap -> [Pitch] -> [Pitch]
-applyRuleMapToPitches = fmap . applyRulesWithMap
 
 {-# INLINE buildRuleMap #-}
 buildRuleMap :: [Rule] -> RuleMap
 buildRuleMap = Map.fromList . fmap (\r -> (fromPitch r, r))
 
 chromaticPosition :: PitchClass -> Rational
-chromaticPosition pc = (pcToRational pc) `mod'` 12
+chromaticPosition pc = pcToRational pc `mod'` 12
 
 
 inferOctaveChange :: PitchClass -> PitchClass -> OctaveChange
@@ -518,12 +535,7 @@ inferOctaveChange (PitchClass fromName _) (PitchClass toName _)
   | otherwise = NoChange
 
 
---applyRulesWithMap :: RuleMap -> Pitch -> Pitch
---applyRulesWithMap ruleMap pitch@(Pitch nn acc _) =
---  let pc_ = PitchClass nn acc
---  in case Map.lookup pc_ ruleMap of
---       Just rule -> applyRule pitch rule
---       Nothing   -> pitch
+
 
 applyRule :: Pitch -> Rule -> Pitch
 applyRule (Pitch _ _ oct) (Rule _ (PitchClass toName toAcc) octChange) =
@@ -607,22 +619,7 @@ p & octave %~ (\(Octave o) -> Octave (o + 1))  -- Increment the octave by 1
 
 -------------------------------------------------------------------------------- -}
 
--- -- !FIXME: MOVE TO TESTS
 
--- instance Arbitrary NoteName where
---   arbitrary = elements [C, D, E, F, G, A, B]
-
--- instance Arbitrary PitchClass where
---   arbitrary = PitchClass <$> arbitrary <*> arbitrary
-
--- instance Arbitrary Octave where
---   arbitrary :: Gen Octave
---   arbitrary = Octave <$> arbitrary
-
--- instance Arbitrary Pitch where
---   arbitrary = Pitch <$> arbitrary <*> arbitrary <*> arbitrary
-
--- -- PitchClass C Flat
 
 notes :: [NoteName]
 notes = [C, D, E, F, G, A, B]
@@ -681,6 +678,7 @@ instance Num Interval where
   negate (Interval a) = Interval (negate a)
   abs (Interval a) = Interval (abs a)
   signum (Interval a) = Interval (signum a)
+  fromInteger :: Integer -> Interval
   fromInteger n = Interval (fromInteger n)
 
 instance Semigroup Interval where
@@ -695,31 +693,34 @@ instance Monoid Interval where
 rationalToPitch :: Rational -> Pitch
 rationalToPitch semitones =
   let
-
     octave_ = Octave (floor (semitones / 12) - 1)
-
     semitoneInOctave = semitones `mod'` 12
-
-    (noteName_, naturalSemitone) = (case reverse (takeWhile (\(_, s) -> s <= semitoneInOctave) noteNameToRational') of
-       x : _ -> x
-       [] -> error "Pitch rationalToPitch Invalid semitone value")
-
-    accidentalValue = semitoneInOctave - naturalSemitone
-    accidental_ = case accidentalValue of
-      0 -> Natural
-      x | x > 0 && x < 0.25 -> Natural
-        | x >= 0.25 && x < 0.75 -> QuarterSharp
-        | x >= 0.75 && x < 1.25 -> Sharp
-        | x >= 1.25 && x < 1.75 -> ThreeQuartersSharp
-        | x >= 1.75 -> DoubleSharp
-        | x < 0 && x > -0.25 -> Natural
-        | x <= -0.25 && x > -0.75 -> QuarterFlat
-        | x <= -0.75 && x > -1.25 -> Flat
-        | x <= -1.25 && x > -1.75 -> ThreeQuartersFlat
-        | x <= -1.75 -> DoubleFlat
-        | otherwise -> error "Invalid accidental value"
+    (noteName_, naturalSemitone) = closestNoteName semitoneInOctave
+    accidental_ = computeAccidental (semitoneInOctave - naturalSemitone)
   in
     Pitch noteName_ accidental_ octave_
+
+closestNoteName :: Rational -> (NoteName, Rational)
+closestNoteName semitone = 
+  let noteRationals = [(C, 0), (D, 2), (E, 4), (F, 5), (G, 7), (A, 9), (B, 11)] :: [(NoteName, Rational)]
+  in fromMaybe (error "Invalid semitone value") $ find (\(_, s) -> s <= semitone) noteRationals
+
+
+-- ! check this
+computeAccidental :: Rational -> Accidental
+computeAccidental 0 = Natural
+computeAccidental x
+  | absx > (2%1) = error ("Pitch computeAccidental: Invalid accidental value: " <> show x)
+  | absx < (1%2) = Natural
+  | absx < (3%4) = selectAccidental QuarterSharp QuarterFlat
+  | absx < (5%4) = selectAccidental Sharp Flat
+  | absx < (7%4) = selectAccidental ThreeQuartersSharp ThreeQuartersFlat
+  | otherwise    = selectAccidental DoubleSharp DoubleFlat
+  where
+    absx = abs x
+    isPositive = signum x > 0
+    selectAccidental sharp flat = if isPositive then sharp else flat
+
 
 rationalToPitchClass :: Rational -> PitchClass
 rationalToPitchClass semitones =

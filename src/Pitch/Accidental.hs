@@ -15,8 +15,6 @@ import Data.String
 import Data.Text qualified as T
 import Language.Haskell.TH.Syntax (Lift, lift)
 
--- import           Text.Parsec
--- import           Text.Parsec.String (Parser)
 
 data Accidental
   = DoubleFlat
@@ -28,8 +26,17 @@ data Accidental
   | Sharp
   | ThreeQuartersSharp
   | DoubleSharp
-  | Custom Rational
-  deriving (Eq, Ord, Show, Data, Typeable)
+  | Custom { label :: String, semitoneOffset :: Rational }
+  deriving (Show, Data, Typeable)
+
+instance Eq Accidental where
+  (==) :: Accidental -> Accidental -> Bool
+  (==) a b = accidentalToSemitones a == accidentalToSemitones b
+
+instance Ord Accidental where
+  compare :: Accidental -> Accidental -> Ordering
+  compare a b = compare (accidentalToSemitones a) (accidentalToSemitones b)
+
 
 instance Lift Accidental where
   lift = \case
@@ -42,7 +49,7 @@ instance Lift Accidental where
     Sharp -> [|Sharp|]
     ThreeQuartersSharp -> [|ThreeQuartersSharp|]
     DoubleSharp -> [|DoubleSharp|]
-    Custom r -> [|Custom r|]
+    Custom s r -> [|Custom s r|]
 
 -- instance LifsemitonesToAccidental ((+ 1) $ accidentalToSemitones acc)
 
@@ -168,7 +175,7 @@ instance Num Accidental where
       GT -> Sharp
       LT -> Flat
   fromInteger n = toAccidental (n % 1)
-  negate (Custom r) = (Custom (-r))
+  negate (Custom s r) = (Custom s (-r))
   negate a = toAccidental $ negate (accidentalToSemitones a)
 
 instance Enum Accidental where
@@ -194,7 +201,7 @@ instance Enum Accidental where
     Sharp -> 6
     ThreeQuartersSharp -> 7
     DoubleSharp -> 8
-    Custom _ -> error "fromEnum: Custom accidental doesn't have a fixed enumeration"
+    Custom _ _ -> error "fromEnum: Custom accidental doesn't have a fixed enumeration"
 
   succ :: Accidental -> Accidental
   succ acc
@@ -235,7 +242,7 @@ accidental_XML_alter QuarterSharp = T.pack "0.5"
 accidental_XML_alter Sharp = T.pack "1"
 accidental_XML_alter ThreeQuartersSharp = T.pack "1.5"
 accidental_XML_alter DoubleSharp = T.pack "2"
-accidental_XML_alter (Custom _) = T.pack "0"
+accidental_XML_alter (Custom _ _) = T.pack "0"
 
 accidental_XML_accidental_value :: Accidental -> T.Text
 accidental_XML_accidental_value DoubleFlat = T.pack "sharp-sharp"
@@ -247,7 +254,7 @@ accidental_XML_accidental_value QuarterSharp = T.pack "quarter-sharp"
 accidental_XML_accidental_value Sharp = T.pack "sharp"
 accidental_XML_accidental_value ThreeQuartersSharp = T.pack "three-quarters-sharp"
 accidental_XML_accidental_value DoubleSharp = T.pack "sharp-sharp"
-accidental_XML_accidental_value (Custom _) = T.pack "other"
+accidental_XML_accidental_value (Custom _ _) = T.pack "other"
 
 -- <pitch>
 --    <step>B</step>
@@ -331,7 +338,7 @@ semitonesToAccidental r
   | r == 1 % 1 = Sharp
   | r == 3 % 2 = ThreeQuartersSharp
   | r == 2 % 1 = DoubleSharp
-  | otherwise = (Custom r)
+  | otherwise = (Custom "custom" r)
 
 -- | Converts an accidental to its corresponding LilyPond representation.
 -- map accToLily allAccidentals == map  T.pack ["ff","tqf","f","qf","","qs","s","tqs","ss"]
@@ -361,7 +368,7 @@ accToLily = \case
   Sharp -> "s"
   ThreeQuartersSharp -> "tqs"
   DoubleSharp -> "ss"
-  Custom r -> T.pack $ show r
+  Custom _ r -> T.pack $ show r
 
 instance Read Accidental where
   readsPrec _ value =
@@ -414,7 +421,7 @@ instance IsString Accidental where
   fromString "𝄳" = QuarterFlat
   fromString "𝄲" = QuarterSharp
   fromString str
-    | "custom " `isPrefixOf` str = Custom (read (drop 7 str) :: Rational)
+    | "custom " `isPrefixOf` str = Custom "custom" (read (drop 7 str) :: Rational)
     | otherwise = error $ "Invalid Accidental string: " <> str
 
 -- | Modify the accidental by applying a function to its semitone value. Returns the modified accidental.
@@ -461,7 +468,7 @@ accidentalToSemitones acc = case acc of
   Sharp -> 1
   ThreeQuartersSharp -> 3 % 2
   DoubleSharp -> 2
-  Custom x -> x
+  Custom _ x -> x
 
 addAccidental :: Accidental -> Rational -> Accidental
 addAccidental acc delta =
@@ -470,7 +477,7 @@ addAccidental acc delta =
       accidentalMap = Map.fromList [(-2, DoubleFlat), ((-3) % 2, ThreeQuartersFlat), (-1, Flat), ((-1) % 2, QuarterFlat), (0, Natural), (1 % 2, QuarterSharp), (1, Sharp), (3 % 2, ThreeQuartersSharp), (2, DoubleSharp)]
    in case Map.lookup newSemitone accidentalMap of
         Just result -> result
-        Nothing -> Custom newSemitone
+        Nothing -> Custom "" newSemitone
 
 invertAccidental :: Accidental -> Accidental
 invertAccidental = negate
