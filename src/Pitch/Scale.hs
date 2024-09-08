@@ -160,4 +160,5 @@ chromaticPitches :: [Pitch]
 chromaticPitches = scaleToPitches chromaticScale c4
 
 
--- >>> scalePitches   chromaticScale c4
+-- >>> scaleToPitches   chromaticScale c4
+-- [C Natural Octave 4,C Sharp Octave 4,D Natural Octave 4,E Flat Octave 4,E Natural Octave 4,F Natural Octave 4,F Sharp Octave 4,G Sharp Octave 4,B Flat Octave 4,B Natural Octave 4,C Natural Octave 4,C Sharp Octave 4,D Natural Octave 4]
