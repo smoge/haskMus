@@ -36,7 +36,7 @@ data PitchClass = PitchClass
   { _noteName :: !NoteName,
     _accidental :: !Accidental
   }
-  deriving (Eq, Lift, Data)
+  deriving (Eq, Lift, Data, Ord)
 
 data Pitch = Pitch
   { _noteName :: !NoteName,
@@ -280,39 +280,34 @@ preferredAccidentalList = fmap preferredAccidentalP
 
 
 normalizeEnharmonicPC :: PitchClass -> PitchClass
-normalizeEnharmonicPC pc = case pc of
+normalizeEnharmonicPC pc_ = case pc_ of
   PitchClass C Flat -> PitchClass B Natural
-  PitchClass C Sharp -> pc  -- Keep C# as is
+  PitchClass C Sharp -> pc_
   PitchClass D Flat -> PitchClass C Sharp
   PitchClass D Sharp -> PitchClass E Flat
   PitchClass E Sharp -> PitchClass F Natural
   PitchClass F Flat -> PitchClass E Natural
-  PitchClass F Sharp -> pc  -- Keep F# as is
+  PitchClass F Sharp -> pc_
   PitchClass G Flat -> PitchClass F Sharp
-  PitchClass G Sharp -> pc  -- Keep G# as is
-  PitchClass A Flat -> pc  -- Keep Ab as is
+  PitchClass G Sharp -> pc_
+  PitchClass A Flat -> pc_
   PitchClass A Sharp -> PitchClass B Flat
   PitchClass B Sharp -> PitchClass C Natural
-  _ -> pc  -- For natural notes and other cases, return the original pitch class
+  _ -> pc_
 
--- For Pitch
 normalizeEnharmonicPitch :: Pitch -> Pitch
 normalizeEnharmonicPitch pitch = case pitch of
   Pitch C Flat oct -> Pitch B Natural (octaveDown oct)
   Pitch C DoubleFlat oct -> Pitch B Flat (octaveDown oct)
-  Pitch C Sharp _ -> pitch  -- Keep C# as is
   Pitch D Flat oct -> Pitch C Sharp oct
   Pitch D Sharp oct -> Pitch E Flat oct
   Pitch E Sharp oct -> Pitch F Natural oct
   Pitch F Flat oct -> Pitch E Natural oct
-  Pitch F Sharp _ -> pitch  -- Keep F# as is
   Pitch G Flat oct -> Pitch F Sharp oct
-  Pitch G Sharp _ -> pitch  -- Keep G# as is
-  Pitch A Flat _ -> pitch  -- Keep Ab as is
   Pitch A Sharp oct -> Pitch B Flat oct
   Pitch B Sharp oct -> Pitch C Natural (octaveUp oct)
   Pitch B ThreeQuartersSharp oct -> Pitch C QuarterSharp (octaveUp oct)
-  _ -> pitch  -- For natural notes and other cases, return the original pitch
+  _ -> pitch 
   where
     octaveDown (Octave o) = Octave (o - 1)
     octaveUp (Octave o) = Octave (o + 1)
@@ -335,7 +330,7 @@ data OctaveChange = NoChange | OctaveUp | OctaveDown
 
 
 applyRules :: [Rule] -> Pitch -> Pitch
-applyRules rules pitch@(Pitch name acc oct) =
+applyRules rules pitch@(Pitch _ _ oct) =
   case find (`matchesRule` pitch) rules of
     Just (Rule _ (PitchClass toName toAcc) octChange) ->
       Pitch toName toAcc (applyOctaveChange octChange oct)
@@ -355,29 +350,28 @@ enharmonicRules :: [Rule]
 enharmonicRules =
   [ Rule (PitchClass C Flat)           (PitchClass B Natural)        OctaveDown
   , Rule (PitchClass C DoubleFlat)     (PitchClass B Flat)           OctaveDown
-  , Rule (PitchClass C Sharp)          (PitchClass C Sharp)          NoChange  -- Keep C# as is
+  , Rule (PitchClass C Sharp)          (PitchClass C Sharp)          NoChange  
   , Rule (PitchClass C DoubleSharp)    (PitchClass D Natural)        NoChange
   , Rule (PitchClass D Flat)           (PitchClass C Sharp)          NoChange
   , Rule (PitchClass D Sharp)          (PitchClass E Flat)           NoChange
   , Rule (PitchClass E Sharp)          (PitchClass F Natural)        NoChange
   , Rule (PitchClass E DoubleSharp)    (PitchClass F Sharp)          NoChange
   , Rule (PitchClass F Flat)           (PitchClass E Natural)        NoChange
-  , Rule (PitchClass F Sharp)          (PitchClass F Sharp)          NoChange  -- Keep F# as is
+  , Rule (PitchClass F Sharp)          (PitchClass F Sharp)          NoChange  
   , Rule (PitchClass G Flat)           (PitchClass F Sharp)          NoChange
-  , Rule (PitchClass G Sharp)          (PitchClass G Sharp)          NoChange  -- Keep G# as is
+  , Rule (PitchClass G Sharp)          (PitchClass G Sharp)          NoChange  
   , Rule (PitchClass A Flat)           (PitchClass G Sharp)          NoChange
   , Rule (PitchClass A Sharp)          (PitchClass B Flat)           NoChange
   , Rule (PitchClass B Sharp)          (PitchClass C Natural)        OctaveUp
   , Rule (PitchClass B DoubleSharp)    (PitchClass C Sharp)          OctaveUp
 
-  -- Quarter-tone and three-quarter-tone rules
-  , Rule (PitchClass C QuarterSharp)   (PitchClass C QuarterSharp)   NoChange  -- Keep as is
+  , Rule (PitchClass C QuarterSharp)   (PitchClass C QuarterSharp)   NoChange  
   , Rule (PitchClass C ThreeQuartersSharp) (PitchClass D QuarterFlat) NoChange
-  , Rule (PitchClass D QuarterFlat)    (PitchClass D QuarterFlat)    NoChange  -- Keep as is
+  , Rule (PitchClass D QuarterFlat)    (PitchClass D QuarterFlat)    NoChange  
   , Rule (PitchClass D ThreeQuartersFlat)  (PitchClass C QuarterSharp) NoChange
   , Rule (PitchClass E QuarterSharp)   (PitchClass F QuarterFlat)    NoChange
-  , Rule (PitchClass F QuarterSharp)   (PitchClass F QuarterSharp)   NoChange  -- Keep as is
-  , Rule (PitchClass G QuarterSharp)   (PitchClass G QuarterSharp)   NoChange  -- Keep as is
+  , Rule (PitchClass F QuarterSharp)   (PitchClass F QuarterSharp)   NoChange  
+  , Rule (PitchClass G QuarterSharp)   (PitchClass G QuarterSharp)   NoChange  
   , Rule (PitchClass A QuarterSharp)   (PitchClass B ThreeQuartersFlat) NoChange
   , Rule (PitchClass B QuarterSharp)   (PitchClass C QuarterFlat)    OctaveUp
   ]
@@ -478,6 +472,24 @@ findMatchingRule pc_ = find (\(Rule fromPC _ _) -> fromPC == pc_)
 
 -- > preferredAccidentalList $  mkPitchesFromIntervals c4 minorScaleInterval
 --[C Natural Octave 4,D Natural Octave 4,E Flat Octave 4,F Natural Octave 4,G Natural Octave 4,G Sharp Octave 4,B Flat Octave 4]
+
+
+
+type RuleMap = Map.Map PitchClass Rule
+
+buildRuleMap :: [Rule] -> RuleMap
+buildRuleMap rules = Map.fromList [(fromPitch rule, rule) | rule <- rules]
+
+applyRulesWithMap :: RuleMap -> Pitch -> Pitch
+applyRulesWithMap ruleMap pitch@(Pitch nn acc _) =
+  let pc_ = PitchClass nn acc
+  in case Map.lookup pc_ ruleMap of
+       Just rule -> applyRule pitch rule
+       Nothing   -> pitch
+
+applyRule :: Pitch -> Rule -> Pitch
+applyRule (Pitch _ _ oct) (Rule _ (PitchClass toName toAcc) octChange) =
+  Pitch toName toAcc (applyOctaveChange octChange oct)
 
 
 {- ---------------------------- playground -----------------------------------
