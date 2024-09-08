@@ -1,10 +1,26 @@
-module Pitch.Scale where
+module Pitch.Scale (
+    Interval(..),
+    Scale(..),
+    Sieve(..),
+    simpleSieve,
+    unionSieve,
+    intersectSieve,
+    complementSieve,
+    xenakisSieve,
+    generateIntervals,
+    scaleFromSieve,
+    quarterToneScale,
+    scaleToHalfTonePitches,
+    scaleToQuarterTonePitches
+    ) where
+
 
 import Data.List (intercalate)
-import Data.Ratio
+import Data.Ratio 
 import Pitch.Accidental
 import Pitch.Pitch
 import Util.Fraction
+import Data.Fixed (mod')
 
 newtype Interval = Interval {getInterval :: Rational} deriving (Eq, Ord, Num)
 
@@ -27,18 +43,14 @@ instance Show Scale where
       <> "]"
       <> maybe "" (\m -> " (Mode: " <> show m <> ")") mode
 
-majorScale :: Scale
-majorScale = Scale "Major" [Interval 2, Interval 2, Interval 1, Interval 2, Interval 2, Interval 2, Interval 1] Nothing
-
-minorScale :: Scale
-minorScale = Scale "Minor" [Interval 2, Interval 1, Interval 2, Interval 2, Interval 1, Interval 2, Interval 2] Nothing
 
 newtype Sieve = Sieve {getSieve :: Interval -> Bool}
 
 simpleSieve :: Interval -> Interval -> Sieve
 simpleSieve modulus residue = Sieve (\n -> getInterval n `modRational` getInterval modulus == getInterval residue)
   where
-    modRational x y = x - y * realToFrac (floor $ realToFrac x / realToFrac y)
+    modRational x y = x `mod'` y 
+    -- modRational x y = x - y * realToFrac (floor $ realToFrac x / realToFrac y)
 
 unionSieve :: Sieve -> Sieve -> Sieve
 unionSieve (Sieve s1) (Sieve s2) = Sieve (\n -> s1 n || s2 n)
@@ -49,11 +61,9 @@ intersectSieve (Sieve s1) (Sieve s2) = Sieve (\n -> s1 n && s2 n)
 complementSieve :: Sieve -> Sieve
 complementSieve (Sieve s) = Sieve (not . s)
 
-xenakisSieve :: Sieve
-xenakisSieve = unionSieve (simpleSieve (Interval $ 3 % 2) (Interval 0)) (intersectSieve (simpleSieve (Interval (1 % 2)) (Interval 0)) (simpleSieve (Interval (5 % 2)) (Interval 0)))
 
-xenakisSieve' :: Sieve
-xenakisSieve' =
+xenakisSieve :: Sieve
+xenakisSieve =
   unionSieve
     (simpleSieve (Interval (3 % 2)) (Interval 0))
     ( intersectSieve
@@ -116,7 +126,17 @@ modifyPitchQuarterTone f (Pitch noteName_ acc octave_) =
       newOctave = if newNoteName < noteName_ then succ octave_ else octave_
    in Pitch newNoteName newAcc newOctave
 
+
+------------------------------------------------------------------------------------------------------------------------
 -- ** Examples/Tests**
+------------------------------------------------------------------------------------------------------------------------
+
+majorScale :: Scale
+majorScale = Scale "Major" [Interval 2, Interval 2, Interval 1, Interval 2, Interval 2, Interval 2, Interval 1] Nothing
+
+minorScale :: Scale
+minorScale = Scale "Minor" [Interval 2, Interval 1, Interval 2, Interval 2, Interval 1, Interval 2, Interval 2] Nothing
+
 
 exampleScale :: Scale
 exampleScale = Scale "Example" [Interval 2, Interval 2, Interval 1, Interval 2, Interval 2, Interval 2, Interval 1] Nothing
