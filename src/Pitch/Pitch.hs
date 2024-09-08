@@ -13,15 +13,13 @@
 module Pitch.Pitch where
 
 import Control.Lens hiding (elements)
--- import Test.QuickCheck (Arbitrary (arbitrary), Gen, elements)
-
 import Control.Monad (forM)
 import Data.Char (toLower)
 import Data.Data
 import Data.Fixed (mod')
 import Data.Map.Strict qualified as Map
 import Data.Maybe (fromMaybe)
-import Data.String
+import Data.String (IsString (..))
 import Language.Haskell.TH
 import Language.Haskell.TH.Syntax
 import Pitch.Accidental
@@ -64,9 +62,6 @@ mkPitch' pc o = Pitch {_noteName = pc ^. noteName, _accidental = pc ^. accidenta
 
 data SomeNote = forall notename. (IsNoteName notename) => SomeNote notename
 
--------------------------------------------------------------------------------------
---  Type classes
--------------------------------------------------------------------------------------
 
 class NoteClass (noteName :: NoteName) where
   sayNote :: String
@@ -86,9 +81,6 @@ class HasPitchClass a where
 class HasOctave a where
   octave :: Lens' a Octave
 
--------------------------------------------------------------------------------------
--- Instances
--------------------------------------------------------------------------------------
 
 -- | Typeclass instance for retrieving the note name of a Pitch.
 instance HasNoteName Pitch where
@@ -346,10 +338,12 @@ applyRules rules pitch@(Pitch _ _ oct) =
       Pitch toName toAcc (applyOctaveChange octChange oct)
     Nothing -> pitch
 
+-- {-# INLINE matchesRule #-}
 matchesRule :: Rule -> Pitch -> Bool
 matchesRule (Rule (PitchClass fromName fromAcc) _ _) (Pitch name acc _) =
   fromName == name && fromAcc == acc
 
+-- {-# INLINE applyRulesWithMap #-}
 applyOctaveChange :: OctaveChange -> Octave -> Octave
 applyOctaveChange NoChange oct = oct
 applyOctaveChange OctaveUp (Octave o) = Octave (o + 1)
@@ -386,7 +380,7 @@ enharmonicRules =
   , Rule (PitchClass B QuarterSharp)   (PitchClass C QuarterFlat)    OctaveUp
   ]
 
--- Example usage of the rules
+
 exampleNormalization :: IO ()
 exampleNormalization = do
   let pitches = [ Pitch C Flat (Octave 4)
@@ -462,7 +456,7 @@ applyRuleMap ruleMap = fmap (applyRulesWithMap ruleMap)
 applyRuleMapToPitch :: RuleMap -> Pitch -> Pitch
 applyRuleMapToPitch   = applyRulesWithMap
 
--- Apply rules to a list of Pitches
+
 applyRuleMapToPitches :: RuleMap -> [Pitch] -> [Pitch]
 applyRuleMapToPitches   = applyRuleMap
 
@@ -476,20 +470,6 @@ applyRulesToPitch rules pitch@(Pitch name acc oct) =
 
 findMatchingRule :: PitchClass -> [Rule] -> Maybe Rule
 findMatchingRule pc_ = find (\(Rule fromPC _ _) -> fromPC == pc_)
-
-
--- Better ?
-
---
---applyRulesWithMap :: RuleMap -> Pitch -> Pitch
---applyRulesWithMap ruleMap (Pitch nn acc oct) =
---    case Map.lookup (PitchClass nn acc) ruleMap of
---        Just (Rule _ toPC octChange) -> 
---            Pitch (toPC ^. noteName) (toPC ^. accidental) (applyOctaveChange octChange oct)
---        Nothing -> Pitch nn acc oct
---
---applyRuleMapToPitches :: RuleMap -> [Pitch] -> [Pitch]
---applyRuleMapToPitches = fmap . applyRulesWithMap
 
 
 -- ! test
@@ -506,8 +486,6 @@ findMatchingRule pc_ = find (\(Rule fromPC _ _) -> fromPC == pc_)
 
 type RuleMap = Map.Map PitchClass Rule
 
---buildRuleMap :: [Rule] -> RuleMap
---buildRuleMap rules = Map.fromList [(fromPitch rule, rule) | rule <- rules]
 
 {-# INLINE applyRulesWithMap #-}
 applyRulesWithMap :: RuleMap -> Pitch -> Pitch
@@ -518,14 +496,16 @@ applyRulesWithMap ruleMap (Pitch nn acc oct) =
         Nothing -> Pitch nn acc oct
 
 
-{-# INLINE buildRuleMap #-}
+--{-# INLINE buildRuleMap #-}
 buildRuleMap :: [Rule] -> RuleMap
 buildRuleMap = Map.fromList . fmap (\r -> (fromPitch r, r))
 
+--{-# INLINE chromaticPosition #-}
 chromaticPosition :: PitchClass -> Rational
 chromaticPosition pc = pcToRational pc `mod'` 12
 
 
+--{-# INLINE inferOctaveChange #-}
 inferOctaveChange :: PitchClass -> PitchClass -> OctaveChange
 inferOctaveChange (PitchClass fromName _) (PitchClass toName _)
   | fromName == C && toName == B = OctaveDown
@@ -624,7 +604,6 @@ p & octave %~ (\(Octave o) -> Octave (o + 1))  -- Increment the octave by 1
 notes :: [NoteName]
 notes = [C, D, E, F, G, A, B]
 
--- Function to create a map of pitch names to pitch values
 createPitchMap :: [NoteName] -> Map.Map String Pitch
 createPitchMap = foldr (Map.union . createPitchesForNote) Map.empty
 
@@ -645,20 +624,11 @@ createPitchesForNote note = Map.fromList $ do
   (octaveSuffix, oct) <- [("", 4), ("'", 5), ("''", 6), ("'''", 7), ("''''", 8), ("'''''", 9), ("_", 3), ("__", 2), ("___", 1), ("____", 0), ("_____", -1)]
   pure (fmap toLower (show note) <> modifier <> octaveSuffix, Pitch note acc (Octave oct))
 
--- Create pitch map
 pitchMap :: Map.Map String Pitch
 pitchMap = createPitchMap notes
 
 concatForM :: (Monad m) => [a] -> (a -> m [b]) -> m [b]
 concatForM xs action = concat <$> forM xs action
-
-{- generatePitchVars :: [String] -> Q [Dec]
-generatePitchVars pitchNames =
-    concatForM pitchNames $ \name -> do
-        let varName = mkName name
-        let pitchVal = AppE (VarE 'fromString) (LitE (StringL name))
-        pure [SigD varName (ConT ''Pitch), ValD (VarP varName) (NormalB pitchVal) []]
- -}
 
 generatePitchVars :: [String] -> Q [Dec]
 generatePitchVars pitchNames = concatForM pitchNames $ \name -> do
@@ -706,20 +676,19 @@ closestNoteName semitone =
   in fromMaybe (error "Invalid semitone value") $ find (\(_, s) -> s <= semitone) noteRationals
 
 
--- ! check this
+
 computeAccidental :: Rational -> Accidental
-computeAccidental 0 = Natural
 computeAccidental x
-  | absx > (2%1) = error ("Pitch computeAccidental: Invalid accidental value: " <> show x)
-  | absx < (1%2) = Natural
-  | absx < (3%4) = selectAccidental QuarterSharp QuarterFlat
-  | absx < (5%4) = selectAccidental Sharp Flat
-  | absx < (7%4) = selectAccidental ThreeQuartersSharp ThreeQuartersFlat
-  | otherwise    = selectAccidental DoubleSharp DoubleFlat
+  | absx <= 2  = case absx of
+      _ | absx < 0.5  -> Natural
+        | absx < 0.75 -> selectAccidental QuarterSharp QuarterFlat
+        | absx < 1.25 -> selectAccidental Sharp Flat
+        | absx < 1.75 -> selectAccidental ThreeQuartersSharp ThreeQuartersFlat
+        | otherwise   -> selectAccidental DoubleSharp DoubleFlat
+  | otherwise  = Custom "Custom" x
   where
     absx = abs x
-    isPositive = signum x > 0
-    selectAccidental sharp flat = if isPositive then sharp else flat
+    selectAccidental sharp flat = if x > 0 then sharp else flat
 
 
 rationalToPitchClass :: Rational -> PitchClass
@@ -767,7 +736,6 @@ transposeDown = (-.)
 
 createScale :: Pitch -> [Interval] -> [Pitch]
 createScale = scanl transposeUp
--- createScale start intervals = scanl transposeUp start intervals
 
 
 data IntervalName =
@@ -924,9 +892,6 @@ neutralFourteenth = intervalFromName NeutralFourteenth
 majorFourteenth = intervalFromName MajorFourteenth
 doubleOctave = intervalFromName DoubleOctave
 
---nameFromInterval :: Interval -> Maybe IntervalName
---nameFromInterval (Interval semitones) =
---  fmap fst $ find (\(_, s) -> s == semitones) $ Map.toList intervalMap
 
 allIntervalNames :: [IntervalName]
 allIntervalNames = enumerate
