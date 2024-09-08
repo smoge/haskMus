@@ -466,24 +466,16 @@ findMatchingRule pc_ = find (\(Rule fromPC _ _) -> fromPC == pc_)
 
 -- Better ?
 
---applyRulesWithMap :: RuleMap -> Pitch -> Pitch
---applyRulesWithMap ruleMap pitch@(Pitch nn acc oct) =
---  let pc_ = PitchClass nn acc
---  in maybe pitch (\(Rule _ toPC octChange) -> Pitch (toPC ^. noteName) (toPC ^. accidental) (applyOctaveChange octChange oct)) 
---       (Map.lookup pc_ ruleMap)
---
---
---applyRuleMapToPitches :: RuleMap -> [Pitch] -> [Pitch]
---applyRuleMapToPitches ruleMap ps = applyRulesWithMap ruleMap <$> ps
 
 applyRulesWithMap :: RuleMap -> Pitch -> Pitch
-applyRulesWithMap ruleMap pitch@(Pitch nn acc oct) =
-  maybe pitch (\(Rule _ toPC octChange) -> Pitch (toPC ^. noteName) (toPC ^. accidental) (applyOctaveChange octChange oct))
-        (Map.lookup (PitchClass nn acc) ruleMap)
+applyRulesWithMap ruleMap (Pitch nn acc oct) =
+    case Map.lookup (PitchClass nn acc) ruleMap of
+        Just (Rule _ toPC octChange) -> 
+            Pitch (toPC ^. noteName) (toPC ^. accidental) (applyOctaveChange octChange oct)
+        Nothing -> Pitch nn acc oct
 
 applyRuleMapToPitches :: RuleMap -> [Pitch] -> [Pitch]
 applyRuleMapToPitches = fmap . applyRulesWithMap
-
 
 
 -- ! test
@@ -513,6 +505,7 @@ buildRuleMap rules = Map.fromList [(fromPitch rule, rule) | rule <- rules]
 applyRule :: Pitch -> Rule -> Pitch
 applyRule (Pitch _ _ oct) (Rule _ (PitchClass toName toAcc) octChange) =
   Pitch toName toAcc (applyOctaveChange octChange oct)
+
 
 
 {- ---------------------------- playground -----------------------------------
