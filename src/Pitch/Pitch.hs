@@ -6,6 +6,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -Wno-name-shadowing #-}
 
 module Pitch.Pitch where
 
@@ -16,7 +17,7 @@ import Control.Monad (forM)
 import Data.Char (toLower)
 import Data.Data
 import Data.Fixed (mod')
-import Data.Map qualified as Map
+import Data.Map.Strict qualified as Map
 import Data.Maybe (fromMaybe)
 import Data.String
 import Language.Haskell.TH
@@ -415,28 +416,21 @@ enharmonicRules2 :: [Rule]
 enharmonicRules2 =
   [ pc C Flat           -:> pc B Natural
   , pc C DoubleFlat     -:> pc B Flat
-  , keep (pc C Sharp)
   , pc C DoubleSharp    =:> pc D Natural
   , pc D Flat           =:> pc C Sharp
   , pc D Sharp          =:> pc E Flat
   , pc E Sharp          =:> pc F Natural
   , pc E DoubleSharp    =:> pc F Sharp
   , pc F Flat           =:> pc E Natural
-  , keep (pc F Sharp)
   , pc G Flat           =:> pc F Sharp
-  , keep (pc G Sharp)
   , pc A Flat           =:> pc G Sharp
   , pc A Sharp          =:> pc B Flat
   , pc B Sharp          +:> pc C Natural
   , pc B DoubleSharp    +:> pc C Sharp
 
-  , keep (pc C QuarterSharp)
   , pc C ThreeQuartersSharp =:> pc D QuarterFlat
-  , keep (pc D QuarterFlat)
   , pc D ThreeQuartersFlat  =:> pc C QuarterSharp
   , pc E QuarterSharp       =:> pc F QuarterFlat
-  , keep (pc F QuarterSharp)
-  , keep (pc G QuarterSharp)
   ]
 
 prettyPrintRules :: [Rule] -> IO ()
@@ -466,16 +460,16 @@ findMatchingRule pc_ = find (\(Rule fromPC _ _) -> fromPC == pc_)
 
 -- Better ?
 
-
-applyRulesWithMap :: RuleMap -> Pitch -> Pitch
-applyRulesWithMap ruleMap (Pitch nn acc oct) =
-    case Map.lookup (PitchClass nn acc) ruleMap of
-        Just (Rule _ toPC octChange) -> 
-            Pitch (toPC ^. noteName) (toPC ^. accidental) (applyOctaveChange octChange oct)
-        Nothing -> Pitch nn acc oct
-
-applyRuleMapToPitches :: RuleMap -> [Pitch] -> [Pitch]
-applyRuleMapToPitches = fmap . applyRulesWithMap
+--
+--applyRulesWithMap :: RuleMap -> Pitch -> Pitch
+--applyRulesWithMap ruleMap (Pitch nn acc oct) =
+--    case Map.lookup (PitchClass nn acc) ruleMap of
+--        Just (Rule _ toPC octChange) -> 
+--            Pitch (toPC ^. noteName) (toPC ^. accidental) (applyOctaveChange octChange oct)
+--        Nothing -> Pitch nn acc oct
+--
+--applyRuleMapToPitches :: RuleMap -> [Pitch] -> [Pitch]
+--applyRuleMapToPitches = fmap . applyRulesWithMap
 
 
 -- ! test
@@ -492,8 +486,37 @@ applyRuleMapToPitches = fmap . applyRulesWithMap
 
 type RuleMap = Map.Map PitchClass Rule
 
+--buildRuleMap :: [Rule] -> RuleMap
+--buildRuleMap rules = Map.fromList [(fromPitch rule, rule) | rule <- rules]
+
+{-# INLINE applyRulesWithMap #-}
+applyRulesWithMap :: RuleMap -> Pitch -> Pitch
+applyRulesWithMap ruleMap (Pitch nn acc oct) =
+    case Map.lookup (PitchClass nn acc) ruleMap of
+        Just (Rule _ toPC octChange) -> 
+            Pitch (toPC ^. noteName) (toPC ^. accidental) (applyOctaveChange octChange oct)
+        Nothing -> Pitch nn acc oct
+
+{-# INLINE applyRuleMapToPitches #-}
+applyRuleMapToPitches :: RuleMap -> [Pitch] -> [Pitch]
+applyRuleMapToPitches = fmap . applyRulesWithMap
+
+{-# INLINE buildRuleMap #-}
 buildRuleMap :: [Rule] -> RuleMap
-buildRuleMap rules = Map.fromList [(fromPitch rule, rule) | rule <- rules]
+buildRuleMap = Map.fromList . fmap (\r -> (fromPitch r, r))
+
+chromaticPosition :: PitchClass -> Rational
+chromaticPosition pc = (pcToRational pc) `mod'` 12
+
+
+inferOctaveChange :: PitchClass -> PitchClass -> OctaveChange
+inferOctaveChange (PitchClass fromName _) (PitchClass toName _)
+  | fromName == C && toName == B = OctaveDown
+  | fromName == D && toName == B = OctaveDown
+  | fromName == B && toName == C = OctaveUp
+  | fromName == A && toName == C = OctaveUp
+  | otherwise = NoChange
+
 
 --applyRulesWithMap :: RuleMap -> Pitch -> Pitch
 --applyRulesWithMap ruleMap pitch@(Pitch nn acc _) =
