@@ -38,6 +38,7 @@ data Selector :: Type -> Type where
   Sequence :: Selector a -> (a -> Selector b) -> Selector b
 
 instance Functor Selector where
+  fmap :: (a -> b) -> Selector a -> Selector b
   fmap f (Pure x)     = Pure (f x)
   fmap f (Element xs) = Element (fmap f xs)
   fmap f Boolean      = Sequence Boolean (Pure . f)
@@ -45,10 +46,13 @@ instance Functor Selector where
   fmap f (Sequence m k) = Sequence m (fmap f . k)
 
 instance Applicative Selector where
+  pure :: a -> Selector a
   pure = Pure
+  (<*>) :: Selector (a -> b) -> Selector a -> Selector b
   (<*>) = ap
 
 instance Monad Selector where
+  (>>=) :: Selector a -> (a -> Selector b) -> Selector b
   (>>=) = Sequence
 
 runSelectorWithGen :: TFGen -> Selector a -> a
