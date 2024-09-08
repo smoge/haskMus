@@ -80,7 +80,10 @@ scaleFromSieve name sieve step range =
 quarterToneScale :: Scale
 quarterToneScale = scaleFromSieve "QuarterTone" xenakisSieve (Interval (1 % 2)) (Interval 12)
 
--- quarterToneScale
+-- >>> quarterToneScale
+-- QuarterTone [0 % 1,3 % 2,5 % 2,3 % 1,9 % 2,5 % 1,6 % 1,15 % 2,9 % 1,10 % 1,21 % 2,12 % 1]
+
+
 
 scaleToHalfTonePitches :: Scale -> Pitch -> [Pitch]
 scaleToHalfTonePitches (Scale _ intervals _) rootPitch =
@@ -88,23 +91,24 @@ scaleToHalfTonePitches (Scale _ intervals _) rootPitch =
   where
     addInterval :: Pitch -> Interval -> Pitch
     addInterval pitch (Interval interval) =
-      let semitoneSteps = realToFrac interval * 2 -- Convert fractional steps to semitones
-       in case drop (round semitoneSteps) (iterate (modifyPitch succ) pitch) of
-            x : _ -> x
-            [] -> error "scaleToHalfTonePitches error"
+      let semitoneSteps = realToFrac interval
+       in iteratePitch pitch semitoneSteps
 
+    iteratePitch :: Pitch -> Double -> Pitch
+    iteratePitch pitch steps
+      | steps >= 1 = iteratePitch (modifyPitch succ pitch) (steps - 1)
+      | otherwise = pitch
 
 modifyPitch :: (Accidental -> Accidental) -> Pitch -> Pitch
 modifyPitch f (Pitch noteName_ acc o) =
   let (quotient, remainder) = splitFraction $ accidentalToSemitones (f acc)
-      -- Only change note name if necessary based on the quotient of semitones
+      --  change note name based on quotient
       newNoteName = if quotient > 0
                       then case noteName_ of
-                             B -> C -- Wrap from B to C if crossing the boundary
+                             B -> C 
                              _ -> succ noteName_
-                      else noteName_ -- Stay on the same note if quotient is 0 or negative
+                      else noteName_ 
       newAcc = semitonesToAccidental remainder
-      -- Adjust octave if we cross from B to C
       newOctave = if noteName_ == B && quotient > 0 then succ o else o
    in Pitch newNoteName newAcc newOctave
 
@@ -114,35 +118,42 @@ scaleToQuarterTonePitches (Scale _ intervals _) rootPitch =
   where
     addQuarterToneInterval :: Pitch -> Interval -> Pitch
     addQuarterToneInterval pitch (Interval interval) =
-      let quarterTones = realToFrac interval * 4 -- Convert interval to quarter-tone steps
-       in case drop (round quarterTones) (iterate (modifyPitchQuarterTone succ) pitch) of
-            x : _ -> x
-            [] -> error "scaleToQuarterTonePitches error"
+      let quarterToneSteps = realToFrac interval * 4 
+       in iterateQuarterTone pitch quarterToneSteps
 
+    iterateQuarterTone :: Pitch -> Double -> Pitch
+    iterateQuarterTone pitch steps
+      | steps >= 1 = iterateQuarterTone (modifyPitchQuarterTone succ pitch) (steps - 1)  
+      | steps > 0  = modifyPitchQuarterTone (\acc -> addQuarterTone acc steps) pitch     
+      | otherwise  = pitch
+
+    addQuarterTone :: Accidental -> Double -> Accidental
+    addQuarterTone acc steps
+      | steps == 0.5 = addAccidental acc (1 % 2)  
 
 modifyPitchQuarterTone :: (Accidental -> Accidental) -> Pitch -> Pitch
 modifyPitchQuarterTone f (Pitch noteName_ acc octave_) =
   let (semitonesCrossed, remainder) = splitFraction $ accidentalToSemitones (f acc) / 2
-      -- Adjust the note name based on the number of semitones crossed
+
       newNoteName = case noteName_ of
-                      B | semitonesCrossed > 0 -> C  -- Wrap from B to C
+                      B | semitonesCrossed > 0 -> C  
                       _ -> iterate succ noteName_ !! fromInteger semitonesCrossed
-      -- Increment octave if crossing from B to C
+   
       newOctave = if noteName_ == B && semitonesCrossed > 0 then succ octave_ else octave_
-      -- Apply enharmonic preferences
+      
       (finalNoteName, newAcc) = preferredEnharmonic newNoteName (semitonesToAccidental (remainder * 2))
    in Pitch finalNoteName newAcc newOctave
 
-      
-preferredEnharmonic :: NoteName -> Accidental -> (NoteName, Accidental)
-preferredEnharmonic A Sharp  = (B, Flat)   
-preferredEnharmonic G Flat   = (F, Sharp)   
-preferredEnharmonic E Sharp  = (F, Natural) 
-preferredEnharmonic B Sharp  = (C, Natural) 
-preferredEnharmonic G ThreeQuartersSharp = (A, QuarterSharp) 
-preferredEnharmonic D Sharp  = (E, Flat)    -- Prefer Eb over D# etc
-preferredEnharmonic note acc = (note, acc)  -- Default: Keep the note and accidental unchanged
 
+preferredEnharmonic :: NoteName -> Accidental -> (NoteName, Accidental)
+preferredEnharmonic A Sharp  = (B, Flat)
+preferredEnharmonic G Flat   = (F, Sharp)
+preferredEnharmonic E Sharp  = (F, Natural)
+preferredEnharmonic B Sharp  = (C, Natural)
+preferredEnharmonic G ThreeQuartersSharp = (A, QuarterSharp)
+preferredEnharmonic F ThreeQuartersSharp = (G, QuarterSharp)
+preferredEnharmonic D Sharp  = (E, Flat)
+preferredEnharmonic note acc = (note, acc)
 
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -172,12 +183,14 @@ quarterTonePitches :: [Pitch]
 quarterTonePitches = scaleToQuarterTonePitches exampleQuarterToneScale c4
 
 chromaticScale :: Scale
-chromaticScale = Scale "Chromatic" (Interval <$> replicate 12 (1%1)) Nothing
+chromaticScale = Scale "Chromatic" (Interval <$> replicate 12 (1/2)) Nothing
 
 chromaticPitches :: [Pitch]
-chromaticPitches = scaleToHalfTonePitches chromaticScale c4
--- [C Natural Octave 4,D Natural Octave 4,E Natural Octave 4,F Natural Octave 4,G Natural Octave 4,A Natural Octave 4,B Natural Octave 4,C Natural Octave 5,D Natural Octave 5,E Natural Octave 5,F Natural Octave 5,G Natural Octave 5,A Natural Octave 5]
+chromaticPitches = scaleToQuarterTonePitches chromaticScale c4
 
 
--- > scaleToQuarterTonePitches exampleQuarterToneScale c4
--- [C Natural Octave 4,C Sharp Octave 4,D Sharp Octave 4,E QuarterSharp Octave 4,F Sharp Octave 4,G Sharp Octave 4,A QuarterSharp Octave 4,B Natural Octave 4]
+-- >>> scaleToQuarterTonePitches   chromaticScale c4
+-- [C Natural Octave 4,C Sharp Octave 4,D Natural Octave 4,E Flat Octave 4,E Natural Octave 4,F Natural Octave 4,F Sharp Octave 4,G Sharp Octave 4,B Flat Octave 4,B Natural Octave 4,C Natural Octave 4,C Sharp Octave 4,D Natural Octave 4]
+
+-- >>> scaleToHalfTonePitches   chromaticScale c4
+-- [C Natural Octave 4,C Natural Octave 4,C Natural Octave 4,C Natural Octave 4,C Natural Octave 4,C Natural Octave 4,C Natural Octave 4,C Natural Octave 4,C Natural Octave 4,C Natural Octave 4,C Natural Octave 4,C Natural Octave 4,C Natural Octave 4]
