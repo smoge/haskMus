@@ -43,7 +43,7 @@ data Pitch = Pitch
   deriving (Eq, Lift, Data)
 
 newtype Octave = Octave {unOctave :: Int}
-  deriving (Eq, Ord, Lift, Data)
+  deriving (Eq, Ord, Lift, Data, Enum)
 
 -- deriving instance Data Pitch
 
