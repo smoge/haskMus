@@ -463,6 +463,29 @@ applyRulesToPitch rules pitch@(Pitch name acc oct) =
 findMatchingRule :: PitchClass -> [Rule] -> Maybe Rule
 findMatchingRule pc_ = find (\(Rule fromPC _ _) -> fromPC == pc_)
 
+
+-- Better ?
+
+--applyRulesWithMap :: RuleMap -> Pitch -> Pitch
+--applyRulesWithMap ruleMap pitch@(Pitch nn acc oct) =
+--  let pc_ = PitchClass nn acc
+--  in maybe pitch (\(Rule _ toPC octChange) -> Pitch (toPC ^. noteName) (toPC ^. accidental) (applyOctaveChange octChange oct)) 
+--       (Map.lookup pc_ ruleMap)
+--
+--
+--applyRuleMapToPitches :: RuleMap -> [Pitch] -> [Pitch]
+--applyRuleMapToPitches ruleMap ps = applyRulesWithMap ruleMap <$> ps
+
+applyRulesWithMap :: RuleMap -> Pitch -> Pitch
+applyRulesWithMap ruleMap pitch@(Pitch nn acc oct) =
+  maybe pitch (\(Rule _ toPC octChange) -> Pitch (toPC ^. noteName) (toPC ^. accidental) (applyOctaveChange octChange oct))
+        (Map.lookup (PitchClass nn acc) ruleMap)
+
+applyRuleMapToPitches :: RuleMap -> [Pitch] -> [Pitch]
+applyRuleMapToPitches = fmap . applyRulesWithMap
+
+
+
 -- ! test
 -- >applyRulesToPitches enharmonicRules2 ( mkPitchesFromIntervals c4 minorScaleInterval)
 -- [C Natural Octave 4,D Natural Octave 4,E Flat Octave 4,F Natural Octave 4,G Natural Octave 4,G Sharp Octave 4,B Flat Octave 4]
@@ -480,12 +503,12 @@ type RuleMap = Map.Map PitchClass Rule
 buildRuleMap :: [Rule] -> RuleMap
 buildRuleMap rules = Map.fromList [(fromPitch rule, rule) | rule <- rules]
 
-applyRulesWithMap :: RuleMap -> Pitch -> Pitch
-applyRulesWithMap ruleMap pitch@(Pitch nn acc _) =
-  let pc_ = PitchClass nn acc
-  in case Map.lookup pc_ ruleMap of
-       Just rule -> applyRule pitch rule
-       Nothing   -> pitch
+--applyRulesWithMap :: RuleMap -> Pitch -> Pitch
+--applyRulesWithMap ruleMap pitch@(Pitch nn acc _) =
+--  let pc_ = PitchClass nn acc
+--  in case Map.lookup pc_ ruleMap of
+--       Just rule -> applyRule pitch rule
+--       Nothing   -> pitch
 
 applyRule :: Pitch -> Rule -> Pitch
 applyRule (Pitch _ _ oct) (Rule _ (PitchClass toName toAcc) octChange) =
