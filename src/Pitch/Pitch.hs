@@ -362,7 +362,7 @@ createPitchesForNote note = Map.fromList $ do
         DoubleFlat -> "eses"
         DoubleSharp -> "isis"
         _ -> ""
-  (octaveSuffix, oct) <- [("", 4), ("'", 5), ("''", 6), ("'''", 7), ("_", 3), ("__", 2), ("___", 1)]
+  (octaveSuffix, oct) <- [("", 4), ("'", 5), ("''", 6), ("'''", 7), ("''''", 8), ("'''''", 9), ("_", 3), ("__", 2), ("___", 1), ("____", 0), ("_____", -1)]
   pure (fmap toLower (show note) <> modifier <> octaveSuffix, Pitch note acc (Octave oct))
 
 -- Create pitch map

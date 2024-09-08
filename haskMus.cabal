@@ -30,6 +30,7 @@ library
         Pitch.Parser
         Pitch.Pitch
         Pitch.QuasiQuoter
+        Pitch.Scale
         Rtm.Common
         Rtm.Parser
         Rtm.QuasiQuoter
