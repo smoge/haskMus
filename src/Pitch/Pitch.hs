@@ -263,20 +263,218 @@ preferedAccidentalPC pc
   | otherwise                 = pc
 
 preferredAccidentalP :: Pitch -> Pitch
-preferredAccidentalP pitch@(Pitch nm acc octave@(Octave o))
-  | pitch == Pitch C Flat octave   = Pitch B Natural (Octave ( o - 1))
-  | pitch == Pitch D Flat octave   = Pitch C Sharp octave
-  | pitch == Pitch D Sharp octave  = Pitch E Flat octave
-  | pitch == Pitch F Flat octave   = Pitch E Natural octave
-  | pitch == Pitch G Flat octave   = Pitch F Sharp octave
-  | pitch == Pitch A Sharp octave  = Pitch B Flat octave
-  | pitch == Pitch B Sharp octave  = Pitch C Natural (Octave ( o + 1))
+preferredAccidentalP pitch@(Pitch _ _ oct@(Octave o))
+  | pitch == Pitch C Flat oct   = Pitch B Natural (Octave ( o - 1))
+  | pitch == Pitch D Flat oct   = Pitch C Sharp oct
+  | pitch == Pitch D Sharp oct  = Pitch E Flat oct
+  | pitch == Pitch F Flat oct   = Pitch E Natural oct
+  | pitch == Pitch G Flat oct   = Pitch F Sharp oct
+  | pitch == Pitch A Sharp oct  = Pitch B Flat oct
+  | pitch == Pitch B Sharp oct  = Pitch C Natural (Octave ( o + 1))
   | otherwise                      = pitch
 
 
 preferredAccidentalList :: [Pitch] -> [Pitch]
 preferredAccidentalList = fmap preferredAccidentalP
 
+
+
+normalizeEnharmonicPC :: PitchClass -> PitchClass
+normalizeEnharmonicPC pc = case pc of
+  PitchClass C Flat -> PitchClass B Natural
+  PitchClass C Sharp -> pc  -- Keep C# as is
+  PitchClass D Flat -> PitchClass C Sharp
+  PitchClass D Sharp -> PitchClass E Flat
+  PitchClass E Sharp -> PitchClass F Natural
+  PitchClass F Flat -> PitchClass E Natural
+  PitchClass F Sharp -> pc  -- Keep F# as is
+  PitchClass G Flat -> PitchClass F Sharp
+  PitchClass G Sharp -> pc  -- Keep G# as is
+  PitchClass A Flat -> pc  -- Keep Ab as is
+  PitchClass A Sharp -> PitchClass B Flat
+  PitchClass B Sharp -> PitchClass C Natural
+  _ -> pc  -- For natural notes and other cases, return the original pitch class
+
+-- For Pitch
+normalizeEnharmonicPitch :: Pitch -> Pitch
+normalizeEnharmonicPitch pitch = case pitch of
+  Pitch C Flat oct -> Pitch B Natural (octaveDown oct)
+  Pitch C DoubleFlat oct -> Pitch B Flat (octaveDown oct)
+  Pitch C Sharp _ -> pitch  -- Keep C# as is
+  Pitch D Flat oct -> Pitch C Sharp oct
+  Pitch D Sharp oct -> Pitch E Flat oct
+  Pitch E Sharp oct -> Pitch F Natural oct
+  Pitch F Flat oct -> Pitch E Natural oct
+  Pitch F Sharp _ -> pitch  -- Keep F# as is
+  Pitch G Flat oct -> Pitch F Sharp oct
+  Pitch G Sharp _ -> pitch  -- Keep G# as is
+  Pitch A Flat _ -> pitch  -- Keep Ab as is
+  Pitch A Sharp oct -> Pitch B Flat oct
+  Pitch B Sharp oct -> Pitch C Natural (octaveUp oct)
+  Pitch B ThreeQuartersSharp oct -> Pitch C QuarterSharp (octaveUp oct)
+  _ -> pitch  -- For natural notes and other cases, return the original pitch
+  where
+    octaveDown (Octave o) = Octave (o - 1)
+    octaveUp (Octave o) = Octave (o + 1)
+
+normalizeEnharmonicPCs :: [PitchClass] -> [PitchClass]
+normalizeEnharmonicPCs = fmap normalizeEnharmonicPC
+
+normalizeEnharmonicPitches :: [Pitch] -> [Pitch]
+normalizeEnharmonicPitches = fmap normalizeEnharmonicPitch
+
+data Rule = Rule
+  { fromPitch :: PitchClass
+  , toPitch :: PitchClass
+  , octaveChange :: OctaveChange
+  } deriving (Show, Eq)
+
+
+data OctaveChange = NoChange | OctaveUp | OctaveDown
+  deriving (Show, Eq)
+
+
+applyRules :: [Rule] -> Pitch -> Pitch
+applyRules rules pitch@(Pitch name acc oct) =
+  case find (`matchesRule` pitch) rules of
+    Just (Rule _ (PitchClass toName toAcc) octChange) ->
+      Pitch toName toAcc (applyOctaveChange octChange oct)
+    Nothing -> pitch
+
+matchesRule :: Rule -> Pitch -> Bool
+matchesRule (Rule (PitchClass fromName fromAcc) _ _) (Pitch name acc _) =
+  fromName == name && fromAcc == acc
+
+applyOctaveChange :: OctaveChange -> Octave -> Octave
+applyOctaveChange NoChange oct = oct
+applyOctaveChange OctaveUp (Octave o) = Octave (o + 1)
+applyOctaveChange OctaveDown (Octave o) = Octave (o - 1)
+
+
+enharmonicRules :: [Rule]
+enharmonicRules =
+  [ Rule (PitchClass C Flat)           (PitchClass B Natural)        OctaveDown
+  , Rule (PitchClass C DoubleFlat)     (PitchClass B Flat)           OctaveDown
+  , Rule (PitchClass C Sharp)          (PitchClass C Sharp)          NoChange  -- Keep C# as is
+  , Rule (PitchClass C DoubleSharp)    (PitchClass D Natural)        NoChange
+  , Rule (PitchClass D Flat)           (PitchClass C Sharp)          NoChange
+  , Rule (PitchClass D Sharp)          (PitchClass E Flat)           NoChange
+  , Rule (PitchClass E Sharp)          (PitchClass F Natural)        NoChange
+  , Rule (PitchClass E DoubleSharp)    (PitchClass F Sharp)          NoChange
+  , Rule (PitchClass F Flat)           (PitchClass E Natural)        NoChange
+  , Rule (PitchClass F Sharp)          (PitchClass F Sharp)          NoChange  -- Keep F# as is
+  , Rule (PitchClass G Flat)           (PitchClass F Sharp)          NoChange
+  , Rule (PitchClass G Sharp)          (PitchClass G Sharp)          NoChange  -- Keep G# as is
+  , Rule (PitchClass A Flat)           (PitchClass G Sharp)          NoChange
+  , Rule (PitchClass A Sharp)          (PitchClass B Flat)           NoChange
+  , Rule (PitchClass B Sharp)          (PitchClass C Natural)        OctaveUp
+  , Rule (PitchClass B DoubleSharp)    (PitchClass C Sharp)          OctaveUp
+
+  -- Quarter-tone and three-quarter-tone rules
+  , Rule (PitchClass C QuarterSharp)   (PitchClass C QuarterSharp)   NoChange  -- Keep as is
+  , Rule (PitchClass C ThreeQuartersSharp) (PitchClass D QuarterFlat) NoChange
+  , Rule (PitchClass D QuarterFlat)    (PitchClass D QuarterFlat)    NoChange  -- Keep as is
+  , Rule (PitchClass D ThreeQuartersFlat)  (PitchClass C QuarterSharp) NoChange
+  , Rule (PitchClass E QuarterSharp)   (PitchClass F QuarterFlat)    NoChange
+  , Rule (PitchClass F QuarterSharp)   (PitchClass F QuarterSharp)   NoChange  -- Keep as is
+  , Rule (PitchClass G QuarterSharp)   (PitchClass G QuarterSharp)   NoChange  -- Keep as is
+  , Rule (PitchClass A QuarterSharp)   (PitchClass B ThreeQuartersFlat) NoChange
+  , Rule (PitchClass B QuarterSharp)   (PitchClass C QuarterFlat)    OctaveUp
+  ]
+
+-- Example usage of the rules
+exampleNormalization :: IO ()
+exampleNormalization = do
+  let pitches = [ Pitch C Flat (Octave 4)
+                , Pitch D Sharp (Octave 4)
+                , Pitch F Natural (Octave 4)
+                , Pitch B Sharp (Octave 3)
+                , Pitch C ThreeQuartersSharp (Octave 4)
+                , Pitch E QuarterSharp (Octave 5)
+                , Pitch G DoubleSharp (Octave 3)
+                ] :: [Pitch]
+  mapM_ (\p -> do
+    putStrLn $ "Original: " <> show p
+    putStrLn $ "Normalized: " <> show (applyRules enharmonicRules p)
+    putStrLn "") pitches
+
+
+
+pc :: NoteName -> Accidental -> PitchClass
+pc = PitchClass
+
+
+(-:>) :: PitchClass -> PitchClass -> Rule
+(-:>) from_ to_ = Rule from_ to_ OctaveDown
+
+(+:>) :: PitchClass -> PitchClass -> Rule
+(+:>) from_ to_ = Rule from_ to_ OctaveUp
+
+(=:>) :: PitchClass -> PitchClass -> Rule
+(=:>) from_ to_ = Rule from_ to_ NoChange
+
+
+keep :: PitchClass -> Rule
+keep p = Rule p p NoChange
+
+enharmonicRules2 :: [Rule]
+enharmonicRules2 =
+  [ pc C Flat           -:> pc B Natural
+  , pc C DoubleFlat     -:> pc B Flat
+  , keep (pc C Sharp)
+  , pc C DoubleSharp    =:> pc D Natural
+  , pc D Flat           =:> pc C Sharp
+  , pc D Sharp          =:> pc E Flat
+  , pc E Sharp          =:> pc F Natural
+  , pc E DoubleSharp    =:> pc F Sharp
+  , pc F Flat           =:> pc E Natural
+  , keep (pc F Sharp)
+  , pc G Flat           =:> pc F Sharp
+  , keep (pc G Sharp)
+  , pc A Flat           =:> pc G Sharp
+  , pc A Sharp          =:> pc B Flat
+  , pc B Sharp          +:> pc C Natural
+  , pc B DoubleSharp    +:> pc C Sharp
+
+  , keep (pc C QuarterSharp)
+  , pc C ThreeQuartersSharp =:> pc D QuarterFlat
+  , keep (pc D QuarterFlat)
+  , pc D ThreeQuartersFlat  =:> pc C QuarterSharp
+  , pc E QuarterSharp       =:> pc F QuarterFlat
+  , keep (pc F QuarterSharp)
+  , keep (pc G QuarterSharp)
+  ]
+
+prettyPrintRules :: [Rule] -> IO ()
+prettyPrintRules = mapM_ (\(Rule from_ to_ oct) ->
+  putStrLn (show from_ <> (" -> " <> show to_ <>
+             case oct of
+               NoChange -> ""
+               OctaveUp -> " (Octave Up)"
+               OctaveDown -> " (Octave Down)")))
+
+
+-- >>> prettyPrintRules enharmonicRules
+
+applyRulesToPitches :: [Rule] -> [Pitch] -> [Pitch]
+applyRulesToPitches rules = fmap (applyRulesToPitch rules)
+
+applyRulesToPitch :: [Rule] -> Pitch -> Pitch
+applyRulesToPitch rules pitch@(Pitch name acc oct) =
+  case findMatchingRule (PitchClass name acc) rules of
+    Just (Rule _ (PitchClass toName toAcc) octChange) ->
+      Pitch toName toAcc (applyOctaveChange octChange oct)
+    Nothing -> pitch
+
+findMatchingRule :: PitchClass -> [Rule] -> Maybe Rule
+findMatchingRule pc_ = find (\(Rule fromPC _ _) -> fromPC == pc_)
+
+-- ! test
+-- >applyRulesToPitches enharmonicRules2 ( mkPitchesFromIntervals c4 minorScaleInterval)
+-- [C Natural Octave 4,D Natural Octave 4,E Flat Octave 4,F Natural Octave 4,G Natural Octave 4,G Sharp Octave 4,B Flat Octave 4]
+
+
+-- demonstrateEnharmonicNormalization
 
 -- > preferredAccidentalList $  mkPitchesFromIntervals c4 minorScaleInterval
 --[C Natural Octave 4,D Natural Octave 4,E Flat Octave 4,F Natural Octave 4,G Natural Octave 4,G Sharp Octave 4,B Flat Octave 4]
@@ -736,10 +934,10 @@ intervalsToNames intervals = fromMaybe (error "Invalid interval") . nameFromInte
 
 
 mkPitchesFromIntervals :: Pitch -> [Interval] -> [Pitch]
-mkPitchesFromIntervals start intervals = 
+mkPitchesFromIntervals start intervals =
   addInterval start <$> intervals
   where
-    addInterval pitch (Interval semitones) = 
+    addInterval pitch (Interval semitones) =
       rationalToPitch (pitchToRational pitch + semitones)
 
 
