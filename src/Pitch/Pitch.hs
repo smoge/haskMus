@@ -1,14 +1,14 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveLift #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveDataTypeable     #-}
+{-# LANGUAGE DeriveLift             #-}
+{-# LANGUAGE DuplicateRecordFields  #-}
+{-# LANGUAGE FlexibleInstances      #-}
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedRecordDot #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses  #-}
+{-# LANGUAGE OverloadedRecordDot    #-}
+{-# LANGUAGE OverloadedStrings      #-}
+{-# LANGUAGE RecordWildCards        #-}
+{-# LANGUAGE StandaloneDeriving     #-}
+{-# LANGUAGE TemplateHaskell        #-}
 
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
@@ -16,20 +16,20 @@
 
 module Pitch.Pitch where
 
-import Control.Lens hiding (elements)
-import Control.Monad (forM)
-import Data.Char (toLower)
-import Data.Data
-import Data.Fixed (mod')
-import Data.Map.Strict qualified as Map
-import Data.Maybe (fromMaybe)
-import Data.String (IsString (..))
-import Language.Haskell.TH
-import Language.Haskell.TH.Syntax
-import Pitch.Accidental
-import Data.Ratio
-import Data.List (find)
-import Data.List.Extra (enumerate)
+import           Control.Lens               hiding (elements)
+import           Control.Monad              (forM)
+import           Data.Char                  (toLower)
+import           Data.Data
+import           Data.Fixed                 (mod')
+import           Data.List                  (find)
+import           Data.List.Extra            (enumerate)
+import qualified Data.Map.Strict            as Map
+import           Data.Maybe                 (fromMaybe)
+import           Data.Ratio
+import           Data.String                (IsString (..))
+import           Language.Haskell.TH
+import           Language.Haskell.TH.Syntax
+import           Pitch.Accidental
 
 
 data NoteName = C | D | E | F | G | A | B
@@ -39,15 +39,15 @@ data IntervalBasis = Chromatic | Diatonic
   deriving (Eq, Ord, Show, Enum)
 
 data PitchClass = PitchClass
-  { noteName :: !NoteName,
-    accidental :: !Accidental
+  { noteName   :: NoteName,
+    accidental :: Accidental
   }
   deriving (Eq, Lift, Data, Ord)
 
 data Pitch = Pitch
-  { noteName :: !NoteName,
-    accidental :: !Accidental,
-    octave :: !Octave
+  { noteName   :: NoteName,
+    accidental :: Accidental,
+    octave     :: Octave
   }
   deriving (Eq, Lift, Data)
 
@@ -81,27 +81,6 @@ instance IsNoteName SomeNote where
 instance Show SomeNote where
   show = show . toNoteName
 
-instance NoteClass C where
-  sayNote = "c"
-
-instance NoteClass D where
-  sayNote = "d"
-
-instance NoteClass E where
-  sayNote = "e"
-
-instance NoteClass F where
-  sayNote = "f"
-
-instance NoteClass G where
-  sayNote = "g"
-
-instance NoteClass A where
-  sayNote = "a"
-
-instance NoteClass B where
-  sayNote = "b"
-
 instance IsString NoteName where
   fromString :: String -> NoteName
   fromString "c" = C
@@ -111,12 +90,14 @@ instance IsString NoteName where
   fromString "g" = G
   fromString "a" = A
   fromString "b" = B
-  fromString s = error $ "Invalid NoteName string: " <> s
+  fromString s   = error $ "Invalid NoteName string: " <> s
 
 instance Show PitchClass where
+  show :: PitchClass -> String
   show (PitchClass name acc) = show name <> " " <> show acc
 
 instance Show Octave where
+  show :: Octave -> String
   show (Octave o) = "Octave " <> show o
 
 instance Show Pitch where
@@ -135,7 +116,7 @@ pitchClass = lens getter setter
     getter p = PitchClass p.noteName p.accidental
 
     setter :: Pitch -> PitchClass -> Pitch
-    setter p (PitchClass n a) = Pitch n a p.octave 
+    setter p (PitchClass n a) = Pitch n a p.octave
 
 
 
@@ -145,7 +126,7 @@ pcToRational pc = base + acVal
   where
     base = case Prelude.lookup nm noteNameToRational' of
       Just val -> val
-      Nothing -> error "NoteName not found"
+      Nothing  -> error "NoteName not found"
     acVal = accidentalToSemitones ac :: Rational
     nm = pc.noteName
     ac = pc.accidental
@@ -226,12 +207,26 @@ preferedAccidentalPC :: PitchClass -> PitchClass
 preferedAccidentalPC pc
   | pc == PitchClass C Flat   = PitchClass B Natural
   | pc == PitchClass D Sharp  = PitchClass E Flat
+  | pc == PitchClass E Sharp  = PitchClass F Natural
+  | pc == PitchClass F Flat   = PitchClass E Natural
   | pc == PitchClass A Sharp  = PitchClass B Flat
   | pc == PitchClass B Sharp  = PitchClass C Natural
+  | pc == PitchClass B DoubleSharp = PitchClass C Sharp
   | otherwise                 = pc
 
 preferredAccidentalP :: Pitch -> Pitch
 preferredAccidentalP pitch@(Pitch _ _ oct@(Octave o))
+  | pitch == Pitch C Flat oct   = Pitch B Natural (Octave ( o - 1))
+  | pitch == Pitch D Flat oct   = Pitch C Sharp oct
+  | pitch == Pitch D Sharp oct  = Pitch E Flat oct
+  | pitch == Pitch F Flat oct   = Pitch E Natural oct
+  | pitch == Pitch G Flat oct   = Pitch F Sharp oct
+  | pitch == Pitch A Sharp oct  = Pitch B Flat oct
+  | pitch == Pitch B Sharp oct  = Pitch C Natural (Octave ( o + 1))
+  | otherwise                      = pitch
+
+piPitch :: Pitch -> Pitch
+piPitch pitch@(Pitch _ _ oct@(Octave o))
   | pitch == Pitch C Flat oct   = Pitch B Natural (Octave ( o - 1))
   | pitch == Pitch D Flat oct   = Pitch C Sharp oct
   | pitch == Pitch D Sharp oct  = Pitch E Flat oct
@@ -249,33 +244,33 @@ preferredAccidentalList = fmap preferredAccidentalP
 
 normalizeEnharmonicPC :: PitchClass -> PitchClass
 normalizeEnharmonicPC pc_ = case pc_ of
-  PitchClass C Flat -> PitchClass B Natural
+  PitchClass C Flat  -> PitchClass B Natural
   PitchClass C Sharp -> pc_
-  PitchClass D Flat -> PitchClass C Sharp
+  PitchClass D Flat  -> PitchClass C Sharp
   PitchClass D Sharp -> PitchClass E Flat
   PitchClass E Sharp -> PitchClass F Natural
-  PitchClass F Flat -> PitchClass E Natural
+  PitchClass F Flat  -> PitchClass E Natural
   PitchClass F Sharp -> pc_
-  PitchClass G Flat -> PitchClass F Sharp
+  PitchClass G Flat  -> PitchClass F Sharp
   PitchClass G Sharp -> pc_
-  PitchClass A Flat -> pc_
+  PitchClass A Flat  -> pc_
   PitchClass A Sharp -> PitchClass B Flat
   PitchClass B Sharp -> PitchClass C Natural
-  _ -> pc_
+  _                  -> pc_
 
 normalizeEnharmonicPitch :: Pitch -> Pitch
 normalizeEnharmonicPitch pitch = case pitch of
-  Pitch C Flat oct -> Pitch B Natural (octaveDown oct)
-  Pitch C DoubleFlat oct -> Pitch B Flat (octaveDown oct)
-  Pitch D Flat oct -> Pitch C Sharp oct
-  Pitch D Sharp oct -> Pitch E Flat oct
-  Pitch E Sharp oct -> Pitch F Natural oct
-  Pitch F Flat oct -> Pitch E Natural oct
-  Pitch G Flat oct -> Pitch F Sharp oct
-  Pitch A Sharp oct -> Pitch B Flat oct
-  Pitch B Sharp oct -> Pitch C Natural (octaveUp oct)
+  Pitch C Flat oct               -> Pitch B Natural (octaveDown oct)
+  Pitch C DoubleFlat oct         -> Pitch B Flat (octaveDown oct)
+  Pitch D Flat oct               -> Pitch C Sharp oct
+  Pitch D Sharp oct              -> Pitch E Flat oct
+  Pitch E Sharp oct              -> Pitch F Natural oct
+  Pitch F Flat oct               -> Pitch E Natural oct
+  Pitch G Flat oct               -> Pitch F Sharp oct
+  Pitch A Sharp oct              -> Pitch B Flat oct
+  Pitch B Sharp oct              -> Pitch C Natural (octaveUp oct)
   Pitch B ThreeQuartersSharp oct -> Pitch C QuarterSharp (octaveUp oct)
-  _ -> pitch
+  _                              -> pitch
   where
     octaveDown (Octave o) = Octave (o - 1)
     octaveUp (Octave o) = Octave (o + 1)
@@ -287,8 +282,8 @@ normalizeEnharmonicPitches :: [Pitch] -> [Pitch]
 normalizeEnharmonicPitches = fmap normalizeEnharmonicPitch
 
 data Rule = Rule
-  { fromPitch :: !PitchClass
-  , toPitch :: !PitchClass
+  { fromPitchClass    :: !PitchClass
+  , toPitchClass      :: !PitchClass
   , octaveChange :: !OctaveChange
   } deriving (Show, Eq)
 
@@ -312,8 +307,8 @@ matchesRule (Rule (PitchClass fromName fromAcc) _ _) (Pitch name acc _) =
 
 -- {-# INLINE applyRulesWithMap #-}
 applyOctaveChange :: OctaveChange -> Octave -> Octave
-applyOctaveChange NoChange oct = oct
-applyOctaveChange OctaveUp (Octave o) = Octave (o + 1)
+applyOctaveChange NoChange oct          = oct
+applyOctaveChange OctaveUp (Octave o)   = Octave (o + 1)
 applyOctaveChange OctaveDown (Octave o) = Octave (o - 1)
 
 
@@ -407,8 +402,8 @@ prettyPrintRules :: [Rule] -> IO ()
 prettyPrintRules = mapM_ (\(Rule from_ to_ oct) ->
   putStrLn (show from_ <> (" -> " <> show to_ <>
              case oct of
-               NoChange -> ""
-               OctaveUp -> " (Octave Up)"
+               NoChange   -> ""
+               OctaveUp   -> " (Octave Up)"
                OctaveDown -> " (Octave Down)")))
 
 
@@ -465,7 +460,7 @@ applyRulesWithMap ruleMap (Pitch nn acc oct) =
 
 --{-# INLINE buildRuleMap #-}
 buildRuleMap :: [Rule] -> RuleMap
-buildRuleMap = Map.fromList . fmap (\r -> (fromPitch r, r))
+buildRuleMap = Map.fromList . fmap (\r -> (fromPitchClass r, r))
 
 --{-# INLINE chromaticPosition #-}
 chromaticPosition :: PitchClass -> Rational
@@ -578,16 +573,16 @@ createPitchesForNote :: NoteName -> Map.Map String Pitch
 createPitchesForNote note = Map.fromList $ do
   acc <- [Natural, Sharp, Flat, QuarterSharp, QuarterFlat, ThreeQuartersFlat, ThreeQuartersSharp, DoubleFlat, DoubleSharp]
   let modifier = case acc of
-        Sharp -> "is"
-        Flat -> "es"
-        QuarterSharp -> "ih"
-        QuarterFlat -> "eh"
-        Natural -> ""
-        ThreeQuartersFlat -> "eseh"
+        Sharp              -> "is"
+        Flat               -> "es"
+        QuarterSharp       -> "ih"
+        QuarterFlat        -> "eh"
+        Natural            -> ""
+        ThreeQuartersFlat  -> "eseh"
         ThreeQuartersSharp -> "isih"
-        DoubleFlat -> "eses"
-        DoubleSharp -> "isis"
-        _ -> ""
+        DoubleFlat         -> "eses"
+        DoubleSharp        -> "isis"
+        _                  -> ""
   (octaveSuffix, oct) <- [("", 4), ("'", 5), ("''", 6), ("'''", 7), ("''''", 8), ("'''''", 9), ("_", 3), ("__", 2), ("___", 1), ("____", 0), ("_____", -1)]
   pure (fmap toLower (show note) <> modifier <> octaveSuffix, Pitch note acc (Octave oct))
 
@@ -859,6 +854,12 @@ neutralFourteenth = intervalFromName NeutralFourteenth
 majorFourteenth = intervalFromName MajorFourteenth
 doubleOctave = intervalFromName DoubleOctave
 
+
+-- Apply intervals to a starting pitch after modifying each interval
+applyModifiedIntervals :: Pitch -> [Interval] -> [Pitch]
+applyModifiedIntervals start intervals = mkPitchesFromIntervals start modifiedIntervals
+  where
+    modifiedIntervals = intervals & each %~ (*2)
 
 allIntervalNames :: [IntervalName]
 allIntervalNames = enumerate

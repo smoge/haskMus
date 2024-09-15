@@ -30,6 +30,7 @@ library
         Pitch.Parser
         Pitch.Pitch
         Pitch.QuasiQuoter
+        Pitch.PitchLike
         Pitch.Scale
         Rtm.Common
         Rtm.Parser
@@ -86,6 +87,7 @@ library
         , deepseq
         , clock
         , stm 
+        , array
         --, csound-expression
         , hosc
         , hsc3
