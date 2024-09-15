@@ -35,21 +35,19 @@ instance PitchLike Pitch where
 
 instance PitchLike PitchClass where
   toPitch :: PitchClass -> Pitch
-  toPitch pclass = Pitch pclass.noteName pclass.accidental (Octave 4) 
+  toPitch pitchclass = Pitch pitchclass.noteName pitchclass.accidental (Octave 4) 
 
   fromPitch :: Pitch -> PitchClass
-  fromPitch ptch = PitchClass ptch.noteName ptch.accidental
+  fromPitch pitch = PitchClass pitch.noteName pitch.accidental
 
 instance PitchLike NoteName where
   toPitch :: NoteName -> Pitch
-  toPitch nn = Pitch nn Natural (Octave 4) -- Default accidental and octave
+  toPitch nn = Pitch nn Natural (Octave 4) 
 
   fromPitch :: Pitch -> NoteName
   fromPitch pit = pit.noteName
 
--- Example usage:
 
---
 -- fromPitch @PitchClass (toPitch pc)
 -- C Natural
 
