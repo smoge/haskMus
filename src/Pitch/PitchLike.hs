@@ -1,20 +1,16 @@
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedRecordDot   #-}
 
-module Pitch.PitchLike where
+module Pitch.PitchLike ( PitchLike(..) ) where
 
-import Pitch.Pitch hiding (Rule (..))
-import Pitch.Accidental ( Accidental(Natural) )
+import           Pitch.Accidental (Accidental (Natural))
+import           Pitch.Pitch      hiding (Rule (..))
 
 
 class PitchLike a where
   toPitch :: a -> Pitch
-
   fromPitch :: Pitch -> a
 
   pitchToSemitones :: a -> Rational
@@ -35,14 +31,14 @@ instance PitchLike Pitch where
 
 instance PitchLike PitchClass where
   toPitch :: PitchClass -> Pitch
-  toPitch pitchclass = Pitch pitchclass.noteName pitchclass.accidental (Octave 4) 
+  toPitch pitchclass = Pitch pitchclass.noteName pitchclass.accidental (Octave 4)
 
   fromPitch :: Pitch -> PitchClass
   fromPitch pitch = PitchClass pitch.noteName pitch.accidental
 
 instance PitchLike NoteName where
   toPitch :: NoteName -> Pitch
-  toPitch nn = Pitch nn Natural (Octave 4) 
+  toPitch nn = Pitch nn Natural (Octave 4)
 
   fromPitch :: Pitch -> NoteName
   fromPitch pit = pit.noteName
