@@ -6,12 +6,12 @@
 
 module Pitch.Accidental where
 
-import Data.Data
+import Data.Data ( Data, Typeable )
 import Data.List (isPrefixOf)
 import Data.Map qualified as Map
 import Data.Ord (comparing)
-import Data.Ratio
-import Data.String
+import Data.Ratio ( (%) )
+import Data.String ( IsString(..) )
 import Data.Text qualified as T
 import Language.Haskell.TH.Syntax (Lift, lift)
 

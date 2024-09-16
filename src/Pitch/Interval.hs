@@ -18,19 +18,34 @@ import           Data.Maybe                 (fromMaybe)
 import           Data.String                (IsString (..))
 import           Language.Haskell.TH        ()
 import           Language.Haskell.TH.Syntax (Lift)
-import           Text.Megaparsec
+import Text.Megaparsec
+    ( oneOf,
+      runParser,
+      errorBundlePretty,
+      choice,
+      some,
+      Parsec,
+      MonadParsec(eof, try),
+      ParseErrorBundle )
 
-import           Data.Void
-import           Pitch.Accidental
-import           Pitch.Pitch            
-import Pitch.PitchClass   
-import           Text.Megaparsec.Char
+import Data.Void ( Void )
+import Pitch.Accidental
+    ( Accidental(Custom, Natural, QuarterSharp, QuarterFlat, Sharp,
+                 Flat, ThreeQuartersSharp, ThreeQuartersFlat, DoubleSharp,
+                 DoubleFlat) )
+import Pitch.Pitch
+    ( Octave(Octave),
+      Pitch(accidental, Pitch, noteName),
+      pitchToRational )            
+import Pitch.PitchClass ( PitchClass(PitchClass), NoteName(..) )   
+import Text.Megaparsec.Char ( digitChar, string )
 
 newtype Interval = Interval { semitones :: Rational }
   deriving (Eq, Ord, Lift, Data)
 
 
 instance Show Interval where
+  show :: Interval -> String
   show interval = case nameFromInterval interval of
     Just name -> intervalNameToNotation name
     Nothing   -> "Interval(" <> show (fromRational (semitones interval) :: Double) <> " semitones)"

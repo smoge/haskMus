@@ -1,24 +1,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
 
 module Pitch.LilyPitch where
 
 import Data.Map qualified as Map
-import Data.Maybe (fromMaybe)
-import Data.String (IsString, fromString)
-import Pitch.Pitch
-import Pitch.PitchClass
+import Pitch.Pitch ( Pitch, pitchMap, generatePitchVars )
 
 
-instance IsString Pitch where
-  fromString :: String -> Pitch
-  fromString str = fromMaybe (error $ "Invalid pitch: " <> str) (Map.lookup str pitchMap)
 
 $(generatePitchVars (Map.keys pitchMap))
 
-allPitches :: [Pitch]
-allPitches =
+testAllPitches :: [Pitch]
+testAllPitches =
   [ "c",
     "cis",
     "ces",
@@ -39,8 +32,8 @@ allPitches =
     "f"
   ]
 
-allPitches2 :: [Pitch]
-allPitches2 =
+testAllPitches2 :: [Pitch]
+testAllPitches2 =
   [ c,
     cis,
     ces,
@@ -60,3 +53,31 @@ allPitches2 =
     eih,
     f
   ]
+
+{-
+
+a :: Pitch
+a = fromString "a"
+a' :: Pitch
+a' = fromString "a'"
+a'' :: Pitch
+a'' = fromString "a''"
+a''' :: Pitch
+a''' = fromString "a'''"
+a'''' :: Pitch
+a'''' = fromString "a''''"
+a''''' :: Pitch
+a''''' = fromString "a'''''"
+a_ :: Pitch
+a_ = fromString "a_"
+a__ :: Pitch
+a__ = fromString "a__"
+a___ :: Pitch
+a___ = fromString "a___"
+a____ :: Pitch
+a____ = fromString "a____"
+a_____ :: Pitch
+a_____ = fromString "a_____"
+aeh :: Pitch
+aeh = fromString "aeh"
+aeh' :: Pitch-}

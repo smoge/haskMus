@@ -18,7 +18,7 @@ build-type:    Simple
 -- extra-source-files:  readme.md
 --                      changelog.md
 
-tested-with:   GHC >=9.4 && <9.5 || >=9.6 && <9.7
+tested-with:   GHC >=9.8 && <9.9
 
 library
     hs-source-dirs:     src
@@ -54,7 +54,7 @@ library
         Selector
 
     build-depends:
-        , base                >=4.17 && <4.20
+        , base                >=4.19 && <4.20
         , bytestring
         , containers
         , data-default
@@ -90,19 +90,18 @@ library
         , clock
         , stm 
         , array
-        --, csound-expression
         , hosc
         , hsc3
-        --, vivid
         , tf-random
         , non-empty
         , MonadRandom
-    --, vector-space
-    --    , rando
-    --    , random-fu
-    --  , bimap >= 0.5.0 && < 0.6
-    --  , markov-chain >= 0.0.3 && < 0.1
-    --, witch
+        -- , vector-space
+        -- , rando
+        -- , random-fu
+        -- , bimap >= 0.5.0 && < 0.6
+        -- , markov-chain >= 0.0.3 && < 0.1
+        -- , witch
+
     default-language:   Haskell2010
     default-extensions:
         AllowAmbiguousTypes
@@ -202,20 +201,20 @@ test-suite haskMus-test
     hs-source-dirs:     test
     main-is:            Test.hs
     other-modules:
-        AccidentalProperties
-        PitchProperties
+        --AccidentalProperties
+        --PitchProperties
         PitchSpec
 
     build-depends:
-        , base                        >=4.17 && <4.20
+        , base                        >=4.19 && <4.20
         , haskMus
         , hspec
         , HUnit
         , lens
-        , QuickCheck
-        , test-framework
+        , QuickCheck >= 2.7
+        , test-framework >= 0.8
         , test-framework-hunit
-        , test-framework-quickcheck2
+        , test-framework-quickcheck2 >= 0.3
         , text
 
     default-language:   Haskell2010

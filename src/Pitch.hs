@@ -1,25 +1,31 @@
-{-# LANGUAGE MultiParamTypeClasses  #-}
-{-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE FlexibleInstances      #-}
+{-# LANGUAGE DeriveLift             #-}
 {-# LANGUAGE FlexibleContexts       #-}
+{-# LANGUAGE FlexibleInstances      #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE MultiParamTypeClasses  #-}
+{-# LANGUAGE OverloadedStrings      #-}
+{-# LANGUAGE StandaloneDeriving     #-}
+{-# LANGUAGE TemplateHaskell        #-}
+{-# LANGUAGE TypeFamilies           #-}
 {-# LANGUAGE UndecidableInstances   #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE DeriveLift #-}
- {-# LANGUAGE StandaloneDeriving #-}
 
 
-module Pitch where
+module Pitch (
+  HasNoteName(..),
+  HasAccidental(..),
+  Updatable(..),
+  addOctave,
+  incrementOctave,
+  decrementOctave,
+  modifyListWithComprehension,
+  modifyOctavesWithGuards
+) where
 
-import Control.Lens
-import Pitch.Accidental
-import Pitch.Pitch
-import qualified Pitch.Pitch as P
-import Pitch.PitchClass
+import           Pitch.Accidental
+import           Pitch.Pitch
+import qualified Pitch.Pitch      as P
+import           Pitch.PitchClass
 import qualified Pitch.PitchClass as PC
-import Data.List
-import qualified Pitch.LilyPitch as L
 
 -- Type class for types that have a NoteName
 class HasNoteName a where
@@ -82,9 +88,9 @@ modifyListWithComprehension :: [Pitch] -> [Pitch]
 modifyListWithComprehension pitches = [if p.noteName == D then addOctave p 1 else p | p <- pitches]
 
 modifyPitch :: Pitch -> Pitch
-modifyPitch p@(Pitch C _ _) = addOctave p 1  -- Only modify if noteName is C
+modifyPitch p@(Pitch C _ _)    = addOctave p 1  -- Only modify if noteName is C
 modifyPitch p@(Pitch _ Flat _) = addOctave p (-1) -- Decrease octave if accidental is Flat
-modifyPitch p = p  -- Leave other pitches unchanged
+modifyPitch p                  = p  -- Leave other pitches unchanged
 
 modifyOctavesWithGuards :: [Pitch] -> [Pitch]
 modifyOctavesWithGuards = fmap modifyPitch
