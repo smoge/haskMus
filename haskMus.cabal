@@ -32,6 +32,7 @@ library
         Pitch.QuasiQuoter
         Pitch.PitchLike
         Pitch.Scale
+        Pitch.Interval
         Rtm.Common
         Rtm.Parser
         Rtm.QuasiQuoter

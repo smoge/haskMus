@@ -7,7 +7,7 @@ module Pitch.PitchLike ( PitchLike(..) ) where
 
 import           Pitch.Accidental (Accidental (Natural))
 import           Pitch.Pitch      hiding (Rule (..))
-
+import Pitch.Interval ( Interval(Interval), (+.) )
 
 class PitchLike a where
   toPitch :: a -> Pitch
