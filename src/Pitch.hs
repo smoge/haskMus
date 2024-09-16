@@ -2,13 +2,17 @@
 {-# LANGUAGE DeriveLift             #-}
 {-# LANGUAGE DuplicateRecordFields  #-}
 {-# LANGUAGE OverloadedRecordDot    #-}
+
+{-# LANGUAGE NoFieldSelectors #-}
+{-# LANGUAGE TypeApplications #-}
+
 -- Needed for lens operations
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses  #-}
 {-# LANGUAGE OverloadedStrings      #-}
 {-# LANGUAGE TemplateHaskell        #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 
-{-# LANGUAGE OverloadedRecordDot #-}
 
 module Pitch where
 
@@ -18,23 +22,69 @@ import           Pitch.LilyPitch
 import           Pitch.Parser
 import           Pitch.Pitch
 import           Pitch.PitchClass
+import qualified Pitch.PitchClass as PC
 import           Pitch.PitchLike
 import           Pitch.QuasiQuoter
 import qualified Pitch.Pitch as P
 import Control.Lens
 
+
+mkPitchClass :: NoteName -> Accidental -> PitchClass
+mkPitchClass n a = PitchClass { PC.noteName = n, PC.accidental = a }
+
+mkPitch :: NoteName -> Accidental -> Octave -> Pitch
+mkPitch n acc o = Pitch { P.noteName = n, P.accidental = acc, P.octave = o }
+
+updatePCNoteName :: NoteName -> PitchClass -> PitchClass
+updatePCNoteName n pc = pc { PC.noteName = n }
+
+updatePNoteName :: NoteName -> Pitch -> Pitch
+updatePNoteName n p = p { P.noteName = n }
+
+class HasNoteName a where
+  getNoteName :: a -> NoteName
+  setNoteName :: NoteName -> a -> a
+
+instance HasNoteName PitchClass where
+  getNoteName = PC.noteName
+  setNoteName newName pc = pc { PC.noteName = newName }
+
+instance HasNoteName Pitch where
+  getNoteName = P.noteName
+  setNoteName :: NoteName -> Pitch -> Pitch
+  setNoteName newName p = p { P.noteName = newName }
+
+updateNoteName :: (HasNoteName a) => NoteName -> a -> a
+updateNoteName = setNoteName
+
 {- ---------------------------- playground -----------------------------------
 
 c = PitchClass C Natural
-c ^. noteName
-c ^. accidental
+
+updatePCNoteName D c  -- This will work without type application
+
+updateNoteName @PitchClass D c  -- This will work with type application
+
+c = PitchClass C Natural
+c :: PitchClass
+
+updateNoteNamePC @PitchClass D c
+
+updateNoteName @Pitch D p
+
 
 c.noteName
 
 c.accidental
 
+c { noteName = D } :: PitchClass
 
 c4 = Pitch C Natural (Octave 4)
+
+
+c ^. noteName
+
+c ^. accidental
 
 pitchToRational c4
 
@@ -110,5 +160,12 @@ p & octave %~ (\(Octave o) -> Octave (o + 1))  -- Increment the octave by 1
 -- C Natural Octave 5
 
 --------------------------------------------------------------------------------
+
+-- In Pitch.PitchClass module
+updatePCNoteName :: NoteName -> PitchClass -> PitchClass
+updatePCNoteName newName pc = pc { noteName = newName }
+
+-- Usage
+updatePCNoteName D c
 
 -}
