@@ -3,9 +3,9 @@
 {-# LANGUAGE DuplicateRecordFields  #-}
 {-# LANGUAGE OverloadedRecordDot    #-}
 -- Needed for lens operations
-{-# LANGUAGE TemplateHaskell        #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses  #-}
+{-# LANGUAGE TemplateHaskell        #-}
 
 
 module Pitch.Pitch where
@@ -13,10 +13,9 @@ module Pitch.Pitch where
 import           Control.Lens               hiding (elements)
 import           Control.Monad              (forM)
 import           Data.Char                  (toLower)
-import           Data.Data
+import           Data.Data                  (Data)
 import           Data.Fixed                 (mod')
 import           Data.List                  (find)
-import           Data.List.Extra            (enumerate)
 import qualified Data.Map.Strict            as Map
 import           Data.Maybe                 (fromMaybe)
 import           Data.Ratio
@@ -262,9 +261,9 @@ normalizeEnharmonicPitches :: [Pitch] -> [Pitch]
 normalizeEnharmonicPitches = fmap normalizeEnharmonicPitch
 
 data Rule = Rule
-  { fromPitchClass    :: !PitchClass
-  , toPitchClass      :: !PitchClass
-  , octaveChange :: !OctaveChange
+  { fromPitchClass :: !PitchClass
+  , toPitchClass   :: !PitchClass
+  , octaveChange   :: !OctaveChange
   } deriving (Show, Eq)
 
 
