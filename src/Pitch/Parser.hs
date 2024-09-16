@@ -11,6 +11,8 @@ import Data.Text qualified as T
 import Data.Void (Void)
 import Pitch.Accidental
 import Pitch.Pitch
+import Pitch.PitchClass
+
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer qualified as L

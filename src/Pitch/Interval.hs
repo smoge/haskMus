@@ -3,41 +3,32 @@
 {-# LANGUAGE DuplicateRecordFields  #-}
 {-# LANGUAGE OverloadedRecordDot    #-}
 -- Needed for lens operations
-{-# LANGUAGE TemplateHaskell        #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses  #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings      #-}
+{-# LANGUAGE TemplateHaskell        #-}
 
 module Pitch.Interval where
 
-import           Data.Data ( Data )
-import           Data.Fixed ( mod' ) 
-import           Data.List                    (find)
-import qualified Data.Map.Strict              as Map
-import           Data.Maybe                   (fromMaybe)
-import           Data.String                  (IsString (..))
-import Language.Haskell.TH ()
-import Language.Haskell.TH.Syntax ( Lift )
-import Text.Megaparsec
- 
-import Pitch.Pitch
-    ( NoteName(..),
-      PitchClass(PitchClass),
-      Pitch(accidental, Pitch, noteName),
-      Octave(Octave),
-      pitchToRational )
-import Text.Megaparsec.Char 
-import Text.Megaparsec.Char.Lexer as L 
-import Data.Void
-import Pitch.Accidental
+import           Data.Data                  (Data)
+import           Data.Fixed                 (mod')
+import           Data.List                  (find)
+import qualified Data.Map.Strict            as Map
+import           Data.Maybe                 (fromMaybe)
+import           Data.String                (IsString (..))
+import           Language.Haskell.TH        ()
+import           Language.Haskell.TH.Syntax (Lift)
+import           Text.Megaparsec
 
--- | Represents a musical interval in semitones.
+import           Data.Void
+import           Pitch.Accidental
+import           Pitch.Pitch            
+import Pitch.PitchClass   
+import           Text.Megaparsec.Char
+
 newtype Interval = Interval { semitones :: Rational }
   deriving (Eq, Ord, Lift, Data)
 
---instance Show Interval where
---  show :: Interval -> String
---  show (Interval i) = show i
 
 instance Show Interval where
   show interval = case nameFromInterval interval of
@@ -45,7 +36,6 @@ instance Show Interval where
     Nothing   -> "Interval(" <> show (fromRational (semitones interval) :: Double) <> " semitones)"
 
 
--- | Allows arithmetic operations on 'Interval's.
 instance Num Interval where
   (+) (Interval a) (Interval b) = Interval (a + b)
   (-) (Interval a) (Interval b) = Interval (a - b)
@@ -84,7 +74,6 @@ data IntervalName =
   | PerfectOctave
   deriving (Eq, Ord, Show, Enum, Bounded, Data)
 
--- | Maps 'IntervalName's to their corresponding semitone values.
 intervalMap :: Map.Map IntervalName Rational
 intervalMap = Map.fromList
   [ (Unison, 0)
@@ -111,31 +100,24 @@ intervalMap = Map.fromList
   , (PerfectOctave, 12)
   ]
 
--- | Converts an 'IntervalName' to an 'Interval'.
 intervalFromName :: IntervalName -> Interval
 intervalFromName name = Interval $ fromMaybe (error $ "Unknown interval: " <> show name) (Map.lookup name intervalMap)
 
--- | Converts an 'Interval' to an 'IntervalName' if possible.
 nameFromInterval :: Interval -> Maybe IntervalName
 nameFromInterval (Interval s) = fst <$> find (\(_, semis) -> semis == s) (Map.toList intervalMap)
 
--- | Inverts an 'Interval'.
 invertInterval :: Interval -> Interval
 invertInterval (Interval s) = Interval (12 - (s `mod'` 12))
 
--- | Simplifies a compound 'Interval' to its simple form within an octave.
 simplifyInterval :: Interval -> Interval
 simplifyInterval (Interval s) = Interval (s `mod'` 12)
 
--- | Checks if an 'Interval' is compound (greater than an octave).
 isCompoundInterval :: Interval -> Bool
 isCompoundInterval (Interval s) = s >= 12
 
--- | Complement of an 'Interval' within an octave.
 complementInterval :: Interval -> Interval
 complementInterval (Interval s) = Interval (12 - (s `mod'` 12))
 
--- | Common intervals for easy access.
 unison, minorSecond, majorSecond, augmentedSecond, minorThird, majorThird, perfectFourth, augmentedFourth :: Interval
 diminishedFifth, perfectFifth, minorSixth, majorSixth, minorSeventh, majorSeventh, perfectOctave :: Interval
 
@@ -158,10 +140,6 @@ perfectOctave     = intervalFromName PerfectOctave
 -- | Parser for intervals using standard musical notation (e.g., "M3", "P5").
 -- Supports qualities: P (Perfect), M (Major), m (Minor), A (Augmented), d (Diminished).
 type Parser = Parsec Void String
-
--- | Parses an interval from a string.
---parseInterval :: String -> Either (ParseErrorBundle String Void) Interval
---parseInterval = runParser intervalParser ""
 
 
 parseQuality :: Parser String
@@ -187,14 +165,14 @@ intervalParser = do
   eof
   case intervalFromNotation quality number of
     Just interval -> pure interval
-    Nothing -> fail $ "Invalid interval: " <> quality <> show number
+    Nothing       -> fail $ "Invalid interval: " <> quality <> show number
 
 
 -- | Maps notation to 'Interval's.
 intervalFromNotation :: String -> Int -> Maybe Interval
 intervalFromNotation quality number = do
   name <- intervalNameFromNotation quality number
-  return $ intervalFromName name
+  pure $ intervalFromName name
 
 -- | Maps notation to 'IntervalName's.
 intervalNameFromNotation :: String -> Int -> Maybe IntervalName
@@ -277,13 +255,6 @@ fromSemitones = Interval
 getInterval :: Pitch.Pitch.Pitch -> Pitch.Pitch.Pitch -> Interval
 getInterval p1 p2 = Interval (Pitch.Pitch.pitchToRational p2 - Pitch.Pitch.pitchToRational p1)
 
--- | Creates a scale from a starting pitch and a list of intervals. (Requires 'Pitch.Pitch.Pitch' module)
--- createScale :: Pitch -> [Interval] -> [Pitch]
--- createScale = scanl transposeUp
-
--- Note: The commented-out functions above depend on the 'Pitch' module.
--- You would need to import 'Pitch.Pitch' and define appropriate functions
--- like 'transposeUp' and 'pitchToRational' for them to work.
 
 
 

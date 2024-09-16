@@ -8,6 +8,8 @@ import Data.Map qualified as Map
 import Data.Maybe (fromMaybe)
 import Data.String (IsString, fromString)
 import Pitch.Pitch
+import Pitch.PitchClass
+
 
 instance IsString Pitch where
   fromString :: String -> Pitch

@@ -24,14 +24,15 @@ library
     hs-source-dirs:     src
     exposed-modules:
         Data.WAVE
+        Pitch
         Pitch.Accidental
-        Pitch.Hz
+        --Pitch.Hz
         Pitch.LilyPitch
         Pitch.Parser
         Pitch.Pitch
         Pitch.QuasiQuoter
         Pitch.PitchLike
-        Pitch.Scale
+        Pitch.PitchClass
         Pitch.Interval
         Rtm.Common
         Rtm.Parser
