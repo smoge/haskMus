@@ -1,171 +1,88 @@
-{-# LANGUAGE DeriveDataTypeable     #-}
-{-# LANGUAGE DeriveLift             #-}
-{-# LANGUAGE DuplicateRecordFields  #-}
-{-# LANGUAGE OverloadedRecordDot    #-}
-
-{-# LANGUAGE NoFieldSelectors #-}
-{-# LANGUAGE TypeApplications #-}
-
--- Needed for lens operations
-{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses  #-}
-{-# LANGUAGE OverloadedStrings      #-}
-{-# LANGUAGE TemplateHaskell        #-}
-{-# OPTIONS_GHC -Wno-unused-imports #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE FlexibleInstances      #-}
+{-# LANGUAGE FlexibleContexts       #-}
+{-# LANGUAGE UndecidableInstances   #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveLift #-}
+ {-# LANGUAGE StandaloneDeriving #-}
 
 
 module Pitch where
 
-import           Pitch.Accidental
-import           Pitch.Interval
-import           Pitch.LilyPitch
-import           Pitch.Parser
-import           Pitch.Pitch
-import           Pitch.PitchClass
-import qualified Pitch.PitchClass as PC
-import           Pitch.PitchLike
-import           Pitch.QuasiQuoter
-import qualified Pitch.Pitch as P
 import Control.Lens
+import Pitch.Accidental
+import Pitch.Pitch
+import qualified Pitch.Pitch as P
+import Pitch.PitchClass
+import qualified Pitch.PitchClass as PC
+import Data.List
+import qualified Pitch.LilyPitch as L
 
-
-mkPitchClass :: NoteName -> Accidental -> PitchClass
-mkPitchClass n a = PitchClass { PC.noteName = n, PC.accidental = a }
-
-mkPitch :: NoteName -> Accidental -> Octave -> Pitch
-mkPitch n acc o = Pitch { P.noteName = n, P.accidental = acc, P.octave = o }
-
-updatePCNoteName :: NoteName -> PitchClass -> PitchClass
-updatePCNoteName n pc = pc { PC.noteName = n }
-
-updatePNoteName :: NoteName -> Pitch -> Pitch
-updatePNoteName n p = p { P.noteName = n }
-
+-- Type class for types that have a NoteName
 class HasNoteName a where
   getNoteName :: a -> NoteName
   setNoteName :: NoteName -> a -> a
+
+instance HasNoteName Pitch where
+  getNoteName = P.noteName
+  setNoteName newName p = p { P.noteName = newName }
 
 instance HasNoteName PitchClass where
   getNoteName = PC.noteName
   setNoteName newName pc = pc { PC.noteName = newName }
 
-instance HasNoteName Pitch where
-  getNoteName = P.noteName
-  setNoteName :: NoteName -> Pitch -> Pitch
-  setNoteName newName p = p { P.noteName = newName }
+-- Type class for types that have an Accidental
+class HasAccidental a where
+  getAccidental :: a -> Accidental
+  setAccidental :: Accidental -> a -> a
 
-updateNoteName :: (HasNoteName a) => NoteName -> a -> a
-updateNoteName = setNoteName
+instance HasAccidental Pitch where
+  getAccidental = P.accidental
+  setAccidental newAcc p = p { P.accidental = newAcc }
 
-{- ---------------------------- playground -----------------------------------
+instance HasAccidental PitchClass where
+  getAccidental = PC.accidental
+  setAccidental newAcc pc = pc { PC.accidental = newAcc }
 
-c = PitchClass C Natural
+-- Define a type family to resolve types for `Updatable`
+type family IsList a where
+  IsList [x] = True
+  IsList x   = False
 
-updatePCNoteName D c  -- This will work without type application
+-- Updatable class with type family dispatch
+class Updatable b a where
+  (=:) :: b -> a -> a
 
-updateNoteName @PitchClass D c  -- This will work with type application
+-- For updating NoteName
+instance (HasNoteName a, IsList a ~ False) => Updatable NoteName a where
+  (=:) = setNoteName
 
-c = PitchClass C Natural
-c :: PitchClass
+-- For updating Accidental
+instance (HasAccidental a, IsList a ~ False) => Updatable Accidental a where
+  (=:) = setAccidental
 
-updateNoteNamePC @PitchClass D c
-
-updateNoteName @Pitch D p
-
-
-c.noteName
-
-c.accidental
-
-c { noteName = D } :: PitchClass
-
-c4 = Pitch C Natural (Octave 4)
-
-
-c ^. noteName
-
-c ^. accidental
-
-pitchToRational c4
-
-splitFraction $ pitchToRational $  Pitch G QuarterSharp (Octave 5)
-
-fromRational $ pitchToRational $  Pitch E QuarterSharp (Octave 3)
-
--- Changes the accidental of 'c' to Sharp
-
-c4 & Pitch.Pitch.accidental .~ Sharp
-
-import Control.Lens
-
-c4 & accidental_ %~ (\x -> addAccidental x (1%2))
+-- Instance for updating elements within a list
+instance (Updatable b a, IsList a ~ True) => Updatable b [a] where
+  (=:) x = fmap (x =:)
 
 
---C Sharp
+-- Define a custom infix operator to update a list of Pitches
+--infixl 4 |=
+--(|=) :: Accidental -> [Pitch] -> [Pitch]
+--acc |= ps = ps & each . accidental .~ acc
 
-c & accidental %~ (\x -> addAccidental x (1%2))
--- C QuarterSharp
 
-pitchClasses = map (\x -> PitchClass x Natural) [C .. B]
+addOctave :: Pitch -> Int -> Pitch
+addOctave pitch delta = pitch { octave = Octave (pitch.octave.unOctave + delta) }
 
--- Changes the accidental of every PitchClass in the list to Flat
+incrementOctave :: Pitch -> Pitch
+incrementOctave pitch = pitch { octave = Octave (pitch.octave.unOctave + 1) }
 
-pitchClasses & each . accidental .~ Flat
---[C Flat,D Flat,E Flat,F Flat,G Flat,A Flat,B Flat]
+decrementOctave :: Pitch -> Pitch
+decrementOctave pitch = pitch { octave = Octave (pitch.octave.unOctave - 1) }
 
--- Checks if 'c' has an accidental ojustf Natural
-has (accidental . only Natural) c
---True
-
--- If the accidental is Natural, change it to Flat.
-c & accidental . filtered (== Natural) .~ Flat
-C Flat
-
-p = Pitch C Natural (Octave 4)
-
-p ^. noteName
--- C
-
-p ^. accidental
--- Natural
-
-p ^. octave
--- Octave 4
-
-p & accidental .~ Sharp  -- Changes the accidental of 'p' to Sharp
--- C Sharp Octave 4
-
-p & accidental %~ (\x -> addAccidental x (1%2))
--- C QuarterSharp Octave 4
-
-pitches = map (\x -> Pitch x Natural (Octave 4)) [C .. B]
-pitches & each . accidental .~ Flat  -- Changes the accidental of every Pitch in the list to Flat
-
--- [C Flat Octave 4,D Flat Octave 4,E Flat Octave 4,F Flat Octave 4,G Flat Octave 4,A Flat Octave 4,B Flat Octave 4]
-
-has (accidental . only Natural) p  -- Checks if 'p' has an accidental of Natural
-
--- True
-
-p & accidental . filtered (== Natural) .~ Flat  -- If the accidental is Natural, change it to Flat.
-
--- C Flat Octave 4
-
-p & octave .~ Octave 5  -- Change the octave of 'p' to 5
-
--- C Natural Octave 5
-
-p & octave %~ (\(Octave o) -> Octave (o + 1))  -- Increment the octave by 1
-
--- C Natural Octave 5
-
---------------------------------------------------------------------------------
-
--- In Pitch.PitchClass module
-updatePCNoteName :: NoteName -> PitchClass -> PitchClass
-updatePCNoteName newName pc = pc { noteName = newName }
-
--- Usage
-updatePCNoteName D c
-
--}
+modifyListWithComprehension :: [Pitch] -> [Pitch]
+modifyListWithComprehension pitches = [if p.noteName == D then addOctave p 1 else p | p <- pitches]
