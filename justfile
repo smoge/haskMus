@@ -16,7 +16,7 @@ make_ci:
     haskell-ci github haskMus.cabal
 
 # Build the project
-build_w:
+watch:
     stack build --fast --file-watch
 
 # Make cabal package version bounds
