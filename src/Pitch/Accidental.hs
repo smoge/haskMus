@@ -8,11 +8,9 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
-{-# HLINT ignore "Redundant bracket" #-}
-
 module Pitch.Accidental where
 
-import GHC.Generics (Generic)
+--import GHC.Generics (Generic)
 
 import Data.Data (Data, Typeable)
 import Data.List (isPrefixOf)

@@ -35,9 +35,9 @@ import Text.Megaparsec
 import Text.Megaparsec.Char ( char, space1, string )
 import Text.Megaparsec.Char.Lexer qualified as L
 
-{-# INLINE spaced #-}
-spaced :: Parsec Void T.Text a -> Parsec Void T.Text a
-spaced p = spaceConsumer *> p <* spaceConsumer
+-- {-# INLINE spaced #-}
+-- spaced :: Parsec Void T.Text a -> Parsec Void T.Text a
+-- spaced p = spaceConsumer *> p <* spaceConsumer
 
 spaceConsumer :: ParsecT Void T.Text Identity ()
 spaceConsumer = L.space space1 empty empty

@@ -283,5 +283,6 @@ benchmark haskMus-benchmarks
         , criterion
         , haskMus
         , text
+        , bytestring
 
     default-language: Haskell2010

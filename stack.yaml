@@ -1,4 +1,4 @@
-resolver: nightly-2024-09-20
+resolver: nightly-2024-10-04
 #resolver: lts-21.25
 
 packages:
@@ -13,14 +13,7 @@ notify-if-nix-on-path: false
 
 extra-deps:
  - hsc3-0.20@sha256:4e34f7a544cb7c5bfbf21e351707e032dbf1db4e661edb47c40260594421fdf5,5823
-# - haskell-dap-0.0.16.0@sha256:5ee4fba7ce1b8220f486a5251a941e6cd739ab2330e8f25efc5af553a4e1c61d,944
-# - csound-expression-5.4.4.1@sha256:78bcd0ca3f7fc067325b0c71b64bdcb9a1b1a53d2a68239fd5ff34d5c635ab6a,4952 
-# - csound-expression-dynamic-0.4.0.0@sha256:35ef5a42aa07b868c02059a808ff9aceea413aa0696edeb72cd143fbf284f464,2239
-# - csound-expression-opcodes-0.0.5.4@sha256:863a0db341627548c80528ba1337b93c225f80d291f1466632cf39a6dd748a3e,1786
-# - csound-expression-typed-0.2.9.0@sha256:ec69730381165d05ac97b36a432c4775cc80935a80184e533f0680821f7d923c,4674
-# - temporal-media-0.6.3@sha256:7a27d711a786c3dc9163433627e51efcc4b3fce3a947b71c29f3e388f37cae59,857
-# - data-fix-cse-0.0.3@sha256:c29b23ed2d321e11314599d7a9b8a9d67d5f5dc1206d5665b3408a7d826a8bdc,1000
-# - vivid-0.5.2.0@sha256:c3b8a9994c44fe347c1ed0b0d48cd0572e71e91b793c0e2e1887afa2bb01e595,8330
+
 
 #ghc-options:
 # "$everything": -O2

@@ -6,6 +6,8 @@ import Criterion.Main
 import Pitch.Accidental
 import Pitch.Parser
 import Pitch.Pitch
+import Pitch.PitchClass
+import Pitch
 import qualified Data.Text as T
 
 -- Benchmark the pitchToFloat function

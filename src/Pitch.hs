@@ -26,6 +26,8 @@ import           Pitch.Pitch
 import qualified Pitch.Pitch      as P
 import           Pitch.PitchClass
 import qualified Pitch.PitchClass as PC
+import           Pitch.LilyPitch
+import           Pitch.QuasiQuoter
 
 -- Type class for types that have a NoteName
 class HasNoteName a where
@@ -76,10 +78,10 @@ instance (Updatable b a, IsList a ~ True) => Updatable b [a] where
 
 
 addOctave :: Pitch -> Int -> Pitch
-addOctave pitch delta = pitch { octave = Octave (pitch.octave.unOctave + delta) }
+addOctave p delta = p { octave = Octave (p.octave.unOctave + delta) }
 
 incrementOctave :: Pitch -> Pitch
-incrementOctave pitch = pitch { octave = Octave (pitch.octave.unOctave + 1) }
+incrementOctave p = p { octave = Octave (p.octave.unOctave + 1) }
 
 decrementOctave :: Pitch -> Pitch
 decrementOctave pitch = pitch { octave = Octave (pitch.octave.unOctave - 1) }

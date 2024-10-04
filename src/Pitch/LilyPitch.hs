@@ -2,11 +2,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Pitch.LilyPitch where
-
 import Data.Map qualified as Map
 import Pitch.Pitch ( Pitch, pitchMap, generatePitchVars )
-
-
 
 $(generatePitchVars (Map.keys pitchMap))
 
@@ -54,6 +51,8 @@ testAllPitches2 =
     f
   ]
 
+
+
 {-
 
 a :: Pitch
@@ -80,4 +79,5 @@ a_____ :: Pitch
 a_____ = fromString "a_____"
 aeh :: Pitch
 aeh = fromString "aeh"
-aeh' :: Pitch-}
+aeh' :: Pitch
+-}
