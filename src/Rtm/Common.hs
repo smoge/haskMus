@@ -146,8 +146,8 @@ countRtmScalars (Node (RtmScalar _) children) = 1 + sum (fmap countRtmScalars ch
 countRtmScalars (Node _ children) = sum (fmap countRtmScalars children)
 
 -- | Given a list of RtmLabels, returns a list of Ints extracted from the labels
---   that carry an Int. RtmScalar, RtmGap and RtmVector carry an Int, while
---   RtmCons and any other label do not.
+--  that carry an Int. RtmScalar, RtmGap and RtmVector carry an Int, while
+--  RtmCons and any other label do not.
 extractIntsFromLabels :: [RtmLabel] -> [Int]
 extractIntsFromLabels = mapMaybe extractInt
   where

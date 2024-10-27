@@ -4,8 +4,8 @@
 
 -- | This module implements tiny IIR filters.
 --
---  See: http://shepazu.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html
---   Or: https://www.w3.org/TR/audio-eq-cookbook/
+-- See: http://shepazu.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html
+--  Or: https://www.w3.org/TR/audio-eq-cookbook/
 module TinyDSP.IIR
   ( -- * Usage
     filterSamples,
@@ -48,18 +48,18 @@ data IIRParams = IIRParams
 -- | A low-pass filter using cutoff frequency and resonance.
 -- lowPassFilter :: Float -> Float -> IIRParams
 -- lowPassFilter freq q =
---     IIRParams
---         { b0
---         , b1 = 1 - cos w0
---         , b2 = b0
---         , a0 = 1 + α
---         , a1 = - (2 * cos w0)
---         , a2 = 1 - α
---         }
---   where
---     b0 = (1 - cos w0) / 2
---     w0 = calcW0 freq
---     α = calcAQ w0 q
+--    IIRParams
+--        { b0
+--        , b1 = 1 - cos w0
+--        , b2 = b0
+--        , a0 = 1 + α
+--        , a1 = - (2 * cos w0)
+--        , a2 = 1 - α
+--        }
+--  where
+--    b0 = (1 - cos w0) / 2
+--    w0 = calcW0 freq
+--    α = calcAQ w0 q
 lowPassFilter :: Float -> Float -> IIRParams
 lowPassFilter freq q =
   let w0 = calcW0 freq
@@ -239,7 +239,8 @@ applyIIR (IIRParams b0 b1 b2 a0 a1 a2) x0 (IIRState x1 x2 _ y1 y2 _) =
   let newSample = (b0 / a0) * x0 + (b1 / a0) * x1 + (b2 / a0) * x2 - (a1 / a0) * y1 - (a2 / a0) * y2
    in IIRState x0 x1 x2 newSample y1 y2
 
-filterSamplesState :: forall m. (Monad m) => IIRParams -> Samples -> StateT IIRState m Samples
+filterSamplesState ::
+  forall m. (Monad m) => IIRParams -> Samples -> StateT IIRState m Samples
 filterSamplesState params = SV.mapM doApplyIIR
   where
     doApplyIIR :: Float -> StateT IIRState m Float

@@ -1,30 +1,31 @@
-{-# LANGUAGE DeriveDataTypeable     #-}
-{-# LANGUAGE DeriveLift             #-}
-{-# LANGUAGE DuplicateRecordFields  #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveLift #-}
+{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE MultiParamTypeClasses  #-}
-{-# LANGUAGE OverloadedRecordDot    #-}
-{-# LANGUAGE TemplateHaskell        #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedRecordDot #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Pitch.PitchClass where
 
-import           Control.Lens               hiding (elements)
-import           Data.Data                  (Data)
-import           Data.Fixed                 (mod')
-import qualified Data.Map.Strict            as Map
-import           Data.Maybe                 (fromMaybe)
-import           Data.Ratio                 ((%))
-import           Data.String                (IsString (..))
-import           Language.Haskell.TH.Syntax
-import           Pitch.Accidental
+import Control.Lens hiding (elements)
+import Data.Data (Data)
+import Data.Fixed (mod')
+import Data.Map.Strict qualified as Map
+import Data.Maybe (fromMaybe)
+import Data.Ratio ((%))
+import Data.String (IsString (..))
+import Language.Haskell.TH.Syntax
+import Pitch.Accidental
 
 data NoteName = C | D | E | F | G | A | B
   deriving (Eq, Ord, Show, Enum, Bounded, Lift, Data)
 
 data PitchClass = PitchClass
-  { noteName   :: NoteName
-  , accidental :: Accidental
-  } deriving (Eq, Lift, Data, Ord)
+  { noteName :: NoteName,
+    accidental :: Accidental
+  }
+  deriving (Eq, Lift, Data, Ord)
 
 instance Show PitchClass where
   show (PitchClass name acc) = show name <> " " <> show acc
@@ -38,14 +39,16 @@ instance IsString NoteName where
     "g" -> G
     "a" -> A
     "b" -> B
-    _   -> error $ "Invalid NoteName string: " <> s
+    _ -> error $ "Invalid NoteName string: " <> s
 
 makeFields ''PitchClass
 
 pcToRational :: PitchClass -> Rational
 pcToRational pitchclass = base + acVal
   where
-    base = fromMaybe (error "NoteName not found") $ Map.lookup pitchclass.noteName noteNameToRationalMap
+    base =
+      fromMaybe (error "NoteName not found") $
+        Map.lookup pitchclass.noteName noteNameToRationalMap
     acVal = accidentalToSemitones pitchclass.accidental
 
 (=~) :: PitchClass -> PitchClass -> Bool
@@ -65,7 +68,9 @@ allPCRationals :: [Rational]
 allPCRationals = pcToRational <$> allPitchClasses
 
 enharmonicPCEquivs :: Rational -> [(Rational, PitchClass)]
-enharmonicPCEquivs val = filter (\(v, _) -> v `mod'` 12 == val `mod'` 12) $ zip (pcToRational <$> allPitchClasses) allPitchClasses
+enharmonicPCEquivs val =
+  filter (\(v, _) -> v `mod'` 12 == val `mod'` 12) $
+    zip (pcToRational <$> allPitchClasses) allPitchClasses
 
 enharmonicPCEquivs' :: PitchClass -> [(Rational, PitchClass)]
 enharmonicPCEquivs' = enharmonicPCEquivs . pcToRational

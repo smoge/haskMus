@@ -1,55 +1,64 @@
-{-# LANGUAGE DeriveDataTypeable     #-}
-{-# LANGUAGE DeriveLift             #-}
-{-# LANGUAGE DuplicateRecordFields  #-}
-{-# LANGUAGE OverloadedRecordDot    #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveLift #-}
+{-# LANGUAGE DuplicateRecordFields #-}
 -- Needed for lens operations
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE MultiParamTypeClasses  #-}
-{-# LANGUAGE OverloadedStrings      #-}
-{-# LANGUAGE TemplateHaskell        #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedRecordDot #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Pitch.Interval where
 
-import           Data.Data                  (Data)
-import           Data.Fixed                 (mod')
-import           Data.List                  (find)
-import qualified Data.Map.Strict            as Map
-import           Data.Maybe                 (fromMaybe)
-import           Data.String                (IsString (..))
-import           Language.Haskell.TH        ()
-import           Language.Haskell.TH.Syntax (Lift)
-import Text.Megaparsec
-    ( oneOf,
-      runParser,
-      errorBundlePretty,
-      choice,
-      some,
-      Parsec,
-      MonadParsec(eof, try),
-      ParseErrorBundle )
-
-import Data.Void ( Void )
+import Data.Data (Data)
+import Data.Fixed (mod')
+import Data.List (find)
+import Data.Map.Strict qualified as Map
+import Data.Maybe (fromMaybe)
+import Data.String (IsString (..))
+import Data.Void (Void)
+import Language.Haskell.TH ()
+import Language.Haskell.TH.Syntax (Lift)
 import Pitch.Accidental
-    ( Accidental(Custom, Natural, QuarterSharp, QuarterFlat, Sharp,
-                 Flat, ThreeQuartersSharp, ThreeQuartersFlat, DoubleSharp,
-                 DoubleFlat) )
+  ( Accidental
+      ( Custom,
+        DoubleFlat,
+        DoubleSharp,
+        Flat,
+        Natural,
+        QuarterFlat,
+        QuarterSharp,
+        Sharp,
+        ThreeQuartersFlat,
+        ThreeQuartersSharp
+      ),
+  )
 import Pitch.Pitch
-    ( Octave(Octave),
-      Pitch(accidental, Pitch, noteName),
-      pitchToRational )            
-import Pitch.PitchClass ( PitchClass(PitchClass), NoteName(..) )   
-import Text.Megaparsec.Char ( digitChar, string )
+  ( Octave (Octave),
+    Pitch (Pitch, accidental, noteName),
+    pitchToRational,
+  )
+import Pitch.PitchClass (NoteName (..), PitchClass (PitchClass))
+import Text.Megaparsec
+  ( MonadParsec (eof, try),
+    ParseErrorBundle,
+    Parsec,
+    choice,
+    errorBundlePretty,
+    oneOf,
+    runParser,
+    some,
+  )
+import Text.Megaparsec.Char (digitChar, string)
 
-newtype Interval = Interval { semitones :: Rational }
+newtype Interval = Interval {semitones :: Rational}
   deriving (Eq, Ord, Lift, Data)
-
 
 instance Show Interval where
   show :: Interval -> String
   show interval = case nameFromInterval interval of
     Just name -> intervalNameToNotation name
-    Nothing   -> "Interval(" <> show (fromRational (semitones interval) :: Double) <> " semitones)"
-
+    Nothing -> "Interval(" <> show (fromRational (semitones interval) :: Double) <> " semitones)"
 
 instance Num Interval where
   (+) (Interval a) (Interval b) = Interval (a + b)
@@ -75,49 +84,70 @@ instance Real Interval where
 
 instance RealFrac Interval where
   properFraction (Interval r) = (fromInteger i, Interval f)
-    where (i, f) = properFraction r
+    where
+      (i, f) = properFraction r
 
 -- | Represents named musical intervals.
-data IntervalName =
-    Unison
-  | MinorSecond | MajorSecond | AugmentedSecond
-  | DiminishedThird | MinorThird | MajorThird | AugmentedThird
-  | DiminishedFourth | PerfectFourth | AugmentedFourth
-  | DiminishedFifth | PerfectFifth | AugmentedFifth
-  | MinorSixth | MajorSixth | AugmentedSixth
-  | DiminishedSeventh | MinorSeventh | MajorSeventh | AugmentedSeventh
+data IntervalName
+  = Unison
+  | MinorSecond
+  | MajorSecond
+  | AugmentedSecond
+  | DiminishedThird
+  | MinorThird
+  | MajorThird
+  | AugmentedThird
+  | DiminishedFourth
+  | PerfectFourth
+  | AugmentedFourth
+  | DiminishedFifth
+  | PerfectFifth
+  | AugmentedFifth
+  | MinorSixth
+  | MajorSixth
+  | AugmentedSixth
+  | DiminishedSeventh
+  | MinorSeventh
+  | MajorSeventh
+  | AugmentedSeventh
   | PerfectOctave
   deriving (Eq, Ord, Show, Enum, Bounded, Data)
 
 intervalMap :: Map.Map IntervalName Rational
-intervalMap = Map.fromList
-  [ (Unison, 0)
-  , (MinorSecond, 1)
-  , (MajorSecond, 2)
-  , (AugmentedSecond, 3)
-  , (DiminishedThird, 2)
-  , (MinorThird, 3)
-  , (MajorThird, 4)
-  , (AugmentedThird, 5)
-  , (DiminishedFourth, 4)
-  , (PerfectFourth, 5)
-  , (AugmentedFourth, 6)
-  , (DiminishedFifth, 6)
-  , (PerfectFifth, 7)
-  , (AugmentedFifth, 8)
-  , (MinorSixth, 8)
-  , (MajorSixth, 9)
-  , (AugmentedSixth, 10)
-  , (DiminishedSeventh, 9)
-  , (MinorSeventh, 10)
-  , (MajorSeventh, 11)
-  , (AugmentedSeventh, 12)
-  , (PerfectOctave, 12)
-  ]
+intervalMap =
+  Map.fromList
+    [ (Unison, 0),
+      (MinorSecond, 1),
+      (MajorSecond, 2),
+      (AugmentedSecond, 3),
+      (DiminishedThird, 2),
+      (MinorThird, 3),
+      (MajorThird, 4),
+      (AugmentedThird, 5),
+      (DiminishedFourth, 4),
+      (PerfectFourth, 5),
+      (AugmentedFourth, 6),
+      (DiminishedFifth, 6),
+      (PerfectFifth, 7),
+      (AugmentedFifth, 8),
+      (MinorSixth, 8),
+      (MajorSixth, 9),
+      (AugmentedSixth, 10),
+      (DiminishedSeventh, 9),
+      (MinorSeventh, 10),
+      (MajorSeventh, 11),
+      (AugmentedSeventh, 12),
+      (PerfectOctave, 12)
+    ]
 
 intervalFromName :: IntervalName -> Interval
-intervalFromName name = Interval $ fromMaybe (error $ "Unknown interval: " <> show name) (Map.lookup name intervalMap)
+intervalFromName name =
+  Interval $
+    fromMaybe (error $ "Unknown interval: " <> show name) (Map.lookup name intervalMap)
 
+-- | Maps 'IntervalName's to their standard notation.
+-- >>> intervalNameToNotation Unison
+-- "P1"
 nameFromInterval :: Interval -> Maybe IntervalName
 nameFromInterval (Interval s) = fst <$> find (\(_, semis) -> semis == s) (Map.toList intervalMap)
 
@@ -133,38 +163,58 @@ isCompoundInterval (Interval s) = s >= 12
 complementInterval :: Interval -> Interval
 complementInterval (Interval s) = Interval (12 - (s `mod'` 12))
 
-unison, minorSecond, majorSecond, augmentedSecond, minorThird, majorThird, perfectFourth, augmentedFourth :: Interval
-diminishedFifth, perfectFifth, minorSixth, majorSixth, minorSeventh, majorSeventh, perfectOctave :: Interval
+unison,
+  minorSecond,
+  majorSecond,
+  augmentedSecond,
+  minorThird,
+  majorThird,
+  perfectFourth,
+  augmentedFourth ::
+    Interval
+diminishedFifth,
+  perfectFifth,
+  minorSixth,
+  majorSixth,
+  minorSeventh,
+  majorSeventh,
+  perfectOctave ::
+    Interval
+unison = intervalFromName Unison
+minorSecond = intervalFromName MinorSecond
+majorSecond = intervalFromName MajorSecond
+augmentedSecond = intervalFromName AugmentedSecond
+minorThird = intervalFromName MinorThird
+majorThird = intervalFromName MajorThird
+perfectFourth = intervalFromName PerfectFourth
+augmentedFourth = intervalFromName AugmentedFourth
 
-unison            = intervalFromName Unison
-minorSecond       = intervalFromName MinorSecond
-majorSecond       = intervalFromName MajorSecond
-augmentedSecond   = intervalFromName AugmentedSecond
-minorThird        = intervalFromName MinorThird
-majorThird        = intervalFromName MajorThird
-perfectFourth     = intervalFromName PerfectFourth
-augmentedFourth   = intervalFromName AugmentedFourth
-diminishedFifth   = intervalFromName DiminishedFifth
-perfectFifth      = intervalFromName PerfectFifth
-minorSixth        = intervalFromName MinorSixth
-majorSixth        = intervalFromName MajorSixth
-minorSeventh      = intervalFromName MinorSeventh
-majorSeventh      = intervalFromName MajorSeventh
-perfectOctave     = intervalFromName PerfectOctave
+diminishedFifth = intervalFromName DiminishedFifth
+
+perfectFifth = intervalFromName PerfectFifth
+
+minorSixth = intervalFromName MinorSixth
+
+majorSixth = intervalFromName MajorSixth
+
+minorSeventh = intervalFromName MinorSeventh
+
+majorSeventh = intervalFromName MajorSeventh
+
+perfectOctave = intervalFromName PerfectOctave
 
 -- | Parser for intervals using standard musical notation (e.g., "M3", "P5").
 -- Supports qualities: P (Perfect), M (Major), m (Minor), A (Augmented), d (Diminished).
 type Parser = Parsec Void String
-
 
 parseQuality :: Parser String
 parseQuality = choice parsers
   where
     parsers :: [Parser String]
     parsers =
-      [ try (string "dd")
-      , try (string "AA")
-      , (:[]) <$> oneOf ("PpMmAaDd" :: String)
+      [ try (string "dd"),
+        try (string "AA"),
+        (: []) <$> oneOf ("PpMmAaDd" :: String)
       ]
 
 parseNumber :: Parser Int
@@ -180,8 +230,7 @@ intervalParser = do
   eof
   case intervalFromNotation quality number of
     Just interval -> pure interval
-    Nothing       -> fail $ "Invalid interval: " <> quality <> show number
-
+    Nothing -> fail $ "Invalid interval: " <> quality <> show number
 
 -- | Maps notation to 'Interval's.
 intervalFromNotation :: String -> Int -> Maybe Interval
@@ -195,37 +244,37 @@ intervalNameFromNotation quality number = Map.lookup (quality, number) notationM
 
 -- | Notation map for interval parsing.
 notationMap :: Map.Map (String, Int) IntervalName
-notationMap = Map.fromList
-  [ (("P", 1), Unison)
-  , (("m", 2), MinorSecond)
-  , (("M", 2), MajorSecond)
-  , (("A", 2), AugmentedSecond)
-  , (("d", 3), DiminishedThird)
-  , (("m", 3), MinorThird)
-  , (("M", 3), MajorThird)
-  , (("A", 3), AugmentedThird)
-  , (("d", 4), DiminishedFourth)
-  , (("P", 4), PerfectFourth)
-  , (("A", 4), AugmentedFourth)
-  , (("d", 5), DiminishedFifth)
-  , (("P", 5), PerfectFifth)
-  , (("A", 5), AugmentedFifth)
-  , (("m", 6), MinorSixth)
-  , (("M", 6), MajorSixth)
-  , (("A", 6), AugmentedSixth)
-  , (("d", 7), DiminishedSeventh)
-  , (("m", 7), MinorSeventh)
-  , (("M", 7), MajorSeventh)
-  , (("A", 7), AugmentedSeventh)
-  , (("P", 8), PerfectOctave)
-  ]
+notationMap =
+  Map.fromList
+    [ (("P", 1), Unison),
+      (("m", 2), MinorSecond),
+      (("M", 2), MajorSecond),
+      (("A", 2), AugmentedSecond),
+      (("d", 3), DiminishedThird),
+      (("m", 3), MinorThird),
+      (("M", 3), MajorThird),
+      (("A", 3), AugmentedThird),
+      (("d", 4), DiminishedFourth),
+      (("P", 4), PerfectFourth),
+      (("A", 4), AugmentedFourth),
+      (("d", 5), DiminishedFifth),
+      (("P", 5), PerfectFifth),
+      (("A", 5), AugmentedFifth),
+      (("m", 6), MinorSixth),
+      (("M", 6), MajorSixth),
+      (("A", 6), AugmentedSixth),
+      (("d", 7), DiminishedSeventh),
+      (("m", 7), MinorSeventh),
+      (("M", 7), MajorSeventh),
+      (("A", 7), AugmentedSeventh),
+      (("P", 8), PerfectOctave)
+    ]
 
 -- | Allows string literals to represent 'Interval's using the 'IsString' type class.
 instance IsString Interval where
   fromString s = case parseInterval s of
     Right interval -> interval
-    Left err       -> error $ errorBundlePretty err
-
+    Left err -> error $ errorBundlePretty err
 
 -- | Converts an 'IntervalName' to its standard notation.
 intervalNameToNotation :: IntervalName -> String
@@ -233,30 +282,31 @@ intervalNameToNotation name = fromMaybe (error "Unknown interval name") $ Map.lo
 
 -- | Mapping from 'IntervalName's to their standard notation.
 notationToIntervalName :: Map.Map IntervalName String
-notationToIntervalName = Map.fromList
-  [ (Unison, "P1")
-  , (MinorSecond, "m2")
-  , (MajorSecond, "M2")
-  , (AugmentedSecond, "A2")
-  , (DiminishedThird, "d3")
-  , (MinorThird, "m3")
-  , (MajorThird, "M3")
-  , (AugmentedThird, "A3")
-  , (DiminishedFourth, "d4")
-  , (PerfectFourth, "P4")
-  , (AugmentedFourth, "A4")
-  , (DiminishedFifth, "d5")
-  , (PerfectFifth, "P5")
-  , (AugmentedFifth, "A5")
-  , (MinorSixth, "m6")
-  , (MajorSixth, "M6")
-  , (AugmentedSixth, "A6")
-  , (DiminishedSeventh, "d7")
-  , (MinorSeventh, "m7")
-  , (MajorSeventh, "M7")
-  , (AugmentedSeventh, "A7")
-  , (PerfectOctave, "P8")
-  ]
+notationToIntervalName =
+  Map.fromList
+    [ (Unison, "P1"),
+      (MinorSecond, "m2"),
+      (MajorSecond, "M2"),
+      (AugmentedSecond, "A2"),
+      (DiminishedThird, "d3"),
+      (MinorThird, "m3"),
+      (MajorThird, "M3"),
+      (AugmentedThird, "A3"),
+      (DiminishedFourth, "d4"),
+      (PerfectFourth, "P4"),
+      (AugmentedFourth, "A4"),
+      (DiminishedFifth, "d5"),
+      (PerfectFifth, "P5"),
+      (AugmentedFifth, "A5"),
+      (MinorSixth, "m6"),
+      (MajorSixth, "M6"),
+      (AugmentedSixth, "A6"),
+      (DiminishedSeventh, "d7"),
+      (MinorSeventh, "m7"),
+      (MajorSeventh, "M7"),
+      (AugmentedSeventh, "A7"),
+      (PerfectOctave, "P8")
+    ]
 
 -- | Utility function to create an 'Interval' from semitones.
 fromSemitones :: Rational -> Interval
@@ -270,12 +320,9 @@ fromSemitones = Interval
 getInterval :: Pitch.Pitch.Pitch -> Pitch.Pitch.Pitch -> Interval
 getInterval p1 p2 = Interval (Pitch.Pitch.pitchToRational p2 - Pitch.Pitch.pitchToRational p1)
 
-
-
-
-
 (-:) :: Pitch -> Pitch -> Interval
 p1 -: p2 = Interval (pitchToRational p2 - pitchToRational p1)
+
 --
 (+.) :: Pitch -> Interval -> Pitch
 p +. i = rationalToPitch (pitchToRational p + semitones i)
@@ -283,48 +330,39 @@ p +. i = rationalToPitch (pitchToRational p + semitones i)
 (-.) :: Pitch -> Interval -> Pitch
 p -. i = rationalToPitch (pitchToRational p - semitones i)
 
-
 rationalToPitch :: Rational -> Pitch
 rationalToPitch semitones_ =
-  let
-    octave_ = Octave (floor (semitones_ / 12) - 1)
-    semitoneInOctave = semitones_ `mod'` 12
-    (noteName_, naturalSemitone) = closestNoteName semitoneInOctave
-    accidental_ = computeAccidental (semitoneInOctave - naturalSemitone)
-  in
-    Pitch noteName_ accidental_ octave_
-
-
+  let octave_ = Octave (floor (semitones_ / 12) - 1)
+      semitoneInOctave = semitones_ `mod'` 12
+      (noteName_, naturalSemitone) = closestNoteName semitoneInOctave
+      accidental_ = computeAccidental (semitoneInOctave - naturalSemitone)
+   in Pitch noteName_ accidental_ octave_
 
 computeAccidental :: Rational -> Accidental
 computeAccidental x
-  | absx <= 2  = case absx of
-      _ | absx < 0.5  -> Natural
+  | absx <= 2 = case absx of
+      _
+        | absx < 0.5 -> Natural
         | absx < 0.75 -> selectAccidental QuarterSharp QuarterFlat
         | absx < 1.25 -> selectAccidental Sharp Flat
         | absx < 1.75 -> selectAccidental ThreeQuartersSharp ThreeQuartersFlat
-        | otherwise   -> selectAccidental DoubleSharp DoubleFlat
-  | otherwise  = Custom "Custom" x
+        | otherwise -> selectAccidental DoubleSharp DoubleFlat
+  | otherwise = Custom "Custom" x
   where
     absx = abs x
     selectAccidental sharp flat = if x > 0 then sharp else flat
 
-
 rationalToPitchClass :: Rational -> PitchClass
 rationalToPitchClass semitones_ =
   let pitch = rationalToPitch semitones_
-  in PitchClass pitch.noteName pitch.accidental
-
+   in PitchClass pitch.noteName pitch.accidental
 
 closestNoteName :: Rational -> (NoteName, Rational)
 closestNoteName semitone =
   let noteRationals = [(C, 0), (D, 2), (E, 4), (F, 5), (G, 7), (A, 9), (B, 11)] :: [(NoteName, Rational)]
-  in fromMaybe (error "Invalid semitone value") $ find (\(_, s) -> s <= semitone) noteRationals
-
+   in fromMaybe (error "Invalid semitone value") $ find (\(_, s) -> s <= semitone) noteRationals
 
 {-
-
-
 
 newtype Interval = Interval { semitones :: Rational }
   deriving (Eq, Ord, Show, Lift, Data)
@@ -347,7 +385,6 @@ instance Monoid Interval where
   mempty :: Interval
   mempty = Interval 0
 
-
 rationalToPitch :: Rational -> Pitch
 rationalToPitch semitones_ =
   let
@@ -363,8 +400,6 @@ closestNoteName semitone =
   let noteRationals = [(C, 0), (D, 2), (E, 4), (F, 5), (G, 7), (A, 9), (B, 11)] :: [(NoteName, Rational)]
   in fromMaybe (error "Invalid semitone value") $ find (\(_, s) -> s <= semitone) noteRationals
 
-
-
 computeAccidental :: Rational -> Accidental
 computeAccidental x
   | absx <= 2  = case absx of
@@ -378,14 +413,10 @@ computeAccidental x
     absx = abs x
     selectAccidental sharp flat = if x > 0 then sharp else flat
 
-
 rationalToPitchClass :: Rational -> PitchClass
 rationalToPitchClass semitones_ =
   let pitch = rationalToPitch semitones_
   in PitchClass pitch.noteName pitch.accidental
-
-
-
 
 pitchToInterval :: Pitch -> Pitch -> Interval
 pitchToInterval p1 p2 = Interval (pitchToRational p2 - pitchToRational p1)
@@ -413,7 +444,6 @@ transposeDown = (-.)
 
 createScale :: Pitch -> [Interval] -> [Pitch]
 createScale = scanl transposeUp
-
 
 data IntervalName =
     Unison
@@ -501,11 +531,9 @@ intervalFromName name = case Map.lookup name intervalMap of
   Just semitones -> Interval semitones
   Nothing -> error $ "Klarenz ERROR: in Pitch.Pitch function intervalFromName: Unknown interval: " <> show name
 
-
 nameFromInterval :: Interval -> Maybe IntervalName
 nameFromInterval (Interval semitones) =
   fmap fst $ find (\(_, s) -> s == semitones) $ Map.toList intervalMap
-
 
 unison, augmentedUnison, minorSecond, neutralSecond, majorSecond, augmentedSecond, minorThird :: Interval
 neutralThird, majorThird, augmentedThird, diminishedFourth, perfectFourth :: Interval
@@ -569,7 +597,6 @@ neutralFourteenth = intervalFromName NeutralFourteenth
 majorFourteenth = intervalFromName MajorFourteenth
 doubleOctave = intervalFromName DoubleOctave
 
-
 -- Apply intervals to a starting pitch after modifying each interval
 applyModifiedIntervals :: Pitch -> [Interval] -> [Pitch]
 applyModifiedIntervals start intervals = mkPitchesFromIntervals start modifiedIntervals
@@ -613,7 +640,6 @@ minorScaleIntervals = [Unison, MajorSecond, MinorThird, PerfectFourth, PerfectFi
 minorScale :: Pitch -> [Pitch]
 minorScale start = createNamedScale start minorScaleIntervals
 
-
 majorScale :: Pitch -> [Pitch]
 majorScale start = createNamedScale start majorScaleIntervalNames
 
@@ -623,15 +649,12 @@ majorScaleInterval = fmap intervalFromName majorScaleIntervalNames
 minorScaleInterval :: [Interval]
 minorScaleInterval = fmap intervalFromName minorScaleIntervals
 
-
 --
 -- >majorScaleInterval
 --[Interval {semitones = 0 % 1},Interval {semitones = 2 % 1},Interval {semitones = 4 % 1},Interval {semitones = 5 % 1},Interval {semitones = 7 % 1},Interval {semitones = 9 % 1},Interval {semitones = 11 % 1}]
 
-
 intervalsToNames :: [Interval] -> [IntervalName]
 intervalsToNames intervals = fromMaybe (error "Invalid interval") . nameFromInterval <$> intervals
-
 
 mkPitchesFromIntervals :: Pitch -> [Interval] -> [Pitch]
 mkPitchesFromIntervals start intervals =
@@ -639,7 +662,6 @@ mkPitchesFromIntervals start intervals =
   where
     addInterval pitch (Interval semitones_) =
       rationalToPitch (pitchToRational pitch + semitones_)
-
 
 cMinorScale :: [PitchClass]
 cMinorScale =
@@ -664,7 +686,6 @@ prettyPrintEnharmonicMapping  = mapM_ printEntry
       mapM_ (\pc_ -> putStrLn $ "  " <> show pc_) pcs
       putStrLn ""
 
-
 -------------------------------------------------------------
 
 {-
@@ -677,7 +698,6 @@ p2 = p & pitchClass .~ PitchClass D Sharp
 
 pc1 :: PitchClass
 pc1 = p ^. pitchClass
-
 
 -}
 

@@ -4,35 +4,36 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
-module Pitch.Parser (
-  pitchClassParser,
-  parsePitches,
-  pitchParser,
-  pitchesParser,
-  mkPitch'',
-  octaveParser  
-
-) where
+module Pitch.Parser
+  ( pitchClassParser,
+    parsePitches,
+    pitchParser,
+    pitchesParser,
+    mkPitch'',
+    octaveParser,
+  )
+where
 
 import Data.Functor.Identity (Identity)
 import Data.Text qualified as T
 import Data.Void (Void)
 import Pitch.Accidental
-    ( Accidental(Natural, QuarterFlat, QuarterSharp, Flat, Sharp) )
-import Pitch.Pitch ( Octave(Octave), Pitch(Pitch) )
-import Pitch.PitchClass ( PitchClass(PitchClass), NoteName(..) )
-
+  ( Accidental (Flat, Natural, QuarterFlat, QuarterSharp, Sharp),
+  )
+import Pitch.Pitch (Octave (Octave), Pitch (Pitch))
+import Pitch.PitchClass (NoteName (..), PitchClass (PitchClass))
 import Text.Megaparsec
-    ( empty,
-      runParser,
-      choice,
-      many,
-      sepEndBy,
-      Parsec,
-      MonadParsec(try),
-      ParseErrorBundle,
-      ParsecT )
-import Text.Megaparsec.Char ( char, space1, string )
+  ( MonadParsec (try),
+    ParseErrorBundle,
+    Parsec,
+    ParsecT,
+    choice,
+    empty,
+    many,
+    runParser,
+    sepEndBy,
+  )
+import Text.Megaparsec.Char (char, space1, string)
 import Text.Megaparsec.Char.Lexer qualified as L
 
 -- {-# INLINE spaced #-}

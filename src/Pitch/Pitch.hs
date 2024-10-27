@@ -158,7 +158,17 @@ createPitchMap = foldr (Map.union . createPitchesForNote) Map.empty
 
 createPitchesForNote :: NoteName -> Map.Map String Pitch
 createPitchesForNote note = Map.fromList $ do
-  acc <- [Natural, Sharp, Flat, QuarterSharp, QuarterFlat, ThreeQuartersFlat, ThreeQuartersSharp, DoubleFlat, DoubleSharp]
+  acc <-
+    [ Natural,
+      Sharp,
+      Flat,
+      QuarterSharp,
+      QuarterFlat,
+      ThreeQuartersFlat,
+      ThreeQuartersSharp,
+      DoubleFlat,
+      DoubleSharp
+      ]
   let modifier = case acc of
         Sharp -> "is"
         Flat -> "es"
@@ -170,7 +180,19 @@ createPitchesForNote note = Map.fromList $ do
         DoubleFlat -> "eses"
         DoubleSharp -> "isis"
         _ -> error "Invalid accidental"
-  (octaveSuffix, oct) <- [("", 4), ("'", 5), ("''", 6), ("'''", 7), ("''''", 8), ("'''''", 9), ("_", 3), ("__", 2), ("___", 1), ("____", 0), ("_____", -1)]
+  (octaveSuffix, oct) <-
+    [ ("", 4),
+      ("'", 5),
+      ("''", 6),
+      ("'''", 7),
+      ("''''", 8),
+      ("'''''", 9),
+      ("_", 3),
+      ("__", 2),
+      ("___", 1),
+      ("____", 0),
+      ("_____", -1)
+      ]
   pure (fmap toLower (show note) <> modifier <> octaveSuffix, Pitch note acc (Octave oct))
 
 pitchMap :: Map.Map String Pitch

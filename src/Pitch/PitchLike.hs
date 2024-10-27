@@ -1,15 +1,14 @@
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedRecordDot   #-}
+{-# LANGUAGE OverloadedRecordDot #-}
 
-module Pitch.PitchLike ( PitchLike(..) ) where
+module Pitch.PitchLike (PitchLike (..)) where
 
-import           Pitch.Accidental (Accidental (Natural))
-import           Pitch.Interval   
-import           Pitch.Pitch      hiding (Rule (..))
-import           Pitch.PitchClass
-
+import Pitch.Accidental (Accidental (Natural))
+import Pitch.Interval
+import Pitch.Pitch hiding (Rule (..))
+import Pitch.PitchClass
 
 class PitchLike a where
   toPitch :: a -> Pitch
@@ -45,7 +44,5 @@ instance PitchLike NoteName where
   fromPitch :: Pitch -> NoteName
   fromPitch pit = pit.noteName
 
-
 -- fromPitch @PitchClass (toPitch pc)
 -- C Natural
-

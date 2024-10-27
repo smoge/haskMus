@@ -1,16 +1,15 @@
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveLift #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE DeriveGeneric #-}
-
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
 module Pitch.Accidental where
 
---import GHC.Generics (Generic)
+-- import GHC.Generics (Generic)
 
 import Data.Data (Data, Typeable)
 import Data.List (isPrefixOf)
@@ -31,7 +30,7 @@ data Accidental
   | Sharp
   | ThreeQuartersSharp
   | DoubleSharp
-  | Custom { label :: String, semitoneOffset :: Rational }
+  | Custom {label :: String, semitoneOffset :: Rational}
   deriving (Show, Data, Typeable)
 
 instance Eq Accidental where
@@ -41,7 +40,6 @@ instance Eq Accidental where
 instance Ord Accidental where
   compare :: Accidental -> Accidental -> Ordering
   compare a b = compare (accidentalToSemitones a) (accidentalToSemitones b)
-
 
 instance Lift Accidental where
   lift = \case
@@ -56,19 +54,18 @@ instance Lift Accidental where
     DoubleSharp -> [|DoubleSharp|]
     Custom s r -> [|Custom s r|]
 
-  liftTyped :: Quote m => Accidental -> Code m Accidental
+  liftTyped :: (Quote m) => Accidental -> Code m Accidental
   liftTyped = \case
-    DoubleFlat -> [|| DoubleFlat ||]
-    Flat -> [|| Flat ||]
-    Natural -> [|| Natural ||]
-    Sharp -> [|| Sharp ||]
-    DoubleSharp -> [|| DoubleSharp ||]
-    ThreeQuartersFlat -> [|| ThreeQuartersFlat ||]
-    QuarterFlat -> [|| QuarterFlat ||]
-    QuarterSharp -> [|| QuarterSharp ||]
-    ThreeQuartersSharp -> [|| ThreeQuartersSharp ||]
-    Custom s r -> [|| Custom s r ||]
-
+    DoubleFlat -> [||DoubleFlat||]
+    Flat -> [||Flat||]
+    Natural -> [||Natural||]
+    Sharp -> [||Sharp||]
+    DoubleSharp -> [||DoubleSharp||]
+    ThreeQuartersFlat -> [||ThreeQuartersFlat||]
+    QuarterFlat -> [||QuarterFlat||]
+    QuarterSharp -> [||QuarterSharp||]
+    ThreeQuartersSharp -> [||ThreeQuartersSharp||]
+    Custom s r -> [||Custom s r||]
 
 sharpenQ :: Accidental -> Accidental
 sharpenQ acc = modifyAccidental acc (+ (1 / 2))
@@ -113,7 +110,6 @@ instance IsAccidental Accidental where
 instance IsAccidental Rational where
   toAccidental :: Rational -> Accidental
   toAccidental = semitonesToAccidental
-
 
 -- >>> read @Accidental "f"
 -- Flat
@@ -226,8 +222,6 @@ accidental_XML_accidental_value ThreeQuartersSharp = T.pack "three-quarters-shar
 accidental_XML_accidental_value DoubleSharp = T.pack "sharp-sharp"
 accidental_XML_accidental_value (Custom _ _) = T.pack "other"
 
-
-
 semitonesToAccidental :: Rational -> Accidental
 semitonesToAccidental r
   | r == (-2) % 1 = DoubleFlat
@@ -257,7 +251,6 @@ semitonesToAccidental r
 -- accToLily DoubleSharp = T.pack "ss"
 -- accToLily (Custom r) = T.pack $ show r
 
-
 accToLily :: Accidental -> T.Text
 accToLily = \case
   DoubleFlat -> "ff"
@@ -276,16 +269,17 @@ instance Read Accidental where
     case value of
       "ff" -> [(DoubleFlat, "")]
       "tqf" -> [(ThreeQuartersFlat, "")]
-      "f" -> [(Flat, "")]-- |
---
--- >>> map sharpesemitonesToAccidental ((+ ((-1) % 2)) $ accidentalToSemitones acc)
--- >>> map sharpenS allAccidentals
--- >>> map flattenQ allAccidentals
--- >>> map flattesemitonesToAccidental ((+ (-1)) $ accidentalToSemitones acc)
---  [ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp,Custom (5 % 2)]
---  [Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp,Custom (5 % 2),Custom (3 % 1)]
---  [Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp]l
---  [Custom ((-3) % 1),Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp]
+      "f" -> [(Flat, "")]
+      -- \|
+      --
+      -- >>> map sharpesemitonesToAccidental ((+ ((-1) % 2)) $ accidentalToSemitones acc)
+      -- >>> map sharpenS allAccidentals
+      -- >>> map flattenQ allAccidentals
+      -- >>> map flattesemitonesToAccidental ((+ (-1)) $ accidentalToSemitones acc)
+      --  [ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp,Custom (5 % 2)]
+      --  [Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp,Custom (5 % 2),Custom (3 % 1)]
+      --  [Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp]l
+      --  [Custom ((-3) % 1),Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp]
 
       "qf" -> [(QuarterFlat, "")]
       "" -> [(Natural, "")]
@@ -327,7 +321,6 @@ instance IsString Accidental where
   fromString "♭" = Flat
   fromString "♯" = Sharp
   fromString "♮" = Natural
-
   fromString "𝄳" = QuarterFlat
   fromString "𝄲" = QuarterSharp
   fromString str
@@ -384,7 +377,18 @@ addAccidental :: Accidental -> Rational -> Accidental
 addAccidental acc delta =
   let currentSemitone = accidentalToSemitones acc
       newSemitone = currentSemitone + delta
-      accidentalMap = Map.fromList [(-2, DoubleFlat), ((-3) % 2, ThreeQuartersFlat), (-1, Flat), ((-1) % 2, QuarterFlat), (0, Natural), (1 % 2, QuarterSharp), (1, Sharp), (3 % 2, ThreeQuartersSharp), (2, DoubleSharp)]
+      accidentalMap =
+        Map.fromList
+          [ (-2, DoubleFlat),
+            ((-3) % 2, ThreeQuartersFlat),
+            (-1, Flat),
+            ((-1) % 2, QuarterFlat),
+            (0, Natural),
+            (1 % 2, QuarterSharp),
+            (1, Sharp),
+            (3 % 2, ThreeQuartersSharp),
+            (2, DoubleSharp)
+          ]
    in case Map.lookup newSemitone accidentalMap of
         Just result -> result
         Nothing -> Custom "" newSemitone
@@ -425,8 +429,6 @@ succ pc1
 
 --------------------------------------------------------------------------------------- -}
 
-
-
 -- |
 --
 -- >>> map sharpesemitonesToAccidental ((+ ((-1) % 2)) $ accidentalToSemitones acc)
@@ -437,7 +439,6 @@ succ pc1
 --  [Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp,DoubleSharp,Custom (5 % 2),Custom (3 % 1)]
 --  [Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp,ThreeQuartersSharp]l
 --  [Custom ((-3) % 1),Custom ((-5) % 2),DoubleFlat,ThreeQuartersFlat,Flat,QuarterFlat,Natural,QuarterSharp,Sharp]
-
 
 -- <pitch>
 --    <step>B</step>
@@ -509,38 +510,37 @@ succ pc1
 
 -- --------------------------------------------------------------
 
-
---class AccClass (accNme :: Accidental) where
+-- class AccClass (accNme :: Accidental) where
 --  sayAccidental :: String
 --
---instance Show SomeAccidental where
+-- instance Show SomeAccidental where
 --  show = show . toAccidental
 --
---instance AccClass DoubleFlat where
+-- instance AccClass DoubleFlat where
 --  sayAccidental = "ff"
 --
---instance AccClass Flat where
+-- instance AccClass Flat where
 --  sayAccidental = "f"
 --
---instance AccClass Natural where
+-- instance AccClass Natural where
 --  sayAccidental = "n"
 --
---instance AccClass QuarterFlat where
+-- instance AccClass QuarterFlat where
 --  sayAccidental = "qf"
 --
---instance AccClass QuarterSharp where
+-- instance AccClass QuarterSharp where
 --  sayAccidental = "qs"
 --
---instance AccClass Sharp where
+-- instance AccClass Sharp where
 --  sayAccidental = "s"
 --
---instance AccClass ThreeQuartersSharp where
+-- instance AccClass ThreeQuartersSharp where
 --  sayAccidental = "qss"
 --
---instance AccClass ThreeQuartersFlat where
+-- instance AccClass ThreeQuartersFlat where
 --  sayAccidental = "qsf"
 --
---instance AccClass DoubleSharp where
+-- instance AccClass DoubleSharp where
 --  sayAccidental = "ss"
 
 -- acidente1 :: Accidental

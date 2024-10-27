@@ -29,7 +29,7 @@ clean:
 
 # Format Haskell project
 format:
-    @echo "Formating the Haskell project (ormolu)..."
+    @echo "Formating the Haskell project..."
     find ./src -name '*.hs' | xargs ormolu -i
 
 # docs

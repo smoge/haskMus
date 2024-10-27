@@ -1,17 +1,17 @@
 -- CHANGE THIS
 
 -- | This module implements reading and writing of the most
---  common kinds of WAVE files.  WAVE files are Microsoft
---  RIFF audio sample files originally based on the AIFF
---  format, and commonly have the .wav filename extension.
---  This module currently supports reading and writing
---  single-section little-endian PCM audio files containing
---  up to 32-bit samples encoded according to the well-known WAVE
---  sample encoding.  The interface audio stream format is a
---  list of frames of 32-bit (`Int32`) left-justified signed
---  PCM samples; each frame has one sample per channel.  The
---  audio reader and writer are sufficiently lazy that files
---  larger than memory can be processed.
+-- common kinds of WAVE files.  WAVE files are Microsoft
+-- RIFF audio sample files originally based on the AIFF
+-- format, and commonly have the .wav filename extension.
+-- This module currently supports reading and writing
+-- single-section little-endian PCM audio files containing
+-- up to 32-bit samples encoded according to the well-known WAVE
+-- sample encoding.  The interface audio stream format is a
+-- list of frames of 32-bit (`Int32`) left-justified signed
+-- PCM samples; each frame has one sample per channel.  The
+-- audio reader and writer are sufficiently lazy that files
+-- larger than memory can be processed.
 module Data.WAVE
   ( WAVE (..),
     WAVEHeader (..),
@@ -51,8 +51,8 @@ import System.IO
 -- import qualified Data.Text as T
 
 -- | For internal use only; the header as it appears on-disk.
---  The interface cleans this up to remove redundancy and
---  make things easier to understand.
+-- The interface cleans this up to remove redundancy and
+-- make things easier to understand.
 data WAVERawHeader = WAVERawHeader
   { rawNumChannels :: Int, -- Number of channels in the audio
     rawSampleRate :: Int, -- Sample rate of the audio
@@ -94,11 +94,11 @@ convertFloatToWord = floatToWord
 -}
 
 -- | Each sample is a left-justified signed integer, with
---  significant bits as given in the header.
+-- significant bits as given in the header.
 type WAVESample = Int32
 
 -- | A stream is a list of frames, each of which is a list of
---  samples with one sample per channel.
+-- samples with one sample per channel.
 type WAVESamples = [[WAVESample]]
 
 -- | The header and stream read or written.
@@ -117,10 +117,10 @@ collect n s = h : collect n s'
     (h, s') = splitAt n s
 
 -- | Utility routine for working with audio data in floating
---  point format.
+-- point format.
 --
---  Convert a sample value to a Double. This function normalizes the sample value
---  to the range -1.0 to 1.0 for ease of use in floating-point computations.
+-- Convert a sample value to a Double. This function normalizes the sample value
+-- to the range -1.0 to 1.0 for ease of use in floating-point computations.
 sampleToDouble :: WAVESample -> Double
 sampleToDouble v =
   let maxb = toInteger (maxBound :: WAVESample)
@@ -130,7 +130,7 @@ sampleToDouble v =
         else -(fromInteger (toInteger v) / fromInteger minb)
 
 -- | Utility routine for working with audio data in floating
---  point format.
+-- point format.
 doubleToSample :: Double -> WAVESample
 doubleToSample v =
   let maxb = toInteger (maxBound :: WAVESample)
@@ -140,13 +140,13 @@ doubleToSample v =
         else fromInteger (ceiling (v * fromInteger minb))
 
 -- |
---   Convert a `ByteString` to a `String`.
+--  Convert a `ByteString` to a `String`.
 bs_to_string :: BS.ByteString -> String
 bs_to_string b = fmap (chr . fromIntegral) (BS.unpack b)
 
 -- |
---   Check if the given `Handle` matches the provided string `s`.
---   If not, throw an error with a mismatched format string message.
+--  Check if the given `Handle` matches the provided string `s`.
+--  If not, throw an error with a mismatched format string message.
 match :: Handle -> String -> IO ()
 match h s = do
   b <- BS.hGet h (length s)
@@ -155,8 +155,8 @@ match h s = do
     (error ("mismatched format string '" <> (s <> "'")))
 
 -- |
---   Convert a list of `Word8` values to a number of type `a`.
---   The type `a` must be an instance of the `Num` class.
+--  Convert a list of `Word8` values to a number of type `a`.
+--  The type `a` must be an instance of the `Num` class.
 convert_nbytes_lend :: (Num a) => [Word8] -> a
 convert_nbytes_lend bs =
   foldl accum 0 (reverse bs)
@@ -164,24 +164,24 @@ convert_nbytes_lend bs =
     accum a b = 256 * a + fromIntegral b
 
 -- |
---   Read `n` bytes from the given `Handle`, convert them to a number and return the result.
+--  Read `n` bytes from the given `Handle`, convert them to a number and return the result.
 get_nbytes_lend :: Handle -> Int -> IO Int
 get_nbytes_lend h n = do
   bytes <- BS.hGet h n
   pure (convert_nbytes_lend (BS.unpack bytes))
 
 -- |
---   Read a 4-byte word from the given `Handle` and return the result.
+--  Read a 4-byte word from the given `Handle` and return the result.
 get_word_lend :: Handle -> IO Int
 get_word_lend h = get_nbytes_lend h 4
 
 -- |
---   Read a 2-byte halfword from the given `Handle` and return the result.
+--  Read a 2-byte halfword from the given `Handle` and return the result.
 get_halfword_lend :: Handle -> IO Int
 get_halfword_lend h = get_nbytes_lend h 2
 
 -- |
---   Read the wave header from the given `Handle` and return it.
+--  Read the wave header from the given `Handle` and return it.
 get_wave_header :: Handle -> IO WAVERawHeader
 get_wave_header h = do
   size <- get_word_lend h
