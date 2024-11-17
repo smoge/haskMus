@@ -57,35 +57,49 @@ jobs:
         stack config set install-ghc true
 
     - name: Install GHC
+      run: stack setup --install-ghc
+
+    - name: Check resolver
       run: |
-        stack setup --install-ghc --silent
+        echo "Current stack.yaml contents:"
+        cat stack.yaml
+        echo "GHC version:"
+        stack exec -- ghc --version
+        echo "Stack configuration:"
+        stack path
 
     - name: Build dependencies
       run: |
-        stack build --only-dependencies --test --bench --no-run-benchmarks --silent
+        # First attempt basic dependencies
+        stack build --only-dependencies || true
+        # If that fails, try with more information
+        stack build --only-dependencies --verbose
 
     - name: Build and test
+      if: success()
       run: |
-        stack build --test --coverage --no-run-benchmarks --silent
-        stack test --coverage
-        stack hpc report .
+        stack build
+        stack test
 
     - name: Install and run HLint
+      if: success()
       run: |
-        stack install hlint --silent
+        stack install hlint
         stack exec -- hlint .
     
     - name: Check formatting
+      if: success()
       run: |
-        stack install ormolu --silent
+        stack install ormolu
         stack exec -- ormolu --mode check $(find . -name '*.hs')
     
     - name: Build documentation
-      run: stack haddock --no-haddock-deps --silent
+      if: success()
+      run: stack haddock --no-haddock-deps
 
     - name: Run benchmarks
-      if: github.event_name == 'pull_request'
-      run: stack bench --silent
+      if: github.event_name == 'pull_request' && success()
+      run: stack bench
 
     - name: Upload test results
       if: always()
