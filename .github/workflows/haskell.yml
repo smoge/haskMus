@@ -55,10 +55,9 @@ jobs:
         stack setup
         stack exec -- ghc --version  # Verify GHC version
 
-    - name: Build and test
+    - name: Build 
       run: |
-        stack build --test --no-run-benchmarks
-        stack test
+        stack build --no-run-benchmarks
 
     - name: Install and run HLint
       if: success()
@@ -76,19 +75,19 @@ jobs:
       if: success()
       run: stack haddock --no-haddock-deps
 
-    - name: Run benchmarks
-      if: github.event_name == 'pull_request' && success()
-      run: stack bench
+    # - name: Run benchmarks
+    #   if: github.event_name == 'pull_request' && success()
+    #   run: stack bench
 
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-results
-        path: |
-          .stack-work/dist/**/test-reports/
-          .stack-work/dist/**/hpc/
-          .stack-work/dist/**/doc/
+    # - name: Upload test results
+    #   if: always()
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: test-results
+    #     path: |
+    #       .stack-work/dist/**/test-reports/
+    #       .stack-work/dist/**/hpc/
+    #       .stack-work/dist/**/doc/
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

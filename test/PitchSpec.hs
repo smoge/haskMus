@@ -6,18 +6,23 @@ import Control.Lens
 import Data.Ratio
 import Pitch.Accidental
 import Pitch.Pitch
+import Pitch.PitchClass
 import Test.Hspec
 import Pitch.Parser
 import qualified Data.Text as T
+import Control.Lens hiding (elements)
+import qualified Pitch.Pitch as P
+import qualified Pitch.PitchClass as PC
+
 
 spec :: Spec
 spec = do
   describe "PitchClass operations" $ do
     it "can view noteName and accidental from a PitchClass" $ do
-      let c = PitchClass C Natural
-      c ^. noteName `shouldBe` C
-      c ^. accidental `shouldBe` Natural
-
+      let c = PC.PitchClass C Natural
+      (PC.noteName c) `shouldBe` C
+      (PC.accidental c) `shouldBe` Natural
+  
   describe "Pitch Parser" $ do
     it "parses correctly" $ do
       parsePitches (T.pack "cqs' cqf,  gqs''") `shouldBe` Right [Pitch C QuarterSharp (Octave 5), Pitch C QuarterFlat (Octave 3), Pitch G QuarterSharp (Octave 6)]

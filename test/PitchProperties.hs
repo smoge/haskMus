@@ -2,6 +2,14 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveLift #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedRecordDot #-}
+{-# LANGUAGE TemplateHaskell #-}
+
 
 {-# HLINT ignore "Redundant id" #-}
 
@@ -10,16 +18,21 @@ module PitchProperties where
 import Control.Lens hiding (elements)
 import Data.Ratio ((%))
 import Pitch.Accidental
-import Pitch.Pitch
+import Pitch.Pitch (Octave (..), Pitch (..))
+import Pitch.PitchClass (NoteName (..), PitchClass (..))
 import Test.Framework (defaultMain, testGroup)
 import Test.Framework.Providers.QuickCheck2 (testProperty)
 import Test.QuickCheck
+import qualified Pitch.Pitch as P
+import qualified Pitch.PitchClass as PC
+import Control.Applicative (liftA2)
+
 
 -- Properties for PitchClass and Pitch:
 
 -- When we set an accidental to a specific value, it should always be that value.
 prop_setAccidental :: Accidental -> PitchClass -> Bool
-prop_setAccidental a pc = (pc & accidental .~ a) ^. accidental == a
+prop_setAccidental a pc = (pc & PC.accidental .~ a) ^. PC.accidental == a
 
 -- Similarly, for Pitch:
 prop_setAccidentalPitch :: Accidental -> Pitch -> Bool
@@ -29,9 +42,11 @@ prop_setAccidentalPitch a p = (p & accidental .~ a) ^. accidental == a
 instance Arbitrary Accidental where
   arbitrary =
     frequency
-      [ (10, elements allAccidentals), -- Picking from the predefined list
-        (1, Custom <$> arbitrary) -- Picking a custom accidental
+      [ (10, elements allAccidentals),                    -- Picking from the predefined list
+        (1, liftA2 Custom arbitrary arbitrary)            -- Generating a custom accidental
       ]
+
+
 
 instance Arbitrary NoteName where
   arbitrary = elements [C, D, E, F, G, A, B]
@@ -82,7 +97,7 @@ instance Arbitrary Pitch where
 
 prop_identityAccidentalIsUnchanged :: Accidental -> Bool
 prop_identityAccidentalIsUnchanged a =
-  let modifiedA = a & id
+  let modifiedA = a
    in modifiedA == a
 
 -- prop_modifyAccidentalCommutative :: Accidental -> PitchClass -> Bool
@@ -134,7 +149,7 @@ instance Arbitrary AccidentalString where
           "𝄲"
         ]
 
-return []
+pure []
 
 runTests :: IO Bool
 runTests = $quickCheckAll
