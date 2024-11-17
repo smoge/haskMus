@@ -17,6 +17,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    # Create stack's root directory first
+    - name: Create Stack root
+      run: |
+        mkdir -p ~/.stack
+        mkdir -p .stack-work
+
     - name: Setup Haskell Stack
       uses: haskell-actions/setup@v2
       with:
@@ -25,39 +31,42 @@ jobs:
         stack-version: 'latest'
         stack-no-global: true
 
-    # Split caching into separate steps for better control
-    - name: Cache Stack work files
+    # Cache stack's package index first
+    - name: Cache Stack package index
       uses: actions/cache@v3
       with:
-        path: .stack-work
-        key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml', 'package.yaml', 'stack.yaml.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-stack-work-
-
-    - name: Cache Stack global package db
+        path: |
+          ~/.stack/pantry
+          ~/.stack/indices
+        key: ${{ runner.os }}-stack-pantry-${{ hashFiles('stack.yaml') }}-v1
+        
+    # Cache global stack programs
+    - name: Cache Stack programs
       uses: actions/cache@v3
       with:
         path: ~/.stack/programs
-        key: ${{ runner.os }}-stack-programs-${{ hashFiles('stack.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-stack-programs-
+        key: ${{ runner.os }}-stack-programs-${{ hashFiles('stack.yaml') }}-v1
 
-    - name: Cache Stack pantry files
+    # Cache project dependencies
+    - name: Cache Stack project dependencies
       uses: actions/cache@v3
       with:
-        path: ~/.stack/pantry
-        key: ${{ runner.os }}-stack-pantry-${{ hashFiles('stack.yaml') }}
+        path: .stack-work
+        key: ${{ runner.os }}-stack-work-${{ hashFiles('**/*.cabal', 'package.yaml', 'stack.yaml', 'stack.yaml.lock') }}-v1
         restore-keys: |
-          ${{ runner.os }}-stack-pantry-
+          ${{ runner.os }}-stack-work-
 
-    - name: Prepare Stack
+    # Initialize Stack with minimal operations
+    - name: Initialize Stack
       run: |
         stack --version
-        stack update
+        stack update --silent  # Update package index silently
+        
+    - name: Install GHC
+      run: stack setup --install-ghc
 
     - name: Install dependencies
       run: |
-        stack setup
         stack build --only-dependencies --test --bench --no-run-benchmarks
 
     - name: Build
@@ -85,13 +94,11 @@ jobs:
         stack haddock --no-haddock-deps
         # Optional: deploy docs to GitHub Pages
 
-    - name: Run benchmarks
-      if: github.event_name == 'pull_request'  # Only on PRs to save time
+    - name: Run benchmarkse
       run: stack bench
 
-    # Add artifact upload for test results and docs
     - name: Upload test results
-      if: always()  # Run even if previous steps failed
+      if: always()
       uses: actions/upload-artifact@v3
       with:
         name: test-results
@@ -100,19 +107,8 @@ jobs:
           .stack-work/dist/**/hpc/
           .stack-work/dist/**/doc/
 
-    # Add warning comment on PR if tests fail
-    - name: Comment on PR
-      if: github.event_name == 'pull_request' && failure()
-      uses: actions/github-script@v6
-      with:
-        script: |
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: '❌ CI checks failed. Please check the logs.'
-          })
+
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true  # Cancel previous runs if new commit is pushed
+  cancel-in-progress: true
