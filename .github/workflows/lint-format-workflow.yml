@@ -21,7 +21,12 @@ jobs:
 
       - name: Install Stack
         run: |
-          curl -sSL https://get.haskellstack.org/ | sh
+          set -e
+          if ! stack --version &> /dev/null; then
+            curl -sSL https://get.haskellstack.org/ | sh
+          else
+            echo "Stack is already installed"
+          fi
 
       - name: Install HLint
         run: |
