@@ -15,12 +15,21 @@ jobs:
       - name: Install GHC
         run: |
           stack setup
-          stack exec -- ghc --version  
+          stack exec -- ghc --version 
+
+      - name: Restore Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.stack
+          key: ${{ runner.os }}-stack-cache-${{ matrix.ghc-version }}-${{ hashFiles('stack.yaml', 'package.yaml', '**/*.cabal') }}
+          restore-keys: |
+            ${{ runner.os }}-stack-cache-${{ matrix.ghc-version }}-
+            ${{ runner.os }}-stack-cache-
 
       - name: Build
         run: |
-          stack build --no-run-benchmarks
+          stack build --jobs=4 --no-run-benchmarks
 
       # - name: Test
       #   run: |
-      #     stack test
+      #     stack test --jobs=4
