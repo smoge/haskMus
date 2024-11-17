@@ -1,99 +1,28 @@
 name: Haskell Stack CI
+
 on:
   push:
-    branches: [ "main", "feature/**", "refactor/**" ]
+    branches: ["main", "feature/**", "refactor/**"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+
 permissions:
   contents: read
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        os: [ubuntu-latest]  
-      fail-fast: false  
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Create Stack root
-      run: |
-        mkdir -p ~/.stack
-        mkdir -p .stack-work
-
-    - name: Setup Haskell Stack
-      uses: haskell-actions/setup@v2
-      with:
-        ghc-version: '9.8.2'        # Updated GHC version
-        enable-stack: true
-        stack-version: 'latest'
-        stack-no-global: true
-
-    - name: Cache Stack package index
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.stack/pantry
-          ~/.stack/indices
-        key: ${{ runner.os }}-stack-pantry-${{ hashFiles('stack.yaml') }}-v3
-        restore-keys: |
-          ${{ runner.os }}-stack-pantry-
-
-    - name: Cache Stack programs
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.stack/programs
-          ~/.stack/setup-exe-cache
-        key: ${{ runner.os }}-stack-programs-${{ hashFiles('stack.yaml') }}-v3
-        restore-keys: |
-          ${{ runner.os }}-stack-programs-
-
-    - name: Cache compiled package snapshots
-      uses: actions/cache@v3
-      with:
-        path: ~/.stack/snapshots
-        key: ${{ runner.os }}-stack-snapshots-${{ hashFiles('stack.yaml', '*.cabal', 'package.yaml') }}-v3
-        restore-keys: |
-          ${{ runner.os }}-stack-snapshots-
+  setup:
+    uses: ./.github/workflows/setup-workflow.yml
   
-    - name: Install GHC
-      run: |
-        stack setup
-        stack exec -- ghc --version  
-
-    - name: Build 
-      run: |
-        stack build --no-run-benchmarks
-
-    - name: Install and run HLint
-      run: |
-        stack install hlint
-        stack exec -- hlint . 
-
+  cache:
+    uses: ./.github/workflows/cache-workflow.yml
     
-    - name: Check formatting
-      run: |
-        stack install ormolu
-        stack exec -- ormolu --mode check $(find ./src -name '*.hs')
-    
-    # - name: Build documentation
-    #   run: stack haddock --no-haddock-deps
-
-    # - name: Run benchmarks
-    #   if: github.event_name == 'pull_request' && success()
-    #   run: stack bench
-
-    # - name: Upload test results
-    #   if: always()
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #     name: test-results
-    #     path: |
-    #       .stack-work/dist/**/test-reports/
-    #       .stack-work/dist/**/hpc/
-    #       .stack-work/dist/**/doc/
+  build:
+    needs: [setup, cache]
+    uses: ./.github/workflows/build-workflow.yml
+  
+  lint_format:
+    needs: build
+    uses: ./.github/workflows/lint-format-workflow.yml
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

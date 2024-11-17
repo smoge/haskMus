@@ -1,0 +1,35 @@
+name: Cache Workflow
+
+on: workflow_call
+
+jobs:
+  cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Stack package index
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.stack/pantry
+            ~/.stack/indices
+          key: ${{ runner.os }}-stack-pantry-${{ hashFiles('stack.yaml') }}-v3
+          restore-keys: |
+            ${{ runner.os }}-stack-pantry-
+      
+      - name: Cache Stack programs
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.stack/programs
+            ~/.stack/setup-exe-cache
+          key: ${{ runner.os }}-stack-programs-${{ hashFiles('stack.yaml') }}-v3
+          restore-keys: |
+            ${{ runner.os }}-stack-programs-
+
+      - name: Cache compiled package snapshots
+        uses: actions/cache@v3
+        with:
+          path: ~/.stack/snapshots
+          key: ${{ runner.os }}-stack-snapshots-${{ hashFiles('stack.yaml', '*.cabal', 'package.yaml') }}-v3
+          restore-keys: |
+            ${{ runner.os }}-stack-snapshots-

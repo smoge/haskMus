@@ -1,0 +1,57 @@
+name: Lint and Format Workflow
+
+on: workflow_call
+
+jobs:
+  lint_format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up cache for Stack binary
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.stack
+            ./.stack-work 
+          key: ${{ runner.os }}-stack-${{ hashFiles('**/*.cabal', 'package.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-stack-
+
+      - name: Install Stack
+        run: |
+          curl -sSL https://get.haskellstack.org/ | sh
+
+      - name: Install HLint
+        run: |
+          set -e
+          stack install hlint
+
+      - name: Run HLint
+        run: |
+          set -e
+          FILES=$(find ./src -name '*.hs')
+          
+          if [[ -z "$FILES" ]]; then
+            echo "No Haskell files found to lint."
+            exit 0
+          fi
+          
+          for file in $FILES; do
+            echo "Linting $file"
+            stack exec -- hlint "$file"
+          done
+
+      - name: Install Ormolu
+        run: |
+          set -e
+          stack install ormolu
+
+      - name: Check formatting with Ormolu
+        run: |
+          set -e
+          for file in $(find ./src -name '*.hs'); do
+            echo "Checking format for $file"
+            stack exec -- ormolu --mode check "$file"
+          done
