@@ -1,0 +1,107 @@
+name: Haskell Stack CI
+
+on:
+  push:
+    branches: [ "main", "feature/**", "refactor/**" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest]  
+      fail-fast: false  
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Haskell Stack
+      uses: haskell-actions/setup@v2
+      with:
+        ghc-version: '9.4.8'
+        enable-stack: true
+        stack-version: 'latest'
+        stack-no-global: true
+
+    - name: Cache Stack files
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.stack
+          .stack-work
+          # Add any other project-specific cache directories
+        key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml', 'package.yaml', 'stack.yaml.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-stack-
+
+    - name: Install dependencies
+      run: |
+        stack setup --resolver lts-21.25
+        stack build --only-dependencies --test --bench --no-run-benchmarks
+
+    - name: Build
+      run: |
+        stack build --test --bench --no-run-benchmarks --pedantic
+        # --pedantic turns warnings into errors
+
+    - name: Run tests
+      run: |
+        stack test --coverage
+        stack hpc report .  # Generate coverage report
+
+    
+    - name: Install and run HLint
+      run: |
+        stack install hlint
+        stack exec -- hlint .
+
+    
+    - name: Check formatting
+      run: |
+        stack install ormolu
+        stack exec -- ormolu --mode check $(find . -name '*.hs')
+
+    
+    - name: Build documentation
+      run: |
+        stack haddock --no-haddock-deps
+        # Optional: deploy docs to GitHub Pages
+
+    - name: Run benchmarks
+      if: github.event_name == 'pull_request'  # Only on PRs to save time
+      run: stack bench
+
+    # Add artifact upload for test results and docs
+    - name: Upload test results
+      if: always()  # Run even if previous steps failed
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: |
+          .stack-work/dist/**/test-reports/
+          .stack-work/dist/**/hpc/
+          .stack-work/dist/**/doc/
+
+
+    # Add warning comment on PR if tests fail
+    - name: Comment on PR
+      if: github.event_name == 'pull_request' && failure()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '❌ CI checks failed. Please check the logs.'
+          })
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true  # Cancel previous runs if new commit is pushed
