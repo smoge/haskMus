@@ -50,6 +50,14 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-stack-programs-
 
+    - name: Cache compiled package snapshots
+      uses: actions/cache@v3
+      with:
+        path: ~/.stack/snapshots
+        key: ${{ runner.os }}-stack-snapshots-${{ hashFiles('stack.yaml', '*.cabal', 'package.yaml') }}-v3
+        restore-keys: |
+          ${{ runner.os }}-stack-snapshots-
+  
     - name: Install GHC
       run: |
         stack setup
