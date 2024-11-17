@@ -63,7 +63,8 @@ jobs:
       if: success()
       run: |
         stack install hlint
-        stack exec -- hlint .
+        stack exec -- hlint . --report
+
     
     - name: Check formatting
       if: success()
