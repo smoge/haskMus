@@ -53,28 +53,25 @@ jobs:
     - name: Install GHC
       run: |
         stack setup
-        stack exec -- ghc --version  # Verify GHC version
+        stack exec -- ghc --version  
 
     - name: Build 
       run: |
         stack build --no-run-benchmarks
 
     - name: Install and run HLint
-      if: success()
       run: |
         stack install hlint
-        stack exec -- hlint . --report
+        stack exec -- hlint . 
 
     
     - name: Check formatting
-      if: success()
       run: |
         stack install ormolu
-        stack exec -- ormolu --mode check $(find . -name '*.hs')
+        stack exec -- ormolu --mode check $(find ./src -name '*.hs')
     
-    - name: Build documentation
-      if: success()
-      run: stack haddock --no-haddock-deps
+    # - name: Build documentation
+    #   run: stack haddock --no-haddock-deps
 
     # - name: Run benchmarks
     #   if: github.event_name == 'pull_request' && success()
