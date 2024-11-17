@@ -6,6 +6,20 @@ jobs:
   cache:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Debugging Step: List directories
+      - name: Debug - List initial stack directories
+        run: |
+          echo "Listing contents of ~/.stack:"
+          ls -la ~/.stack || echo "~/.stack directory does not exist"
+
+      - name: Set up Stack (Create Necessary Paths)
+        run: |
+          mkdir -p ~/.stack/pantry ~/.stack/indices ~/.stack/programs ~/.stack/setup-exe-cache ~/.stack/snapshots
+          echo "Created necessary paths for Stack."
+
       - name: Cache Stack package index
         uses: actions/cache@v3
         with:
@@ -15,7 +29,7 @@ jobs:
           key: ${{ runner.os }}-stack-pantry-${{ hashFiles('stack.yaml') }}-v3
           restore-keys: |
             ${{ runner.os }}-stack-pantry-
-      
+
       - name: Cache Stack programs
         uses: actions/cache@v3
         with:
