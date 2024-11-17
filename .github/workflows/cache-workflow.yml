@@ -44,6 +44,6 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.stack/snapshots
-          key: ${{ runner.os }}-stack-snapshots-${{ hashFiles('stack.yaml', '*.cabal', 'package.yaml') }}-v3
+          key: ${{ runner.os }}-stack-snapshots-${{ hashFiles('stack.yaml', '*.cabal', 'package.yaml', 'hie.yaml', '.hlint.yaml') }}-v3
           restore-keys: |
             ${{ runner.os }}-stack-snapshots-
