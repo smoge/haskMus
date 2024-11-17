@@ -25,85 +25,69 @@ jobs:
     - name: Setup Haskell Stack
       uses: haskell-actions/setup@v2
       with:
-        ghc-version: '9.4.8'  # Be explicit about GHC version
+        ghc-version: '9.4.8'
         enable-stack: true
         stack-version: 'latest'
         stack-no-global: true
 
-    # Cache stack's package index first
     - name: Cache Stack package index
       uses: actions/cache@v3
       with:
         path: |
           ~/.stack/pantry
           ~/.stack/indices
-        key: ${{ runner.os }}-stack-pantry-${{ hashFiles('stack.yaml') }}-v2  # Bumped version
+        key: ${{ runner.os }}-stack-pantry-${{ hashFiles('stack.yaml') }}-v3
         restore-keys: |
           ${{ runner.os }}-stack-pantry-
 
-    # Cache global stack programs
     - name: Cache Stack programs
       uses: actions/cache@v3
       with:
         path: |
           ~/.stack/programs
           ~/.stack/setup-exe-cache
-        key: ${{ runner.os }}-stack-programs-${{ hashFiles('stack.yaml') }}-v2  # Bumped version
+        key: ${{ runner.os }}-stack-programs-${{ hashFiles('stack.yaml') }}-v3
         restore-keys: |
           ${{ runner.os }}-stack-programs-
 
-    # Cache project dependencies
-    - name: Cache Stack project dependencies
-      uses: actions/cache@v3
-      with:
-        path: .stack-work
-        key: ${{ runner.os }}-stack-work-${{ hashFiles('**/*.cabal', 'package.yaml', 'stack.yaml', 'stack.yaml.lock') }}-v2  # Bumped version
-        restore-keys: |
-          ${{ runner.os }}-stack-work-
-
-    # Initialize Stack with minimal operations
     - name: Initialize Stack
       run: |
         stack --version
         stack config set system-ghc false
         stack config set install-ghc true
-        stack update --silent
+        # Create or update stack.yaml.lock if it doesn't exist
+        stack lock --modify-stack-yaml
 
     - name: Install GHC
       run: |
-        stack setup --resolver lts-21.25 --install-ghc
-        stack exec -- ghc --version  # Verify GHC version
+        stack setup --resolver lts-21.25 --install-ghc --silent
 
-    - name: Install dependencies
-      run: stack build --resolver lts-21.25 --only-dependencies --test --bench --no-run-benchmarks
-
-    - name: Build
-      run: stack build --test --bench --no-run-benchmarks 
-
-    - name: Build
-      run: stack build --test --bench --no-run-benchmarks 
-
-    - name: Run tests
+    - name: Build dependencies
       run: |
+        stack build --only-dependencies --test --bench --no-run-benchmarks --silent
+
+    - name: Build and test
+      run: |
+        stack build --test --coverage --no-run-benchmarks --silent
         stack test --coverage
-        stack hpc report .  # Generate coverage report
-    
+        stack hpc report .
+
     - name: Install and run HLint
       run: |
-        stack install hlint
+        stack install hlint --silent
         stack exec -- hlint .
     
     - name: Check formatting
       run: |
-        stack install ormolu
+        stack install ormolu --silent
         stack exec -- ormolu --mode check $(find . -name '*.hs')
     
     - name: Build documentation
-      run: stack haddock --no-haddock-deps
+      run: stack haddock --no-haddock-deps --silent
 
     - name: Run benchmarks
-      if: github.event_name == 'pull_request'  # Only run benchmarks on PRs
-      run: stack bench
+      if: github.event_name == 'pull_request'
+      run: stack bench --silent
 
     - name: Upload test results
       if: always()
