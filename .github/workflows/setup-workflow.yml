@@ -5,12 +5,15 @@ on: workflow_call
 jobs:
   setup:
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v4
+      
       - name: Create Stack root
         run: |
           mkdir -p ~/.stack
           mkdir -p .stack-work
+      
       - name: Setup Haskell Stack
         uses: haskell-actions/setup@v2
         with:
@@ -18,3 +21,7 @@ jobs:
           enable-stack: true
           stack-version: 'latest'
           stack-no-global: true
+          
+      - name: Install apply-refact
+        run: stack build apply-refact
+      

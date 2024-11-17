@@ -21,9 +21,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.stack
-          key: ${{ runner.os }}-stack-cache-${{ matrix.ghc-version }}-${{ hashFiles('stack.yaml', 'package.yaml', '**/*.cabal') }}
+          key: ${{ runner.os }}-stack-cache-${{ hashFiles('stack.yaml', 'package.yaml', '**/*.cabal') }}
           restore-keys: |
-            ${{ runner.os }}-stack-cache-${{ matrix.ghc-version }}-
             ${{ runner.os }}-stack-cache-
 
       - name: Build

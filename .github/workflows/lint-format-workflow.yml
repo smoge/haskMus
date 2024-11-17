@@ -5,6 +5,7 @@ on: workflow_call
 jobs:
   lint_format:
     runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,7 +32,7 @@ jobs:
       - name: Install HLint
         run: |
           set -e
-          stack install hlint
+          stack build hlint
 
       - name: Run HLint
         run: |
@@ -45,18 +46,18 @@ jobs:
           
           for file in $FILES; do
             echo "Linting $file"
-            stack exec -- hlint "$file"
+            stack exec hlint -- "$file"
           done
 
       - name: Install Ormolu
         run: |
           set -e
-          stack install ormolu
+          stack build ormolu
 
       - name: Check formatting with Ormolu
         run: |
           set -e
           for file in $(find ./src -name '*.hs'); do
             echo "Checking format for $file"
-            stack exec -- ormolu --mode check "$file"
+            stack exec ormolu --mode check "$file"
           done
