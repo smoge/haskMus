@@ -1,5 +1,6 @@
 #resolver: nightly-2024-10-21
-resolver: lts-21.25
+#resolver: lts-21.25
+resolver: nightly-2024-10-21
 
 packages:
   - .
@@ -13,5 +14,9 @@ notify-if-nix-on-path: false
 
 extra-deps:
   - hsc3-0.20@sha256:4e34f7a544cb7c5bfbf21e351707e032dbf1db4e661edb47c40260594421fdf5,5823
+
 #ghc-options:
 # "$everything": -O2
+
+system-ghc: false
+install-ghc: true
