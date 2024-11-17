@@ -25,7 +25,7 @@ jobs:
     - name: Setup Haskell Stack
       uses: haskell-actions/setup@v2
       with:
-        ghc-version: '9.4.8'
+        ghc-version: '9.8.2'        # Updated GHC version
         enable-stack: true
         stack-version: 'latest'
         stack-no-global: true
@@ -50,35 +50,14 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-stack-programs-
 
-    - name: Initialize Stack
-      run: |
-        stack --version
-        stack config set system-ghc false
-        stack config set install-ghc true
-
     - name: Install GHC
-      run: stack setup --install-ghc
-
-    - name: Check resolver
       run: |
-        echo "Current stack.yaml contents:"
-        cat stack.yaml
-        echo "GHC version:"
-        stack exec -- ghc --version
-        echo "Stack configuration:"
-        stack path
-
-    - name: Build dependencies
-      run: |
-        # First attempt basic dependencies
-        stack build --only-dependencies || true
-        # If that fails, try with more information
-        stack build --only-dependencies --verbose
+        stack setup
+        stack exec -- ghc --version  # Verify GHC version
 
     - name: Build and test
-      if: success()
       run: |
-        stack build
+        stack build --test --no-run-benchmarks
         stack test
 
     - name: Install and run HLint
