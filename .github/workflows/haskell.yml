@@ -17,7 +17,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    # Create stack's root directory first
     - name: Create Stack root
       run: |
         mkdir -p ~/.stack
@@ -26,7 +25,7 @@ jobs:
     - name: Setup Haskell Stack
       uses: haskell-actions/setup@v2
       with:
-        ghc-version: '9.4.8'
+        ghc-version: '9.4.8'  # Be explicit about GHC version
         enable-stack: true
         stack-version: 'latest'
         stack-no-global: true
@@ -38,7 +37,7 @@ jobs:
         path: |
           ~/.stack/pantry
           ~/.stack/indices
-        key: ${{ runner.os }}-stack-pantry-${{ hashFiles('stack.yaml') }}-v1
+        key: ${{ runner.os }}-stack-pantry-${{ hashFiles('stack.yaml') }}-v2  # Bumped version
         restore-keys: |
           ${{ runner.os }}-stack-pantry-
 
@@ -46,8 +45,10 @@ jobs:
     - name: Cache Stack programs
       uses: actions/cache@v3
       with:
-        path: ~/.stack/programs
-        key: ${{ runner.os }}-stack-programs-${{ hashFiles('stack.yaml') }}-v1
+        path: |
+          ~/.stack/programs
+          ~/.stack/setup-exe-cache
+        key: ${{ runner.os }}-stack-programs-${{ hashFiles('stack.yaml') }}-v2  # Bumped version
         restore-keys: |
           ${{ runner.os }}-stack-programs-
 
@@ -56,7 +57,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .stack-work
-        key: ${{ runner.os }}-stack-work-${{ hashFiles('**/*.cabal', 'package.yaml', 'stack.yaml', 'stack.yaml.lock') }}-v1
+        key: ${{ runner.os }}-stack-work-${{ hashFiles('**/*.cabal', 'package.yaml', 'stack.yaml', 'stack.yaml.lock') }}-v2  # Bumped version
         restore-keys: |
           ${{ runner.os }}-stack-work-
 
@@ -64,13 +65,20 @@ jobs:
     - name: Initialize Stack
       run: |
         stack --version
-        stack update --silent  # Update package index silently
-        
+        stack config set system-ghc false
+        stack config set install-ghc true
+        stack update --silent
+
     - name: Install GHC
-      run: stack setup --install-ghc
+      run: |
+        stack setup --resolver lts-21.25 --install-ghc
+        stack exec -- ghc --version  # Verify GHC version
 
     - name: Install dependencies
-      run: stack build --only-dependencies --test --bench --no-run-benchmarks
+      run: stack build --resolver lts-21.25 --only-dependencies --test --bench --no-run-benchmarks
+
+    - name: Build
+      run: stack build --test --bench --no-run-benchmarks 
 
     - name: Build
       run: stack build --test --bench --no-run-benchmarks 
