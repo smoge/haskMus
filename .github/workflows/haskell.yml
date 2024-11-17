@@ -1,14 +1,11 @@
 name: Haskell Stack CI
-
 on:
   push:
     branches: [ "main", "feature/**", "refactor/**" ]
   pull_request:
     branches: [ "main" ]
-
 permissions:
   contents: read
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,7 +14,6 @@ jobs:
       matrix:
         os: [ubuntu-latest]  
       fail-fast: false  
-
     steps:
     - uses: actions/checkout@v4
     
@@ -29,20 +25,39 @@ jobs:
         stack-version: 'latest'
         stack-no-global: true
 
-    - name: Cache Stack files
+    # Split caching into separate steps for better control
+    - name: Cache Stack work files
       uses: actions/cache@v3
       with:
-        path: |
-          ~/.stack
-          .stack-work
-          # Add any other project-specific cache directories
-        key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml', 'package.yaml', 'stack.yaml.lock') }}
+        path: .stack-work
+        key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml', 'package.yaml', 'stack.yaml.lock') }}
         restore-keys: |
-          ${{ runner.os }}-stack-
+          ${{ runner.os }}-stack-work-
+
+    - name: Cache Stack global package db
+      uses: actions/cache@v3
+      with:
+        path: ~/.stack/programs
+        key: ${{ runner.os }}-stack-programs-${{ hashFiles('stack.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-stack-programs-
+
+    - name: Cache Stack pantry files
+      uses: actions/cache@v3
+      with:
+        path: ~/.stack/pantry
+        key: ${{ runner.os }}-stack-pantry-${{ hashFiles('stack.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-stack-pantry-
+
+    - name: Prepare Stack
+      run: |
+        stack --version
+        stack update
 
     - name: Install dependencies
       run: |
-        stack setup --resolver lts-21.25
+        stack setup
         stack build --only-dependencies --test --bench --no-run-benchmarks
 
     - name: Build
@@ -54,19 +69,16 @@ jobs:
       run: |
         stack test --coverage
         stack hpc report .  # Generate coverage report
-
     
     - name: Install and run HLint
       run: |
         stack install hlint
         stack exec -- hlint .
-
     
     - name: Check formatting
       run: |
         stack install ormolu
         stack exec -- ormolu --mode check $(find . -name '*.hs')
-
     
     - name: Build documentation
       run: |
@@ -87,7 +99,6 @@ jobs:
           .stack-work/dist/**/test-reports/
           .stack-work/dist/**/hpc/
           .stack-work/dist/**/doc/
-
 
     # Add warning comment on PR if tests fail
     - name: Comment on PR
